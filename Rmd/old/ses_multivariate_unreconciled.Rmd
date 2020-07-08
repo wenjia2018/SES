@@ -1,0 +1,135 @@
+---
+title: "Linear models on unreconciled data"
+output: html_document
+date: '`r format(Sys.Date(), "%Y-%B-%d")`'
+---
+
+```{r include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(parsnip)
+# See /home/share/projects/ses_multivariate.R for the code that generated the following object.
+multivariate = readRDS("multivariate_unreconciled.rds")
+
+
+# variables
+table1 = 
+   c(
+      "CVD_mRNA", "diabetes_mRNA",
+      "inflam1k_mRNA", "breast_cancer_mRNA",
+      "Lupus_mRNA", "Colorectal_mRNA",
+      "Rheumatoid_Arthritis_mRNA", "Alzheimers_mRNA",
+      "Aortic_Aneurysm_mRNA", "COPD_mRNA"
+   )
+
+# All because map() and kable() don't get along
+dater = 
+   multivariate %>%
+   filter(gene_set_name %in% table1) %>% 
+   filter(out_id == "result") %>% 
+   unnest(out) %>% 
+   filter(!str_detect(gene_set_name, "tfbm"))  %>% 
+   unnest(c(p_parametric, p_permutation, p_univariate_parameteric_median_yeo, p_univariate_parameteric_mean ))  %>% 
+   mutate(gene_set_included = map(gene_set, length),
+          cntrl_treatment = str_c(cntrl, "_", treatment)) %>% 
+   select(cntrl_treatment, gene_set_name, 
+          gene_set_included, 
+          contains("p_"), 
+          -contains("details"), -contains("permutation")) %>% 
+   group_split(cntrl_treatment) %>% 
+   set_names(map(., ~unlist(.x[1,1]))) %>%  
+   map(~ .x %>% 
+          mutate(p_parametric_corr  = p_parametric %>% p.adjust(method = "hochberg"),
+                 # p_permutation_corr  = p_permutation %>% p.adjust(method = "hochberg"),
+                 p_univariate_parameteric_median_yeo_corr = p_univariate_parameteric_median_yeo %>% p.adjust(method = "hochberg"),
+                 p_univariate_parameteric_mean_corr = p_univariate_parameteric_mean %>% p.adjust(method = "hochberg")) %>% 
+          mutate_at(vars(contains("p_")), ~ signif(., 6)))
+
+dater %>%
+   map(knitr::kable)  %>% 
+   list2env(.GlobalEnv)
+
+definitions = 
+   dater %>% 
+   pluck(1) %>%
+   names() %>% 
+   enframe(name = "variable") %>% 
+   cbind(meaning = c("control and treatment", 
+                     "name of signature", 
+                     "number of genes included", 
+                     "multivariate MANCOVA significance", 
+                     "univariate significance median + yeo", 
+                     "univariate significance mean", 
+                     "corrected MANCOVA p-values", 
+                     "corrected univariate significance median + yeo", 
+                     "corrected univariate significance mean")) %>% 
+   knitr::kable()
+
+
+```
+
+# Introduction
+
+All analyses were performed with reference gene normalized data. In addition, we estimated and applied the optimal Yeo-Johnson power transformations to each gene, in order to bring each gene's distribution as close as possible to Gaussian.
+
+# Two multivariate analyses.
+
+Results of two linear multivariate models, treating each disease gene set as a vector. All models include the usual controls.
+
+The p-values for parametric multivariate linear analyses derive from a Mancova style type II decomposition of the model errors, as implemented in the car::Mancova function. FDR corrections for multiplicity via Benjamini-Hochberg procedure. 
+
+The permutation p-values for the same linear multivariate model result for permuting the focal variable - say "ses_sss_composite" - in the model's design matrix then estimating the Pillai statistic via the same procedure (car::Manova). This was repeated $N= 1000$ times creating a histogram encoding of the null distribution: i.e. the distribution of Pillai, were ses_sss_composite scores unrelated to the outcome vector. The p-value is calculated in the standard way as the fraction of the 1000 samples that were equal to, or larger than, the observed Pillai (with unpermuted predictor ses_sss_composite). Beware: pending permutations with larger $N$, some p-values were exactly 0, i.e. the observed Pillai was larger than any permutation value. In this case multiple correction is inaccurate. 
+
+# One Univariate analysis
+
+In lieu of treating the outcome as multivariate, we then took the median of the normalized expression values for each gene set as a scalar outcome variable. We performed standard univariate linear regression of this outcome on the same controls and treatments as above. The raw and FDR-corrected p-values for these analyses are given in each table below. 
+
+# Notes for Wenjia
+
+I used the median, not the mean and also applied Yeo-Johnson transforms to the univariate signatures. These, and other variations can be altered if they differ from your analysis.
+
+# Table 1 variables
+
+```{r}
+
+enframe(table1) %>% knitr::kable()
+```
+
+# Variable names in subsequent tables
+
+```{r}
+definitions
+```
+
+
+# PHENOTYPE CONTROLS
+
+```{r}
+# attach(pretty)
+basic_ses_sss_composite  
+basic_edu_max
+basic_income_hh_ff5
+basic_SEI_ff5
+basic_sss_5
+```
+
+# BIOLOGICAL CONTROLS
+
+```{r}
+biological_ses_sss_composite
+biological_edu_max
+biological_income_hh_ff5
+biological_SEI_ff5
+biological_sss_5
+```
+
+# BOTH BIOLOGICAL AND PHENOTYPE CONTROLS
+
+```{r}
+all_ses_sss_composite
+all_edu_max
+all_income_hh_ff5
+all_SEI_ff5
+all_sss_5
+```

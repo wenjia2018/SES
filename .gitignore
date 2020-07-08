@@ -1,0 +1,10 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+user_jc/supervised_play/
+rds/*
+
+.DS_store
+._.DS_Store

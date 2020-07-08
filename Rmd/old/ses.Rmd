@@ -1,0 +1,114 @@
+---
+title: "ses"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# devtools::install_github("chumbleycode/dbr")
+library(dbr)
+library(tidyverse)
+library(limma)
+
+# ses_sss_composite # (edu,income,SEI,SSS)
+# ses_composite_ff5 #(edu,income,SEI)
+# CHILD (parental)
+# ses_composite_pp1 # (edu,income,SEI)
+
+status_variables = c(
+  ses_adult_4 = "ses_sss_composite", 
+  ses_adult_3 = "ses_composite_ff5", 
+  ses_child_3 = "ses_composite_pp1"
+)
+controls = c(
+  "re", "Plate", "AvgCorrelogram100" ,"age_w5", "BirthY", "W5REGION","pregnant_biow5","kit_biow5",
+  "tube_biow5", "FastHrs", "travel_biow5", "months_biow5", "time_biow5"
+)
+immune_tfbms = 
+  c(
+    "CEBPG_CREB3L1", "CREB3", "CREB3L1", "IRF2", "IRF3",
+    "IRF4", "IRF5", "IRF7", "IRF8", "IRF9", "JUN", "NFKB1", 
+    "NFKB2", "NR3C1"
+  )
+
+if(0) utr1[, immune_tfbms] # the gene-by-motif matrix for immune motifs of interest
+dat = readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_21042020.rds")
+
+```
+
+# INFERENCE
+
+```{r, cache=TRUE}
+
+de_tfbm = status_variables %>% 
+  map(function(chr) {
+    
+    
+    # Specify whole-genome regression of rna on design
+    y <- dat %>% Biobase::exprs()
+    X <- dat %>% Biobase::pData() %>% select(all_of(controls), all_of(chr))
+    
+    keep = X %>% complete.cases()
+    X = X[keep, ]
+    y = y[, keep]
+    
+    X = model.matrix(~ ., data = X)
+    
+    # Estimate DE using standard limmma/edger pipeline. 
+    ttT <-
+      lmFit(y, X) %>%
+      eBayes %>%
+      tidy_topTable(of_in = chr)
+    
+    
+    # genes whose uncorrected p-values below 0.05 (not an inference):
+    ttT_sub = filter(ttT, P.Value <= 0.05)
+    
+    
+    tfbm = 
+      ttT %>%
+      infer_db(ttT_sub = ttT_sub) %>%
+      extract_db %>% 
+      select(tfbm, p_par)
+    
+    return(list(ttT = ttT, tfbm = tfbm))
+  }
+  )
+
+saveRDS(de_tfbm, "de_tfbm.rds" )
+```
+
+# TFBM a priori
+
+```{r}
+
+de_tfbm %>% 
+  map("tfbm") %>% 
+  map(filter, tfbm %in% immune_tfbms) %>% 
+  map(mutate, p_par_corr = p.adjust(p_par, method = "hochberg")) %>% 
+  map(filter, p_par_corr < 0.05) %>% 
+  map(arrange, -p_par_corr)
+
+```
+
+# TFBM de Novo
+
+```{r}
+
+de_tfbm %>% 
+  map("tfbm") %>% 
+  map(mutate, p_par_corr = p.adjust(p_par, method = "hochberg")) %>% 
+  map(filter, p_par_corr < 0.05) %>% 
+  map(arrange, -p_par_corr)
+
+```
+
+# DE
+
+```{r}
+de_tfbm %>% map("ttT") %>% 
+  map(filter, adj.P.Val < 0.05) %>% 
+  map(select, gene, logFC, contains("Val"))
+```
+
