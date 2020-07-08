@@ -24,6 +24,7 @@ de_and_tfbm <- function(treatment, controls) {
     eBayes %>%
     tidy_topTable(of_in = treatment)
   
+  fig1 = DE_enrichplot(ttT)
   
   # genes whose uncorrected p-values below 0.05 (not an inference):
   ttT_sub = filter(ttT, P.Value <= 0.05)
@@ -35,5 +36,5 @@ de_and_tfbm <- function(treatment, controls) {
     pluck("telis", "par", "p_over") %>% # tfbms over represented in DNA of genes labeled with high mRNA relation to treatment
     enframe(name = "tfbm", value = "tellis p.value for over-represented tfbms")
   
-  return(list(ttT = ttT, tfbm = tfbm))
+  return(list(ttT = ttT, tfbm = tfbm, fig1 = fig1))
 }

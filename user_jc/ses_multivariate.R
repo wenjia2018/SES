@@ -24,13 +24,13 @@ source("user_ms/define_treatments_controls_outcomes.R")
 print(abbreviations)
 print("Select which models to estimate from the above table.")
 funcs = str_subset(abbreviations$shorthand, "^m") %>% setdiff(c("m4", "m98")) # m98 breaks for some reason 
-funcs = c("m6", "m7")
-
+ 
 # fit_pca_util %>% debugonce()
 # model_fit %>% debugonce()
 example3 = 
   args %>% 
   filter(is.element(gene_set_name, table1)) %>% 
+  sample_n(20) %>% 
   mutate(out = pmap(., safely(model_fit), funcs), 
          controls = names(controls))
 
@@ -44,7 +44,7 @@ saveRDS(example3, "rds/example3.rds")
 if(0) data.tree::FromListSimple(example3)
 example3 %>% hoist(out, "error") %>% pluck("error") %>% unique
 # three groups of errors
-example3 %>%
+example_wx %>%
   hoist(out, "error") %>% 
   mutate(error = map(error, as.character)) %>%
   unnest(error) %>%
@@ -71,7 +71,7 @@ example3 %>% hoist(out, p = list("result", "m6", 1, "p"))
 ############################################################
 # toy
 ############################################################
-( 
+(
   tabPCA =
     example3 %>% 
     hoist(out, p = list("result" )) %>%
@@ -90,8 +90,7 @@ tabPCA_binary =
   rowwise() %>% 
   mutate(across(matches("m6|m7"), ~ as.numeric(.x < 0.05))) 
 
-list(tabPCA = tabPCA, tabPCA_binary = tabPCA_binary) %>% 
-  set_names() %>% 
+list(tabPCA, tabPCA_binary) %>% 
   saveRDS("rds/2008.7.8_pca.rds")
 
 example3 %>% hoist(out, p = list("result" )) %>% unnest(p) %>% unnest(contains("m")) %>% filter(names(m6_vx) == "other") %>% unnest(contains("m")) %>% unnest(contains("m"))
@@ -157,4 +156,13 @@ tab1b =
 )
 
 
-
+############################################################
+# wx
+############################################################
+debugonce(model_fit)
+example_wx = 
+  args %>% 
+  filter(gene_set_name %>% str_detect("whole")) %>%
+  slice(1:2) %>%   
+  mutate(out = pmap(., safely(model_fit), funcs), 
+         controls = names(controls))

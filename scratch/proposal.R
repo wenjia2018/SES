@@ -24,28 +24,21 @@ source("user_ms/define_treatments_controls_outcomes.R")
 print(abbreviations)
 print("Select which models to estimate from the above table.")
 funcs = str_subset(abbreviations$shorthand, "^m") %>% setdiff(c("m4", "m98")) # m98 breaks for some reason 
-funcs = c("m6", "m7")
-funcs = c("m99")
- 
-# debugonce(model_fit)
-example3 = 
+
+example_wx = 
   args %>% 
-  filter(is.element(gene_set_name, table1)) %>% 
-  slice(1) %>% 
+  filter(gene_set_name %>% str_detect("whole")) %>%
+  slice(1:3) %>%   
   mutate(out = pmap(., safely(model_fit), funcs), 
          controls = names(controls))
 
-############################################################
-# Extract: behold the NAs!
-############################################################
 
-example3 %>% 
-  hoist(out, "result") %>% 
-  hoist(result, !!!funcs)  %>% 
-  unnest(m99) %>%
-  unnest_wider(m99) %>% 
-  hoist(w5bmi, w5bmi_p = c("result", "p"))  %>% 
-  hoist(bingedrink, bingedrink_p = c("result", "p"))  %>% 
-  hoist(currentsmoke, currentsmoke_p = c("result", "p"))  %>% 
-  hoist(phys_activ_ff5, phys_activ_ff5_p = c("result", "p"))  %>%   
-  discard(is.list)
+# no errors
+example_wx %>%
+  hoist(out, "error") %>% 
+  mutate(error = map(error, as.character)) %>%
+  unnest(error) 
+
+# results
+example_wx %>% hoist(out, c("result")) %>% pluck("result")
+

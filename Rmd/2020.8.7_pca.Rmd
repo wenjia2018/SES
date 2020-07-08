@@ -25,16 +25,15 @@ For ease of scanning, the second table is simply a thresholded version of the fi
 ```{r}
 
 ex = readRDS("../rds/2008.7.8_pca.rds")
-ex %>% list2env(.GlobalEnv)
-
+ 
 ```
 
 ```{r}
 
-tabPCA %>% 
+ex[1] %>% 
   knitr::kable() 
 
-tabPCA_binary %>% 
+ex[2] %>% 
   knitr::kable() 
 
 ```
