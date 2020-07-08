@@ -8,8 +8,12 @@ abbreviations =
     "m3", "univariate outcome (mean)",
     "m4", "multivariate permutation (c.f. m1)",
     "m5", "multiple testing",
-    "m6", "multivariate outcome = top rotated PCs in signature set",
-    "m7", "regress rotated PCs on covariates, one by one (see m6 for complementary analysis)",
+    "m6_nn", "PCA not rotated: multivariate outcome = top PCs in signature set",
+    "m7_nn", "PCA not rotated: regress PCs on covariates, one by one (see m6 for complementary analysis)",
+    "m6_vx", "PCA varimax rotated: multivariate outcome = top PCs in signature set",
+    "m7_vx", "PCA varimax rotated: regress PCs on covariates, one by one (see m6 for complementary analysis)",
+    "m6_ob", "PCA oblimin rotated: multivariate outcome = top PCs in signature set",
+    "m7_ob", "PCA oblimin rotated: regress PCs on covariates, one by one (see m6 for complementary analysis)",
     
     "m98", "regress PCs on covariates",
     "m99", "mediation (outcome = mean mRNA)"
@@ -236,9 +240,6 @@ fit_m5 = function(controls, treatment, gene_set){
   
   ttT
 }
-
-
-
 
 
 ############################################################
