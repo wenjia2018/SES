@@ -372,11 +372,13 @@ summary {
 <p>nn = no rotation, vx = varimax, ob = oblimin (oblique).</p>
 <p>So: m6_ob is the Mancova p-value for the top 9 dimensions of oblique rotated. Collumn m7_ob_d3 is, for example, the p-value associated with dimension 3 of that outcome vector.</p>
 <p>For ease of scanning, the second table is simply a thresholded version of the first. 1 means the uncorrected p-value is &lt; 0.05. 0 means otherwise.</p>
-<pre class="r"><code>ex = readRDS(&quot;../rds/2008.7.8_pca.rds&quot;)
-ex %&gt;% list2env(.GlobalEnv)</code></pre>
-<pre><code>## &lt;environment: R_GlobalEnv&gt;</code></pre>
-<pre class="r"><code>tabPCA %&gt;% 
+<pre class="r"><code>ex = readRDS(&quot;../rds/2008.7.8_pca.rds&quot;)</code></pre>
+<pre class="r"><code>ex[1] %&gt;% 
   knitr::kable() </code></pre>
+<table class="kable_wrapper">
+<tbody>
+<tr>
+<td>
 <table class="kable_wrapper">
 <tbody>
 <tr>
@@ -37047,8 +37049,16 @@ ex %&gt;% list2env(.GlobalEnv)</code></pre>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>tabPCA_binary %&gt;% 
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>ex[2] %&gt;% 
   knitr::kable() </code></pre>
+<table class="kable_wrapper">
+<tbody>
+<tr>
+<td>
 <table style="width:100%;">
 <colgroup>
 <col width="5%"></col>
@@ -55376,6 +55386,10 @@ ex %&gt;% list2env(.GlobalEnv)</code></pre>
 <td align="right">1</td>
 <td align="right">0</td>
 <td align="left">NULL</td>
+</tr>
+</tbody>
+</table>
+</td>
 </tr>
 </tbody>
 </table>
