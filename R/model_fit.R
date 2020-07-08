@@ -36,12 +36,18 @@ model_fit =
       out$m6_vx = fit_m6(datt, gene_set, "varimax") %>% extract_m6()
       out$m6_ob = fit_m6(datt, gene_set, "oblimin") %>% extract_m6()
       
+      
     }
     if(is.element("m7", funcs)) {
       
       out$m7_nn  = fit_m7(datt, gene_set, "none"   ) %>% extract_m7()
       out$m7_vx  = fit_m7(datt, gene_set, "varimax") %>% extract_m7()
       out$m7_ob  = fit_m7(datt, gene_set, "oblimin") %>% extract_m7()
+      
+      # for each of the results just calculated above, append the genes loading high in this dimension
+      out$m7_nn$other <- get_well_loaded_genes(datt, gene_set, "none")
+      out$m7_vx$other <- get_well_loaded_genes(datt, gene_set, "varimax")
+      out$m7_ob$other <- get_well_loaded_genes(datt, gene_set, "oblimin")
       
     } 
     if(is.element("m98", funcs)) out$m98 = fit_m98(datt, gene_set) %>% extract_m98()

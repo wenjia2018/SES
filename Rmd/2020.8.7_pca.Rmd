@@ -3,9 +3,13 @@ title: "2020.8.7_pca"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
+ids = c("treatment", "gene_set_name", "controls")
+binarize = . %>% 
+  rowwise() %>% 
+  mutate(across(matches("m6|m7"), ~ as.numeric(.x < 0.05))) 
 
 ```
 
@@ -22,18 +26,45 @@ So: m6_ob is the Mancova p-value for the top 9 dimensions of oblique rotated. Co
 
 For ease of scanning, the second table is simply a thresholded version of the first. 1 means the uncorrected p-value is < 0.05. 0 means otherwise.
 
+```{r, echo=FALSE}
+
+example3 = readRDS("../rds/example3.rds")
+
+tabPCA =
+  example3 %>% 
+  hoist(out, p = list("result" )) %>%
+  unnest(p) %>% 
+  unnest(matches("m6|m7")) %>%
+  filter(names(m6_vx) == "p") %>%
+  unnest(matches("m6")) %>%
+  unnest_wider(m7_nn, names_sep = "_") %>% 
+  unnest_wider(m7_vx, names_sep = "_") %>% 
+  unnest_wider(m7_ob, names_sep = "_")
+
+```
+# No rotation
+
 ```{r}
 
-ex = readRDS("../rds/2008.7.8_pca.rds")
- 
+select(tabPCA, all_of(ids), matches("nn")) %>% knitr::kable()
+select(tabPCA, all_of(ids), matches("nn")) %>% binarize  %>% knitr::kable()
+
 ```
 
+# Varimax
+
 ```{r}
 
-ex[1] %>% 
-  knitr::kable() 
+select(tabPCA, all_of(ids), matches("vx")) %>% knitr::kable()
+select(tabPCA, all_of(ids), matches("vx")) %>% binarize  %>% knitr::kable()
 
-ex[2] %>% 
-  knitr::kable() 
+```
+
+# Oblimin
+
+```{r}
+
+select(tabPCA, all_of(ids), matches("ob")) %>% knitr::kable()
+select(tabPCA, all_of(ids), matches("ob")) %>% binarize  %>% knitr::kable()
 
 ```
