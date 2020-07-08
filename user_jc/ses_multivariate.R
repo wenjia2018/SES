@@ -27,7 +27,7 @@ source("user_ms/define_treatments_controls_outcomes.R")
 print(abbreviations)
 print("Select which models to estimate from the above table.")
 funcs = str_subset(abbreviations$shorthand, "^m") %>% setdiff(c("m4", "m98")) # m98 breaks for some reason 
- 
+
 ############################################################
 # EXAMPLES
 ############################################################
@@ -43,6 +43,7 @@ if(example0){
   example0 = 
     args %>% 
     filter(is.element(gene_set_name, table1)) %>% 
+    sample_n(3) %>% 
     mutate(out = pmap(., safely(model_fit), funcs), 
            controls = names(controls))
   
@@ -52,7 +53,7 @@ if(example0){
   ############################################################
   # ERRORS?
   ############################################################
-
+  
   # group errors
   example0 %>% 
     hoist(out, "error") %>% 
@@ -72,8 +73,8 @@ if(example0){
   (
     tabPCA =
       example0 %>% 
-      hoist(out, p = list("result" )) %>%
-      unnest(p) %>% 
+      hoist(out, result = list("result" )) %>%
+      unnest(result) %>% 
       unnest(matches("m6|m7")) %>%
       filter(names(m6_vx) == "p") %>%
       unnest(matches("m6")) %>%
@@ -81,6 +82,34 @@ if(example0){
       unnest_wider(m7_vx, names_sep = "_") %>% 
       unnest_wider(m7_ob, names_sep = "_")
   )
+  
+  
+  
+  ids = c("treatment", "gene_set_name", "controls")
+  binarize = . %>% 
+    rowwise() %>% 
+    mutate(across(matches("m6|m7"), ~ as.numeric(.x < 0.05))) 
+  select(tabPCA, all_of(ids), matches("nn")) 
+  
+  ( 
+  tmp = 
+    example0 %>% 
+    hoist(out, result = list("result" )) %>%
+    unnest(result) %>% 
+    unnest(matches("m7")) %>% 
+    filter(names(m7_nn) == "other") 
+  )
+  x = 
+    select(tabPCA, all_of(ids), matches("nn")) %>% 
+    binarize() %>% 
+    select(matches("m7")) %>%
+    rowwise() %>%
+    group_split() %>%
+    map(unlist) %>%
+    map(as.logical)
+  y = tmp$m7_nn
+    
+  pmap(list(x = x, y = y), function(x,y)  y[x])
   
   ############################################################
   # Unpack other

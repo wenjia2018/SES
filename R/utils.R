@@ -47,3 +47,13 @@ DE_enrichplot = function(ttT){
   barplot(edo, showCategory=20)
 }
 
+
+get_well_loaded_genes = 
+  function(datt, gene_set, rotate, threshold = 0.1){
+    # "threshold" appears to the default threshold for psych
+    # for each PC dimension, get well-loaded genes (i.e. factor loading > 0.1)
+    
+    pca_rotated = fit_pca_util(datt, gene_set, rotate)
+    non_sparse = abs(pca_rotated$loadings[,]) > threshold
+    well_loaded_genes = non_sparse %>% as_tibble() %>% map(~rownames(non_sparse)[.x])
+  }
