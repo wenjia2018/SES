@@ -8,6 +8,7 @@ library(recipes)
 library(parsnip)
 library(workflows)
 library(Biobase) 
+library(enrichplot)
 library(dbr) # my package
 walk(dir(path = "R",full.names = TRUE), source)
 fit_m4 = partial(fit_m4, n_perm = 1000) # specify n_perm
@@ -24,7 +25,6 @@ source("user_ms/define_treatments_controls_outcomes.R")
 print(abbreviations)
 print("Select which models to estimate from the above table.")
 funcs = str_subset(abbreviations$shorthand, "^m") %>% setdiff(c("m4", "m98")) # m98 breaks for some reason 
-
 example_wx = 
   args %>% 
   filter(gene_set_name %>% str_detect("whole")) %>%
