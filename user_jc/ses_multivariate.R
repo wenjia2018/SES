@@ -22,11 +22,14 @@ example1 <- example0 <- TRUE
 load_data(reconciled = FALSE) %>% 
   list2env(.GlobalEnv)
 
+define_treatments_and_controls() %>% 
+  list2env(.GlobalEnv)
+
 if(discritize_exposures <- TRUE) recode_variables_in_dat()
-source("user_ms/define_treatments_controls_outcomes.R")
+
+print("Select which models to estimate from the below table.")
 print(abbreviations)
-print("Select which models to estimate from the above table.")
-funcs = str_subset(abbreviations$shorthand, "^m") %>% setdiff(c("m4", "m98")) # m98 breaks for some reason 
+funcs = str_subset(abbreviations$shorthand, "^m") %>% setdiff(c("m4", "m98", "m99")) # m98 breaks for some reason 
 
 ############################################################
 # EXAMPLES
@@ -35,7 +38,7 @@ funcs = str_subset(abbreviations$shorthand, "^m") %>% setdiff(c("m4", "m98")) # 
 if(example0){ 
   
   ############################################################
-  # SIGNATURES
+  # SIGNATURE
   ############################################################
   
   # fit_pca_util %>% debugonce()
@@ -43,11 +46,10 @@ if(example0){
   example0 = 
     args %>% 
     filter(is.element(gene_set_name, table1)) %>% 
-    sample_n(3) %>% 
     mutate(out = pmap(., safely(model_fit), funcs), 
            controls = names(controls))
   
-  saveRDS(example0, "rds/example0.rds")
+  # saveRDS(example0, "rds/example0.rds")
   # example0 = readRDS("rds/example0.rds")
   
   ############################################################
@@ -57,7 +59,7 @@ if(example0){
   # group errors
   example0 %>% 
     hoist(out, "error") %>% 
-    mutate(error = map_chr(error, as.character)) %>%
+    mutate(error = map(error, as.character)) %>%
     unnest(error) %>%
     group_by(error)
   
@@ -83,33 +85,15 @@ if(example0){
       unnest_wider(m7_ob, names_sep = "_")
   )
   
+  ############################################################
+  # FOR EACH SIGNIFICANT PC, DO GENE ENRICHMENT ANALYSIS OF THE IMPORTANT GENES THEREIN.
+  ############################################################
   
+  get_well_loaded_genes_on_significant_PCs(example = example0, m7_model = "m7_nn", tabPCA = tabPCA)
+  enrichment_of_well_loaded_genes_on_significant_PCs(m7_model = "m7_nn", example = example0, tabPCA = tabPCA)
   
-  ids = c("treatment", "gene_set_name", "controls")
-  binarize = . %>% 
-    rowwise() %>% 
-    mutate(across(matches("m6|m7"), ~ as.numeric(.x < 0.05))) 
-  select(tabPCA, all_of(ids), matches("nn")) 
-  
-  ( 
-  tmp = 
-    example0 %>% 
-    hoist(out, result = list("result" )) %>%
-    unnest(result) %>% 
-    unnest(matches("m7")) %>% 
-    filter(names(m7_nn) == "other") 
-  )
-  x = 
-    select(tabPCA, all_of(ids), matches("nn")) %>% 
-    binarize() %>% 
-    select(matches("m7")) %>%
-    rowwise() %>%
-    group_split() %>%
-    map(unlist) %>%
-    map(as.logical)
-  y = tmp$m7_nn
-    
-  pmap(list(x = x, y = y), function(x,y)  y[x])
+  # for all "rotations"
+  map(c("m7_nn", "m7_vx", "m7_ob"), enrichment_of_well_loaded_genes_on_significant_PCs, example = example0, tabPCA = tabPCA)
   
   ############################################################
   # Unpack other

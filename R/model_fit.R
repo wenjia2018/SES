@@ -30,7 +30,7 @@ model_fit =
     if(is.element("m3", funcs))  out$m3  = fit_m3(datt, gene_set) %>% extract_m3()
     if(is.element("m4", funcs))  out$m4  = fit_m4(datt, gene_set) %>% extract_m4()
     if(is.element("m5", funcs))  out$m5  = fit_m5(controls, treatment, gene_set) %>% extract_m5()
-    if(is.element("m6", funcs)) {
+    if(any(str_detect(funcs, "m6"))) {
       
       out$m6_nn = fit_m6(datt, gene_set, "none"   ) %>% extract_m6() # no rotation (normal PCA)
       out$m6_vx = fit_m6(datt, gene_set, "varimax") %>% extract_m6()
@@ -38,7 +38,7 @@ model_fit =
       
       
     }
-    if(is.element("m7", funcs)) {
+    if(any(str_detect(funcs, "m7"))) {
       
       out$m7_nn  = fit_m7(datt, gene_set, "none"   ) %>% extract_m7()
       out$m7_vx  = fit_m7(datt, gene_set, "varimax") %>% extract_m7()
