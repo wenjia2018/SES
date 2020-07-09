@@ -72,6 +72,7 @@ if(example0){
   ############################################################
   # unpack PCA
   ############################################################
+  
   (
     tabPCA =
       example0 %>% 
@@ -89,11 +90,20 @@ if(example0){
   # FOR EACH SIGNIFICANT PC, DO GENE ENRICHMENT ANALYSIS OF THE IMPORTANT GENES THEREIN.
   ############################################################
   
-  get_well_loaded_genes_on_significant_PCs(example = example0, m7_model = "m7_nn", tabPCA = tabPCA)
-  enrichment_of_well_loaded_genes_on_significant_PCs(m7_model = "m7_nn", example = example0, tabPCA = tabPCA)
+  # FIRST PICK A ROTATION
+  m7_model = "m7_nn" # of "m7_nn", "m7_vx", "m7_ob"
   
-  # for all "rotations"
-  map(c("m7_nn", "m7_vx", "m7_ob"), enrichment_of_well_loaded_genes_on_significant_PCs, example = example0, tabPCA = tabPCA)
+  # 
+  significant_PCs_enriched = 
+    tabPCA %>% 
+    transmute(treatment, gene_set_name, controls, 
+              loaded = get_well_loaded_genes_on_significant_PCs(example = example0, m7_model = m7_model, tabPCA = tabPCA),
+              significant_PCs_enriched_for = enrichment_of_well_loaded_genes_on_significant_PCs(m7_model = "m7_nn", example = example0, tabPCA = tabPCA)) 
+  
+  # WHICH PHYSIOLOGICAL FUNCTIONS ARE ENRICHED in "enriched_physiology"
+  # NON-NULL enriched_physiology VALUES MEANS BOTH SIGNIFICANT PC AND SIGNIFICANT OVERLAP BETWEEN ITS WELL LOADED GENES AND SOME PHYSIOLOGICAL FUNCTION
+  
+  significant_PCs_enriched$significant_PCs_enriched_for[[1]]$PC5$result$out$fig
   
   ############################################################
   # Unpack other
@@ -107,7 +117,7 @@ if(example0){
     hoist(m1, pm1 = "p") %>% 
     hoist(m2, pm2 = "p") %>% 
     hoist(m3, pm3 = "p") %>% 
-    hoist(m5, pm5 = "p")  %>% 
+    hoist(m5, pm5 = "p") %>%
     discard(is.list)
   
   # mediation

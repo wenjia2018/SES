@@ -49,11 +49,12 @@ get_well_loaded_genes =
 
 get_well_loaded_genes_on_significant_PCs = function(example, m7_model, tabPCA){ 
   # get_well_loaded_genes_significant_genes(m7_model = "m7_ob")
+  
   ids = c("treatment", "gene_set_name", "controls")
   binarize = . %>% 
     rowwise() %>% 
     mutate(across(matches("m6|m7"), ~ as.numeric(.x < 0.05))) 
-  # select(tabPCA, all_of(ids), matches(m7_model)) 
+  # select(tabPCA, all_of(ids), matches(m7_model))
   
   y = 
     example %>% 
@@ -83,18 +84,19 @@ my_vis = function(DE_list){
   
   results = readRDS("/home/share/preprocessed_two_batches/entrezgeneid.rds") 
   de = 
-    enframe( unlist(DE_list), value = "gene") %>%
+    enframe(DE_list, value = "gene") %>%
     left_join(results, by = c("gene" = "hgnc_symbol")) %>% 
     dplyr::pull(entrezgene_id)
   
   edo <- DOSE::enrichDGN(de)
-  barplot(edo, showCategory=20)
+  fig = barplot(edo, showCategory=20)
+  enriched_physiology = edo@result %>% filter(p.adjust <= 0.05) %>% select(Description) %>% unlist %>% unname
   
+  list(out = list(fig = fig, enriched_physiology = enriched_physiology))
 }
 
 enrichment_of_well_loaded_genes_on_significant_PCs =
   function(example, m7_model, tabPCA) {
   get_well_loaded_genes_on_significant_PCs(example, m7_model, tabPCA) %>% 
-    discard(~length(.x) == 0) %>%
-    map(my_vis) 
+    map_depth(2, safely(my_vis)) 
 }
