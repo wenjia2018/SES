@@ -29,59 +29,28 @@ DE_enrichplot = function(ttT){
     left_join(results, by = c("gene" = "hgnc_symbol")) %>% 
     dplyr::pull(entrezgene_id)
   
-  # pass entrezgene_id to enrich function
+  # pass entrezgene_id to enrich function, then plot
   edo <- DOSE::enrichDGN(de)
-  # plot
   barplot(edo, showCategory=20)
 }
 
 
 get_well_loaded_genes = 
-  function(datt, gene_set, rotate, threshold = 0.1){
-    # "threshold" appears to the default threshold for psych
+  function(datt, gene_set, rotate, loading_threshold = 0.1){
+    # "loading_threshold" appears to the default threshold for psych
     # for each PC dimension, get well-loaded genes (i.e. factor loading > 0.1)
     
     pca_rotated = fit_pca_util(datt, gene_set, rotate)
-    non_sparse = abs(pca_rotated$loadings[,]) > threshold
+    non_sparse = abs(pca_rotated$loadings[,]) > loading_threshold
     well_loaded_genes = non_sparse %>% as_tibble() %>% map(~rownames(non_sparse)[.x])
   }
 
 
-get_well_loaded_genes_on_significant_PCs = function(example, m7_model, tabPCA){ 
-  # get_well_loaded_genes_significant_genes(m7_model = "m7_ob")
-  
-  ids = c("treatment", "gene_set_name", "controls")
-  binarize = . %>% 
-    rowwise() %>% 
-    mutate(across(matches("m6|m7"), ~ as.numeric(.x < 0.05))) 
-  # select(tabPCA, all_of(ids), matches(m7_model))
-  
-  y = 
-    example %>% 
-    hoist(out, result = list("result" )) %>%
-    unnest(result) %>% 
-    unnest(matches("m7")) %>% 
-    filter(names(m7_nn) == "other") %>% 
-    pluck(m7_model) 
-  x = 
-    select(tabPCA, all_of(ids), matches(m7_model)) %>% 
-    binarize() %>% 
-    select(matches(m7_model)) %>%
-    rowwise() %>%
-    group_split() %>%
-    map(unlist) %>%
-    map(as.logical) 
-  
-  pmap(list(x = x, y = y), function(x,y)  y[x]) 
-  
-}
 
-
-
-my_vis = function(DE_list){ 
+my_vis = function(DE_list, p_val_threshold = 0.05){ 
   
-  #  plaguerized from DE_enrichplot()
-  
+  # see also DE_enrichplot()
+  print(str_c(runif(1), "  please wait: calculating enrichment for the well-loaded genes of significant PCs ..."))
   results = readRDS("/home/share/preprocessed_two_batches/entrezgeneid.rds") 
   de = 
     enframe(DE_list, value = "gene") %>%
@@ -90,13 +59,66 @@ my_vis = function(DE_list){
   
   edo <- DOSE::enrichDGN(de)
   fig = barplot(edo, showCategory=20)
-  enriched_physiology = edo@result %>% filter(p.adjust <= 0.05) %>% select(Description) %>% unlist %>% unname
+  enriched_physiology = edo@result %>% filter(p.adjust <= p_val_threshold) %>% pull(Description)  
   
   list(out = list(fig = fig, enriched_physiology = enriched_physiology))
 }
 
-enrichment_of_well_loaded_genes_on_significant_PCs =
-  function(example, m7_model, tabPCA) {
-  get_well_loaded_genes_on_significant_PCs(example, m7_model, tabPCA) %>% 
-    map_depth(2, safely(my_vis)) 
+
+
+get_sig_PCs_and_sig_enrichment_on_those_PCs = function(example, m7_model){ 
+  
+  ( 
+    tabPCA =
+      example %>% 
+      # hoist(out, result = list("result" )) %>%
+      unnest(result) %>% 
+      unnest(matches("m6|m7")) %>%
+      filter(names(m7_nn) == "p") %>%
+      unnest(matches("m6")) %>%
+      unnest_wider(m7_nn, names_sep = "_") %>% 
+      unnest_wider(m7_vx, names_sep = "_") %>% 
+      unnest_wider(m7_ob, names_sep = "_")
+  )
+  
+  ############################################################
+  # FOR EACH SIGNIFICANT PC, DO GENE ENRICHMENT ANALYSIS OF THE IMPORTANT GENES THEREIN.
+  ############################################################
+  ############################################################
+  # 1. WHICH PCs HAVE BONFERONNI CORRECTED SIGNIFICANT RELATION TO TREATMENT?
+  ############################################################
+  
+  # HOW MANY SIGNIFICANT PCs
+  
+  n_args =   dim(tabPCA)[1]  # MORE CONSERVATIVE: number of treatment/outcome/control on RHS
+  n_args =   length(table1) # LESS CONSEVRATIVE: the number of signature sets
+  n_pc_dims = 9 # number of dimensions on LHS
+  bonferonni_threshold = 0.05 / (n_args * n_pc_dims) 
+  tabPCA %>% 
+    rowwise(treatment, gene_set_name, controls) %>%
+    summarize(sum = sum(c_across(matches(m7_model)) < bonferonni_threshold)) %>% 
+    arrange(-sum) %>% 
+    print(n = Inf) 
+  
+  # WHERE ARE THE SIGNIFICANT PCS?
+  x = 
+    tabPCA %>% 
+    rowwise() %>%
+    transmute(across(matches(m7_model), ~ . < bonferonni_threshold)) %>% 
+    group_split() %>% 
+    map(as_vector) %>% 
+    map(unname)
+  # WHICH GENES ARE WELL LOADED?
+  y = 
+    example %>% 
+    unnest(result) %>% 
+    unnest_wider(m7_model) %>% 
+    pluck("other") 
+  
+  # TAKE WELL-LOADED GENES OF SIGNIFICANT PCs, THEN DO ENRICHMENT
+  example = 
+    example %>% 
+    mutate(well_loaded_genes_on_significant_PCs = pmap(list(x = x, y = y), function(x,y)  y[x]),
+           enrichment_of_well_loaded_genes_on_significant_PCs= map_depth(well_loaded_genes_on_significant_PCs , 2, my_vis)) 
+  
 }

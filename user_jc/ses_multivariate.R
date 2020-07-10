@@ -7,158 +7,123 @@ library(limma)
 library(recipes)
 library(parsnip)
 library(workflows)
-library(Biobase) 
+library(Biobase)
 library(enrichplot)
 library(dbr) # my package
 walk(dir(path = "R",full.names = TRUE), source)
 fit_m4 = partial(fit_m4, n_perm = 1000) # specify n_perm
 
+# WHICH EXAMPLES TO RUN?
 example1 <- example0 <- TRUE
 
 ############################################################
-# LOAD DATA
+# LOAD DATA, DEFINE VARIABLES, RECODE VARIABLES
 ############################################################
 
-load_data(reconciled = FALSE) %>% 
-  list2env(.GlobalEnv)
-
-define_treatments_and_controls() %>% 
-  list2env(.GlobalEnv)
-
-if(discritize_exposures <- TRUE) recode_variables_in_dat()
-
-print("Select which models to estimate from the below table.")
+load_data(reconciled = FALSE)
+define_treatments_and_controls()
+recode_variables_in_dat()
 print(abbreviations)
-funcs = str_subset(abbreviations$shorthand, "^m") %>% setdiff(c("m4", "m98", "m99")) # m98 breaks for some reason 
+funcs = str_subset(abbreviations$shorthand, "^m") %>% setdiff(c("m4", "m98")) # m98 breaks for some reason
 
 ############################################################
-# EXAMPLES
+# EXAMPLE: SIGNATURES
 ############################################################
 
-if(example0){ 
+if(example0){
+  
+  if(from_disk <- TRUE){
+    
+    example0 = readRDS("/home/share/scratch/example0.rds")
+    
+  } else {
+    
+    example0 =
+      args %>%
+      filter(is.element(gene_set_name, table1)) %>%
+      mutate(out = pmap(., safely(model_fit), funcs),
+             controls = names(controls))
+    
+    saveRDS(example0, "/home/share/scratch/example0.rds")
+    
+  }
   
   ############################################################
-  # SIGNATURE
+  # ANY ESTIMATION ERRORS?
   ############################################################
   
-  # fit_pca_util %>% debugonce()
-  # model_fit %>% debugonce()
-  example0 = 
-    args %>% 
-    filter(is.element(gene_set_name, table1)) %>% 
-    mutate(out = pmap(., safely(model_fit), funcs), 
-           controls = names(controls))
-  
-  # saveRDS(example0, "rds/example0.rds")
-  # example0 = readRDS("rds/example0.rds")
-  
-  ############################################################
-  # ERRORS?
-  ############################################################
-  
-  # group errors
-  example0 %>% 
-    hoist(out, "error") %>% 
+  # ERRORS:
+  example0 %>%
+    hoist(out, "error") %>%
     mutate(error = map(error, as.character)) %>%
     unnest(error) %>%
-    group_by(error)
+    group_by(error) %>%
+    slice(1)
   
-  # where is the problem? relate NA to each of the arguments to model_fit(),
-  # controls, treatment, gene_set_name:
-  example0 %>% 
-    hoist(out, p = list("result", "m1", 1, "p")) %>% 
-    with(table(gene_set_name, is.na(p))) 
+  # WHAT CAUSES ERROR? RELATE NA TO ARGS OF model_fit()
+  example0 %>%
+    hoist(out, p = list("result", "m1", 1, "p")) %>%
+    with(table(gene_set_name, is.na(p)))
   
-  ############################################################
-  # unpack PCA
-  ############################################################
-  
-  (
-    tabPCA =
-      example0 %>% 
-      hoist(out, result = list("result" )) %>%
-      unnest(result) %>% 
-      unnest(matches("m6|m7")) %>%
-      filter(names(m6_vx) == "p") %>%
-      unnest(matches("m6")) %>%
-      unnest_wider(m7_nn, names_sep = "_") %>% 
-      unnest_wider(m7_vx, names_sep = "_") %>% 
-      unnest_wider(m7_ob, names_sep = "_")
-  )
+  # REMOVE MODELS THAT ERR
+  example0 = example0 %>% hoist(out, "result") %>% drop_na()
   
   ############################################################
-  # FOR EACH SIGNIFICANT PC, DO GENE ENRICHMENT ANALYSIS OF THE IMPORTANT GENES THEREIN.
+  # GET TABLE 1
   ############################################################
   
-  # FIRST PICK A ROTATION
+  get_table1(example0) %>% print(n = Inf)
+  
+  ############################################################
+  # HARVEST SIGNIFICANT PCs and THEIR POSSIBLY SIGNIFICANT ENRICHMENT
+  ############################################################
+  
+  # FIRST PICK A PCA "ROTATION"
   m7_model = "m7_nn" # of "m7_nn", "m7_vx", "m7_ob"
+  example0 = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs(m7_model)
   
-  # 
-  significant_PCs_enriched = 
-    tabPCA %>% 
-    transmute(treatment, gene_set_name, controls, 
-              loaded = get_well_loaded_genes_on_significant_PCs(example = example0, m7_model = m7_model, tabPCA = tabPCA),
-              significant_PCs_enriched_for = enrichment_of_well_loaded_genes_on_significant_PCs(m7_model = "m7_nn", example = example0, tabPCA = tabPCA)) 
+  # INSPECT MODELS WHICH HAVE SIGNIFICANT PCs
+  interesting_PCS =
+    example0 %>%
+    select(treatment, controls, gene_set_name, matches("well_loaded")) %>%
+    drop_na()
+  print(interesting_PCS, n = Inf)
   
-  # WHICH PHYSIOLOGICAL FUNCTIONS ARE ENRICHED in "enriched_physiology"
-  # NON-NULL enriched_physiology VALUES MEANS BOTH SIGNIFICANT PC AND SIGNIFICANT OVERLAP BETWEEN ITS WELL LOADED GENES AND SOME PHYSIOLOGICAL FUNCTION
+  # PICK YOUR FAVORITE ROW OF PRECEDING TABLE TO VISUALIZE
+  particularly_interesting_row = 1
   
-  significant_PCs_enriched$significant_PCs_enriched_for[[1]]$PC5$result$out$fig
+  # WHAT ARE THE WELL-LOADED GENES FOR EACH SIGNIFICANT PC IN THIS ROW?
+  interesting_PCS %>% slice(particularly_interesting_row) %>% pluck(4)
   
-  ############################################################
-  # Unpack other
-  ############################################################
-  
-  tab1a = 
-    example0 %>% 
-    hoist(out, "result") %>% 
-    hoist(result, !!!funcs)  %>% 
-    unnest(!!funcs) %>% 
-    hoist(m1, pm1 = "p") %>% 
-    hoist(m2, pm2 = "p") %>% 
-    hoist(m3, pm3 = "p") %>% 
-    hoist(m5, pm5 = "p") %>%
-    discard(is.list)
-  
-  # mediation
-  tab1b = 
-    example0 %>% 
-    hoist(out, "result") %>% 
-    hoist(result, !!!funcs)  %>% 
-    unnest(m99) %>%
-    unnest_wider(m99) %>% 
-    hoist(w5bmi, w5bmi_p = c("result", "p"))  %>% 
-    hoist(bingedrink, bingedrink_p = c("result", "p"))  %>% 
-    hoist(currentsmoke, currentsmoke_p = c("result", "p"))  %>% 
-    hoist(phys_activ_ff5, phys_activ_ff5_p = c("result", "p"))  %>%   
-    discard(is.list)
-  
-  (
-    tab1a %>% left_join(tab1b)
-  )
-  
+  # WHAT IS THE ENRICHMENT STATUS OF THESE PCs
+  interesting_PCS %>% slice(particularly_interesting_row) %>% pluck(5)
 }
+
+############################################################
+# EXAMPLE:  WHOLE GENOME
+############################################################
 
 if(example1){
   
-  ############################################################
-  # whole genome
-  ############################################################
   
-  example1 = 
-    args %>% 
-    filter(gene_set_name %>% str_detect("whole")) %>%
-    slice(1:3) %>%   
-    mutate(out = pmap(., safely(model_fit), funcs), 
+  # FILTER OUT YOUR FAVORITE LHS-RHS AND LOOK AT TFBM, DE AND ENRICHMENT PLOTS
+  example1 =
+    args %>%
+    filter(treatment == "ses_sss_composite",
+           gene_set_name == "whole_genome_and_tfbm",
+           names(controls) == "basic") %>%
+    mutate(out = pmap(., safely(model_fit), funcs),
            controls = names(controls))
   
-  # no errors
+  # ERRORS?
   example1 %>%
-    hoist(out, "error") %>% 
+    hoist(out, "error") %>%
     mutate(error = map(error, as.character)) %>%
-    unnest(error) 
+    unnest(error)
   
-  # results
-  example1 %>% hoist(out, c("result")) %>% pluck("result")
+  # RESULTS
+  example1 %>%
+    hoist(out, "result") %>%
+    pluck("result")
   
 }

@@ -9,10 +9,6 @@ de_and_tfbm <- function(treatment, controls) {
   X = X[keep, ]
   y = y[, keep]
   
-  # FIXED? See line 16
-  # if(treatment == "edu_max") X[, treatment] <- as.numeric(X[, treatment] != "high") # tfbm can't handle factors
-  # if(is.factor(X[[treatment]])) message("beware: TFBM analyses cannot handle multi-level factors at present")
-  
   X = model.matrix(~ ., data = X)
   
   # needed for limma::topTables() to work with factors

@@ -21,9 +21,11 @@ load_data = function(reconciled){
   funny_names = signatures$outcome_set %>% map(str_subset, "-")
   signatures$outcome_set = list(signatures$outcome_set, funny_names) %>% pmap(setdiff)
   
-  return(out = list(dat = dat,
-                    signatures = signatures,
-                    signature_names = signature_names))
+  list(dat = dat,
+       signatures = signatures,
+       signature_names = signature_names) %>% 
+    list2env(.GlobalEnv)
+  
   if(0) {
     
     library(sas7bdat)
