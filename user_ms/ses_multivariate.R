@@ -1,114 +1,129 @@
+set.seed(123)
 library(tidyverse)
+library(rlang)
+library(skimr)
 library(furrr)
 library(limma)
 library(recipes)
 library(parsnip)
 library(workflows)
-library(Biobase) 
+library(Biobase)
+library(enrichplot)
 library(dbr) # my package
 walk(dir(path = "R",full.names = TRUE), source)
+fit_m4 = partial(fit_m4, n_perm = 1000) # specify n_perm
+
+# WHICH EXAMPLES TO RUN?
+example1 <- example0 <- TRUE
 
 ############################################################
-# LOAD DATA (reconciled = ideal setting)
+# LOAD DATA, DEFINE VARIABLES, RECODE VARIABLES
 ############################################################
 
-load_data(reconciled = FALSE) %>% 
-  list2env(.GlobalEnv)
-
-recode_variables_in_dat() 
-
-source("user_ms/define_treatments_controls_outcomes.R")
-
-############################################################
-# EXAMPLE 1: ESTIMATE WHOLE GENOME DE AND TFBM
-############################################################
-
-example1 = 
-  args %>% 
-  filter(treatment == "ses_sss_composite", 
-         gene_set_name == "whole_genome_and_tfbm", 
-         names(controls) == "basic") %>% 
-  get_results(permutation = FALSE)
-
-# INSPECT DE 
-example1 %>% pluck("out", "result", "ttT")  
-example1 %>% pluck("out", "result", "ttT") %>%  filter(adj.P.Val < 0.05) %>% pluck("gene") # which genes have corrected p-value < 0.05
-
-# INSPECT TFBM: uncorrected p values
-example1 %>% pluck("out", "result", "tfbm")  # TFBM de Novo
-example1 %>% pluck("out", "result", "tfbm")  %>% filter(tfbm %in% immune_tfbms) # Inflammation
+load_data(reconciled = FALSE)
+define_treatments_and_controls()
+recode_variables_in_dat()
+print(abbreviations)
+funcs = str_subset(abbreviations$shorthand, "^m") %>% setdiff(c("m4", "m98")) # m98 breaks for some reason
 
 ############################################################
-# EXAMPLE 2: ESTIMATE UNIVARIATE/MULTIVARIATE MODELS FOR TABLE 1
+# EXAMPLE: SIGNATURES
 ############################################################
 
-example2 = 
-  args %>% 
-  filter(treatment == "ses_sss_composite", 
-         is.element(gene_set_name, table1), 
-         names(controls) == "basic") %>%
-  sample_n(1) %>% 
-  get_results(permutation = FALSE) 
-
-# INSPECT
-# what do the column abbreviations of the following table mean?
-example2 %>% pluck("out", "result", "table")
-example2 %>% 
-  filter(out_id == "result") %>%
-  unnest(out) %>% 
-  unnest(contains("m")) %>% 
-  mutate(nm = names(m1)) %>% # any m would do
-  filter(nm == "p") %>% 
-  unnest(contains("m")) 
+if(example0){
+  
+  if(from_disk <- TRUE){
+    
+    example0 = readRDS("/home/share/scratch/example0.rds")
+    
+  } else {
+    
+    example0 =
+      args %>%
+      filter(is.element(gene_set_name, table1)) %>%
+      mutate(out = pmap(., safely(model_fit), funcs),
+             controls = names(controls))
+    
+    saveRDS(example0, "/home/share/scratch/example0.rds")
+    
+  }
+  
+  ############################################################
+  # ANY ESTIMATION ERRORS?
+  ############################################################
+  
+  # ERRORS:
+  example0 %>%
+    hoist(out, "error") %>%
+    mutate(error = map(error, as.character)) %>%
+    unnest(error) %>%
+    group_by(error) %>%
+    slice(1)
+  
+  # WHAT CAUSES ERROR? RELATE NA TO ARGS OF model_fit()
+  example0 %>%
+    hoist(out, p = list("result", "m1", 1, "p")) %>%
+    with(table(gene_set_name, is.na(p)))
+  
+  # REMOVE MODELS THAT ERR
+  example0 = example0 %>% hoist(out, "result") %>% drop_na()
+  
+  ############################################################
+  # GET TABLE 1
+  ############################################################
+  
+  get_table1(example0) %>% print(n = Inf)
+  
+  ############################################################
+  # HARVEST SIGNIFICANT PCs and THEIR POSSIBLY SIGNIFICANT ENRICHMENT
+  ############################################################
+  
+  # FIRST PICK A PCA "ROTATION"
+  m7_model = "m7_nn" # of "m7_nn", "m7_vx", "m7_ob"
+  example0 = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs(m7_model)
+  
+  # INSPECT MODELS WHICH HAVE SIGNIFICANT PCs
+  interesting_PCS =
+    example0 %>%
+    select(treatment, controls, gene_set_name, matches("well_loaded")) %>%
+    drop_na()
+  print(interesting_PCS, n = Inf)
+  
+  # PICK YOUR FAVORITE ROW OF PRECEDING TABLE TO VISUALIZE
+  particularly_interesting_row = 1
+  
+  # WHAT ARE THE WELL-LOADED GENES FOR EACH SIGNIFICANT PC IN THIS ROW?
+  interesting_PCS %>% slice(particularly_interesting_row) %>% pluck(4)
+  
+  # WHAT IS THE ENRICHMENT STATUS OF THESE PCs
+  interesting_PCS %>% slice(particularly_interesting_row) %>% pluck(5)
+}
 
 ############################################################
-# diagnose errors in any model?
+# EXAMPLE:  WHOLE GENOME
 ############################################################
 
-(errors =
-   example2 %>% 
-   filter(out_id == "error") %>%
-   filter(map_lgl(out, negate(is.null)))) 
-
-errors %>% pluck("out")
-
-############################################################
-# EXAMPLE 3: SIMILAR TO EXAMPLE 2 BUT WITH ALL CONTROLS AND CONSTITUENT TREATMENTS
-############################################################
-
-example3 = 
-  args %>% 
-  filter(is.element(gene_set_name, table1)) %>%  
-  sample_n(10) %>% 
-  get_results(permutation = TRUE, n_perm = 1000)
-
-
-# scalar summaries
-example3 %>%   
-  filter(out_id == "result") %>%
-  unnest(out) %>% 
-  unnest(contains("m")) %>% 
-  mutate(nm = names(m1)) %>% # any m would do
-  filter(nm == "p") %>% 
-  unnest(contains("m")) 
-
-# details for m1
-example3 %>%   
-  filter(out_id == "result") %>%
-  unnest(out) %>% 
-  unnest(contains("m")) %>% 
-  mutate(nm = names(m1)) %>% # any m would do
-  filter(nm == "detail") %>% 
-  unnest(m1)
-
-# Pillai from m1
-example3 %>%   
-  filter(out_id == "result") %>%
-  unnest(out) %>% 
-  unnest(contains("m")) %>% 
-  mutate(nm = names(m1)) %>% 
-  filter(nm == "other") %>% # hack to get summaries which have length 1
-  unnest(m1) %>% 
-  mutate(Pillai = map_dbl(m1, ~.x))
-
-saveRDS(example3, "rds/example3.rds")
+if(example1){
+  
+  
+  # FILTER OUT YOUR FAVORITE LHS-RHS AND LOOK AT TFBM, DE AND ENRICHMENT PLOTS
+  example1 =
+    args %>%
+    filter(treatment == "ses_sss_composite",
+           gene_set_name == "whole_genome_and_tfbm",
+           names(controls) == "basic") %>%
+    mutate(out = pmap(., safely(model_fit), funcs),
+           controls = names(controls))
+  
+  # ERRORS?
+  example1 %>%
+    hoist(out, "error") %>%
+    mutate(error = map(error, as.character)) %>%
+    unnest(error)
+  
+  # RESULTS
+  example1 %>%
+    hoist(out, "result") %>%
+    pluck("result")
+  
+}

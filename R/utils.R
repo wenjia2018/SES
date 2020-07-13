@@ -11,49 +11,34 @@ mediate = function(mediator){
   fit_m99(datt_m, gene_set) %>% extract_m99()  
 }
 
-DE_enrichplot = function(ttT){
+
+
+get_table1 = function(example){ 
+  tab1a = 
+    example %>% 
+    # hoist(out, "result") %>% 
+    hoist(result, !!!funcs)  %>% 
+    unnest(!!funcs) %>% 
+    hoist(m1, pm1 = "p") %>% 
+    hoist(m2, pm2 = "p") %>% 
+    hoist(m3, pm3 = "p") %>% 
+    hoist(m5, pm5 = "p") %>%
+    discard(is.list)
   
-  if (reproducible <- FALSE){
-    # load our whole gene list 
-    dt_batches1_2_recon <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_25.06.2020.rds")
-    dt_batches1_2_unrecon <- readRDS("/home/share/preprocessed_two_batches/wx/dt_batches1_2_steve_waves_21042020.rds")
-    
-    Glist= union(featureNames(dt_batches1_2_recon), featureNames(dt_batches1_2_unrecon)) 
-    # convert our whole gene list from hugo name to entrez
-    mart = useMart('ENSEMBL_MART_ENSEMBL',dataset='hsapiens_gene_ensembl')
-    attributes = c('entrezgene_accession','entrezgene_id','hgnc_symbol')
-    filters = 'entrezgene_accession'
-    results = getBM(mart=mart,
-                    attributes = attributes,
-                    filters = filters,
-                    values = Glist)
-    # save genelist with both names for future lookup
-    results %>% saveRDS("/home/share/preprocessed_two_batches/entrezgeneid.rds")
-  }
+  # mediation
+  tab1b = 
+    example %>% 
+    # hoist(out, "result") %>% 
+    hoist(result, !!!funcs)  %>% 
+    unnest(m99) %>%
+    unnest_wider(m99) %>% 
+    hoist(w5bmi, w5bmi_p = c("result", "p"))  %>% 
+    hoist(bingedrink, bingedrink_p = c("result", "p"))  %>% 
+    hoist(currentsmoke, currentsmoke_p = c("result", "p"))  %>% 
+    hoist(phys_activ_ff5, phys_activ_ff5_p = c("result", "p"))  %>%   
+    discard(is.list)
   
-  
-  # load our whole gene name list
-  results =  readRDS("/home/share/preprocessed_two_batches/entrezgeneid.rds")
-  DE_list = ttT %>% filter(adj.P.Val <= 0.05)
-  
-  # coverting to entrezgene id
-  de = DE_list %>%
-    left_join(results, by = c("gene" = "hgnc_symbol")) %>% 
-    dplyr::pull(entrezgene_id)
-  
-  # pass entrezgene_id to enrich function
-  edo <- DOSE::enrichDGN(de)
-  # plot
-  barplot(edo, showCategory=20)
+  (
+    tab1a %>% left_join(tab1b)
+  )
 }
-
-
-get_well_loaded_genes = 
-  function(datt, gene_set, rotate, threshold = 0.1){
-    # "threshold" appears to the default threshold for psych
-    # for each PC dimension, get well-loaded genes (i.e. factor loading > 0.1)
-    
-    pca_rotated = fit_pca_util(datt, gene_set, rotate)
-    non_sparse = abs(pca_rotated$loadings[,]) > threshold
-    well_loaded_genes = non_sparse %>% as_tibble() %>% map(~rownames(non_sparse)[.x])
-  }

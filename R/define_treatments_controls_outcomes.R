@@ -78,6 +78,6 @@ define_treatments_and_controls = function(){
       "NFKB2", "NR3C1"
     )
   
-  mget(ls())
+  list2env(mget(ls()), .GlobalEnv)
   
 }
