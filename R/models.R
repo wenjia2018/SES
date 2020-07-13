@@ -14,7 +14,7 @@ abbreviations =
     "m7_vx", "PCA varimax rotated: regress PCs on covariates, one by one (see m6 for complementary analysis)",
     "m6_ob", "PCA oblimin rotated: multivariate outcome = top PCs in signature set",
     "m7_ob", "PCA oblimin rotated: regress PCs on covariates, one by one (see m6 for complementary analysis)",
-    
+    "m97", "mediation (outcome = single gene mRNA in disease signature)",
     "m98", "regress PCs on covariates",
     "m99", "mediation (outcome = mean mRNA)"
   )

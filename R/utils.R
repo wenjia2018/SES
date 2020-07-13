@@ -1,4 +1,4 @@
-mediate = function(mediator){
+mediate = function(mediator, gene_set){
   
   datt_m = 
     prepro(gene_set, treatment, c(controls, mediator)) %>%
