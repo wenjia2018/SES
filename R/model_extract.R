@@ -53,8 +53,16 @@ extract_m4 = function(m, out = NULL){
 
 extract_m5 = function(m, out = NULL){
   
-  out$detail = m
+  out$detail = "too big" # m
   out$p = min(m$adj.P.Val)
+  out$other = "empty"
+  
+  return(out = out)
+}
+
+extract_m5b = function(m, out = NULL){
+  out$detail = "too big" # m
+  out$p = any(m$P.Value < (0.05 / length(m$P.Value))) # does any P.value exceed Bonferonni threshold?
   out$other = "empty"
   
   return(out = out)
@@ -70,6 +78,7 @@ extract_m7 =  function(m, out = NULL){
   out$detail = m %>% map(extract_anova)
   out$p = out$detail %>% map_dbl(pluck("p.value"))
   out$other = "empty"
+  
   return(out = out)
 }
 
@@ -87,7 +96,7 @@ extract_m99 = function(m, out = NULL){
       pluck(4)
     
   }
-  out$detail = "see code details" # m # m is quite big
+  out$detail = "too big" #m
   out$p = extract_p("ACME")
   out$other = "empty"
   return(out = out)

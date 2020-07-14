@@ -16,6 +16,7 @@ model_fit =
     print("*******************")
     print(treatment)
     print(gene_set_name)
+    print(controls)
     print("*******************") 
     
     gene_set = pluck(signatures, "outcome_set", gene_set_name)
@@ -30,6 +31,8 @@ model_fit =
     if(is.element("m3", funcs))  out$m3  = fit_m3(datt, gene_set) %>% extract_m3()
     if(is.element("m4", funcs))  out$m4  = fit_m4(datt, gene_set) %>% extract_m4()
     if(is.element("m5", funcs))  out$m5  = fit_m5(controls, treatment, gene_set) %>% extract_m5()
+    if(is.element("m5", funcs))  out$m5b = fit_m5(controls, treatment, gene_set) %>% extract_m5b()
+    
     if(any(str_detect(funcs, "m6"))) {
       
       out$m6_nn = fit_m6(datt, gene_set, "none"   ) %>% extract_m6() 
@@ -45,6 +48,7 @@ model_fit =
       }
       
     }
+    
     if(any(str_detect(funcs, "m7"))) {
       
       out$m7_nn  = fit_m7(datt, gene_set, "none"   ) %>% extract_m7()
@@ -58,10 +62,9 @@ model_fit =
       
     } 
     
-    if(is.element("m98", funcs)) out$m98 = fit_m98(datt, gene_set) %>% extract_m98()
     source("R/utils.R", local = TRUE)
     if(is.element("m97", funcs)) out$m97 = mediate_multiple(gene_set)
-    if(is.element("m99", funcs)) out$m99 =  mediators %>% set_names() %>%map(safely(mediate), gene_set = gene_set) 
+    if(is.element("m99", funcs)) out$m99 =  mediators %>% set_names() %>% map(safely(mediate), gene_set = gene_set) 
     
     if(0){ 
       # More elegant but requires more work to unify arguments across functions

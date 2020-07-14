@@ -7,7 +7,8 @@ abbreviations =
     "m2", "univariate outcome (median + Yeo-Johnson)",
     "m3", "univariate outcome (mean)",
     "m4", "multivariate permutation (c.f. m1)",
-    "m5", "multiple testing",
+    "m5", "multiple testing (FDR)",
+    "m5b", "multiple testing (FWER)",
     "m6_nn", "PCA not rotated: multivariate outcome = top PCs in signature set",
     "m7_nn", "PCA not rotated: regress PCs on covariates, one by one (see m6 for complementary analysis)",
     "m6_vx", "PCA varimax rotated: multivariate outcome = top PCs in signature set",
@@ -15,7 +16,6 @@ abbreviations =
     "m6_ob", "PCA oblimin rotated: multivariate outcome = top PCs in signature set",
     "m7_ob", "PCA oblimin rotated: regress PCs on covariates, one by one (see m6 for complementary analysis)",
     "m97", "mediation (outcome = single gene mRNA in disease signature)",
-    "m98", "regress PCs on covariates",
     "m99", "mediation (outcome = mean mRNA)"
   )
 
@@ -315,49 +315,6 @@ fit_m7 = function(datt, gene_set, rotate){
     set_names() %>% 
     map(workflow_reg, datt = datt) %>% 
     map(~ pluck(.x, "fit", "fit", "fit"))
-  
-}
-
-############################################################
-# WENJIA'S PCA
-############################################################
-
-fit_m98 = function(datt, gene_set){
-  # workhorse
-  
-  # ONLY BINDING LOCALLY :+)
-  signature_pca = 
-    datt[gene_set] %>% 
-    prcomp(scale. = TRUE) %>%  
-    factoextra::get_pca_ind() %>%
-    pluck("coord") %>%
-    as.data.frame()
-  
-  datt = bind_cols(dplyr::select(datt, -gene_set), signature_pca)
-  gene_set = colnames(datt) %>% str_subset("Dim")
-  
-  workflow_reg = 
-    function(outcome, datt){
-      
-      datt_pca = bind_cols(dplyr::select(datt, -matches("Dim")),
-                           dplyr::select(datt, outcome))
-      
-      (rec =
-          str_c(outcome) %>%
-          str_c(" ~ .") %>%
-          as.formula() %>%
-          recipe(datt_pca))
-      (mod = linear_reg() %>%
-          set_engine("lm"))
-      (wf =
-          workflow() %>%
-          add_recipe(rec) %>%
-          add_model(mod) %>%
-          fit(datt_pca))
-    }
-  
-  out_all = gene_set %>% set_names() %>% map(workflow_reg, datt = datt) 
-  map(out_all, ~ pluck(.x, "fit", "fit", "fit"))
   
 }
 
