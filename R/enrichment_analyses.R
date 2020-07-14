@@ -119,6 +119,6 @@ get_sig_PCs_and_sig_enrichment_on_those_PCs = function(example, m7_model){
   example = 
     example %>% 
     mutate(well_loaded_genes_on_significant_PCs = pmap(list(x = x, y = y), function(x,y)  y[x]),
-           enrichment_of_well_loaded_genes_on_significant_PCs= map_depth(well_loaded_genes_on_significant_PCs , 2, my_vis)) 
+           enrichment_of_well_loaded_genes_on_significant_PCs= map_depth(well_loaded_genes_on_significant_PCs, 2, my_vis)) 
   
 }

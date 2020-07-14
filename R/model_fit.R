@@ -32,10 +32,17 @@ model_fit =
     if(is.element("m5", funcs))  out$m5  = fit_m5(controls, treatment, gene_set) %>% extract_m5()
     if(any(str_detect(funcs, "m6"))) {
       
-      out$m6_nn = fit_m6(datt, gene_set, "none"   ) %>% extract_m6() # no rotation (normal PCA)
+      out$m6_nn = fit_m6(datt, gene_set, "none"   ) %>% extract_m6() 
       out$m6_vx = fit_m6(datt, gene_set, "varimax") %>% extract_m6()
       out$m6_ob = fit_m6(datt, gene_set, "oblimin") %>% extract_m6()
       
+      if(0){ 
+        # ALTERNATIVELY, MORE GENERAL BUT PROBABLY TOO GENERAL UNLESS WE CONSIDER MANY ROTATIONS
+        out = out %>% 
+          append(c(m6_nn = "none", m6_vx = "varimax", m6_ob = "oblimin") %>% 
+                   map(fit_m6, datt = datt, gene_set = gene_set) %>% 
+                   map(extract_m6))
+      }
       
     }
     if(any(str_detect(funcs, "m7"))) {
