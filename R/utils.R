@@ -12,7 +12,7 @@ mediate = function(mediator, gene_set){
 }
 
 mediate_multiple = function(gene_set){
-  mediators <<- mediators
+  mediators = get("mediators", .GlobalEnv)
   args_m97 = crossing(mediators, gene_set) %>% rename(mediator = mediators) %>% 
     mutate(names = str_c(mediator, gene_set, sep = "_"))
   map2(args_m97$mediator, args_m97$gene_set, safely(mediate)) %>% set_names(args_m97$names)
