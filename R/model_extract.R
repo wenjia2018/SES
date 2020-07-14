@@ -61,9 +61,8 @@ extract_m5 = function(m, out = NULL){
 }
 
 extract_m5b = function(m, out = NULL){
-  browser()
   out$detail = m
-  out$p = min(m$adj.P.Val)
+  out$p = any(m$P.Value < (0.05 / length(m$P.Value))) # does any P.value exceed Bonferonni threshold?
   out$other = "empty"
   
   return(out = out)
