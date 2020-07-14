@@ -87,7 +87,7 @@ extract_m99 = function(m, out = NULL){
       pluck(4)
     
   }
-  out$detail = m
+  out$detail = "see code details" # m # m is quite big
   out$p = extract_p("ACME")
   out$other = "empty"
   return(out = out)
