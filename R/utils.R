@@ -11,7 +11,12 @@ mediate = function(mediator, gene_set){
   fit_m99(datt_m, gene_set) %>% extract_m99()  
 }
 
-
+mediate_multiple = function(gene_set){
+  mediators <<- mediators
+  args_m97 = crossing(mediators, gene_set) %>% rename(mediator = mediators) %>% 
+    mutate(names = str_c(mediator, gene_set, sep = "_"))
+  map2(args_m97$mediator, args_m97$gene_set, safely(mediate)) %>% set_names(args_m97$names)
+}
 
 get_table1 = function(example){ 
   tab1a = 
