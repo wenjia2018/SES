@@ -30,6 +30,7 @@ model_fit =
     if(is.element("m3", funcs))  out$m3  = fit_m3(datt, gene_set) %>% extract_m3()
     if(is.element("m4", funcs))  out$m4  = fit_m4(datt, gene_set) %>% extract_m4()
     if(is.element("m5", funcs))  out$m5  = fit_m5(controls, treatment, gene_set) %>% extract_m5()
+    if(is.element("m5", funcs))  out$m5b = fit_m5(controls, treatment, gene_set) %>% extract_m5b()
     if(any(str_detect(funcs, "m6"))) {
       
       out$m6_nn = fit_m6(datt, gene_set, "none"   ) %>% extract_m6() 

@@ -60,6 +60,15 @@ extract_m5 = function(m, out = NULL){
   return(out = out)
 }
 
+extract_m5b = function(m, out = NULL){
+  browser()
+  out$detail = m
+  out$p = min(m$adj.P.Val)
+  out$other = "empty"
+  
+  return(out = out)
+}
+
 extract_m6 = extract_m1
 
 extract_m7 =  function(m, out = NULL){

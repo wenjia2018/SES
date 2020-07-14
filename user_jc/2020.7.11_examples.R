@@ -24,7 +24,7 @@ load_data(reconciled = FALSE)
 define_treatments_and_controls()
 recode_variables_in_dat()
 print(abbreviations)
-funcs = str_subset(abbreviations$shorthand, "^m") %>% setdiff(c("m4", "m97", "m98")) # m98 breaks for some reason
+funcs = str_subset(abbreviations$shorthand, "^m") %>% setdiff(c("m4", "m97"))  
  
 ############################################################
 # EXAMPLE: SIGNATURES
