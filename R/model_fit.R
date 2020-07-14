@@ -57,10 +57,12 @@ model_fit =
       out$m7_ob$other <- get_well_loaded_genes(datt, gene_set, "oblimin")
       
     } 
+    
     if(is.element("m98", funcs)) out$m98 = fit_m98(datt, gene_set) %>% extract_m98()
     source("R/utils.R", local = TRUE)
     if(is.element("m97", funcs)) out$m97 = mediate_multiple(gene_set)
     if(is.element("m99", funcs)) out$m99 =  mediators %>% set_names() %>%map(safely(mediate), gene_set = gene_set) 
+    
     if(0){ 
       # More elegant but requires more work to unify arguments across functions
       eval_me = function(x) compose(!!!str_subset(ls(.GlobalEnv), x)) 
