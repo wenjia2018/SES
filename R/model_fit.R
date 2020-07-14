@@ -59,11 +59,7 @@ model_fit =
     } 
     if(is.element("m98", funcs)) out$m98 = fit_m98(datt, gene_set) %>% extract_m98()
     source("R/utils.R", local = TRUE)
-    if(is.element("m97", funcs)){
-      args_m97 = crossing(mediators, gene_set) %>% rename(mediator = mediators) %>% 
-        mutate(names = str_c(mediator, gene_set, sep = "_"))
-      out$m97 = map2(args_m97$mediator, args_m97$gene_set, safely(mediate)) %>% set_names(args_m97$names)
-    }
+    if(is.element("m97", funcs)) out$m97 = mediate_multiple(gene_set)
     if(is.element("m99", funcs)) out$m99 =  mediators %>% set_names() %>%map(safely(mediate), gene_set = gene_set) 
     if(0){ 
       # More elegant but requires more work to unify arguments across functions
