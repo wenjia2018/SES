@@ -30,8 +30,17 @@ DE_enrichplot = function(ttT){
     dplyr::pull(entrezgene_id)
   
   # pass entrezgene_id to enrich function, then plot
-  edo <- DOSE::enrichDGN(de)
-  barplot(edo, showCategory=20)
+  edo_DOSE <- DOSE::enrichDGN(de)
+  barplot(edo_DOSE, showCategory=20)
+  pathway_DOSE = edo_DOSE@result %>% filter(p.adjust<=0.05)
+  
+  edo_ReactomePA <- ReactomePA::enrichPathway(de)
+  barplot(edo_ReactomePA, showCategory=20)
+  pathway_ReactomePA = edo_ReactomePA@result %>% filter(p.adjust<=0.05)
+  
+  edo_clusterProfiler <- clusterProfiler::enrichKEGG(de)
+  barplot(edo_clusterProfiler, showCategory=20)
+  pathway_clusterProfiler = edo_clusterProfiler@result %>% filter(p.adjust<=0.05)
 }
 
 
