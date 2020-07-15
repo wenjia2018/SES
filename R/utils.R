@@ -1,5 +1,4 @@
 mediate = function(mediator, gene_set){
-  
   datt_m = 
     prepro(gene_set, treatment, c(controls, mediator)) %>%
     rename(treatment = treatment,
@@ -33,7 +32,7 @@ get_table1 = function(example){
     hoist(m2, pm2 = "p") %>% 
     hoist(m3, pm3 = "p") %>% 
     hoist(m5, pm5 = "p") %>%
-    hoist(m5b, pm5b = "p") %>% 
+    hoist(m5b, pm5b = "p") %>%
     discard(is.list)
   
   # mediation

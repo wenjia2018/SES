@@ -363,7 +363,8 @@ fit_m99 = function(datt, gene_set){
     
     out.m = pluck(wf, "fit", "fit", "fit")
     
-  }else if(datt$mediator %>% table() %>% length()==2){
+  } else if(datt$mediator %>% table() %>% length() == 2){
+    
     datt$mediator = datt$mediator %>% as.character() %>%  as.numeric()
     keep = datt %>% complete.cases()
     datt_keep = datt[keep,]
@@ -373,7 +374,9 @@ fit_m99 = function(datt, gene_set){
     
     formula_m = str_c("mediator", " ~ .") %>% as.formula()
     out.m = glm(formula_m, family = "binomial", data = datt_keep %>% dplyr::select(-gene_set))
-  }else if(datt$mediator %>% table() %>% length()>2){
+    
+  } else if(datt$mediator %>% table() %>% length() > 2){
+    
     datt$mediator = datt$mediator %>% as.factor()
     keep = datt %>% complete.cases()
     datt_keep = datt[keep,]
@@ -385,6 +388,7 @@ fit_m99 = function(datt, gene_set){
     # https://stackoverflow.com/questions/28916377/r-error-with-polr-initial-value-in-vmmin-is-not-finite
     formula_m = str_c("mediator", " ~ .") %>% as.formula()
     out.m = MASS::polr(formula_m, data = datt_keep %>% dplyr::select(-gene_set), Hess=TRUE)
+    
   }
   
   

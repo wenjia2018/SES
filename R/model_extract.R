@@ -62,7 +62,8 @@ extract_m5 = function(m, out = NULL){
 
 extract_m5b = function(m, out = NULL){
   out$detail = "too big" # m
-  out$p = any(m$P.Value < (0.05 / length(m$P.Value))) # does any P.value exceed Bonferonni threshold?
+  # out$p = any(m$P.Value < (0.05 / length(m$P.Value))) # does any P.value exceed Bonferonni threshold?
+  out$p = min(m$P.Value * length(m$P.Value)) # smallest FWER corrected pvalue
   out$other = "empty"
   
   return(out = out)

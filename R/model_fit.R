@@ -26,7 +26,13 @@ model_fit =
       rename(treatment = treatment) %>% 
       remove_diseased_subjects_from_datt(gene_set_name, controls)
     
-    if(is.element("m1", funcs))  out$m1  = fit_m1(datt, gene_set) %>% extract_m1()
+    if(is.element("m1", funcs)){
+      if(str_detect(gene_set_name, "inflam1k_mRNA")){ 
+        out$m1 = NA # estimation fails here: this gene set is too big for lm to handle
+      } else {
+        out$m1  = fit_m1(datt, gene_set) %>% extract_m1()      
+      }
+    }
     if(is.element("m2", funcs))  out$m2  = fit_m2(datt, gene_set) %>% extract_m2()
     if(is.element("m3", funcs))  out$m3  = fit_m3(datt, gene_set) %>% extract_m3()
     if(is.element("m4", funcs))  out$m4  = fit_m4(datt, gene_set) %>% extract_m4()

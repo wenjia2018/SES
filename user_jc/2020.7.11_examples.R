@@ -67,12 +67,12 @@ if(example0){
   
   # REMOVE MODELS THAT ERR
   example0 = example0 %>% hoist(out, "result") %>% drop_na()
-  
+
   ############################################################
-  # GET TABLE 1
+  # TABLE 1
   ############################################################
   
-  get_table1(example0) %>% print(n = Inf)
+   get_table1(example0)  
   
   ############################################################
   # HARVEST SIGNIFICANT PCs and THEIR POSSIBLY SIGNIFICANT ENRICHMENT
