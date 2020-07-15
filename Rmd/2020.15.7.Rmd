@@ -1,0 +1,60 @@
+---
+title: 'tables and figures'
+output: html_document
+classoption: landscape
+date: '`r paste("Updated on", Sys.Date())`'
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F,comment=NULL,message=FALSE)
+library(tidyverse)
+library(knitr)
+
+```
+# Table of contents
+1. [table 1]
+2. [PCA]
+
+## table 1
+
+###### FWER is a logical value, indicating if any of the P.value is less than Bonferonni threshold (0.05 / length(P.Value))?
+* True means at least one P.value is less than Bonferonni threshold
+* False means none of the P.value is less than Bonferonni threshold
+
+
+```{r include=T,comment=NULL,message=FALSE}
+readRDS("/home/xu/ses-1/user_wx/table1.rds") %>%
+  kableExtra::kable(booktabs = T) %>%
+  kableExtra::kable_styling()
+```
+
+## PCA
+
+* pval_mancova: multivariate regression p value
+* d1:d9: p values for each pc 
+
+### pca non rotation
+
+```{r include=T,comment=NULL,message=FALSE}
+readRDS("/home/xu/ses-1/user_wx/pca_nn.rds") %>%
+  kableExtra::kable(booktabs = T) %>%
+  kableExtra::kable_styling()
+```
+
+
+### pca varimax rotation
+
+```{r include=T,comment=NULL,message=FALSE}
+readRDS("/home/xu/ses-1/user_wx/pca_vx.rds") %>%
+  kableExtra::kable(booktabs = T) %>%
+  kableExtra::kable_styling()
+```
+
+### pca oblimin rotation
+
+```{r include=T,comment=NULL,message=FALSE}
+readRDS("/home/xu/ses-1/user_wx/pca_ob.rds") %>%
+  kableExtra::kable(booktabs = T) %>%
+  kableExtra::kable_styling()
+```
