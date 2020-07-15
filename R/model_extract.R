@@ -83,6 +83,26 @@ extract_m7 =  function(m, out = NULL){
   return(out = out)
 }
 
+
+extract_m8_fwer = function(m, out = NULL){
+  
+  out$detail = NA # m
+  out$p = min(m$P.Value * length(m$P.Value)) # smallest FWER corrected pvalue
+  out$other = "empty"
+  
+  return(out = out)
+}
+
+extract_m8_fdr = function(m, out = NULL){
+  
+  out$detail = NA # m
+  out$p = min(m$adj.P.Val) # smallest FWER corrected pvalue
+  out$other = "empty"
+  
+  return(out = out)
+}
+
+
 extract_m98 = extract_m7
 
 extract_m99 = function(m, out = NULL){

@@ -67,10 +67,13 @@ model_fit =
       out$m7_ob$other <- get_well_loaded_genes(datt, gene_set, "oblimin")
       
     } 
+    if(str_detect(funcs, "m8"))  out$m8_fdr  = fit_m8(controls, treatment, gene_set) %>% extract_m8_fdr()
+    if(str_detect(funcs, "m8"))  out$m8_fwer = fit_m8(controls, treatment, gene_set) %>% extract_m8_fwer()
+    
     
     source("R/utils.R", local = TRUE)
     if(is.element("m97", funcs)) out$m97 = mediate_multiple(gene_set)
-    if(is.element("m99", funcs)) out$m99 =  mediators %>% set_names() %>% map(safely(mediate), gene_set = gene_set) 
+    if(is.element("m99", funcs)) out$m99 = mediators %>% set_names() %>% map(safely(mediate), gene_set = gene_set) 
     
     if(0){ 
       # More elegant but requires more work to unify arguments across functions

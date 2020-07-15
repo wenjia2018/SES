@@ -1,5 +1,4 @@
-de_and_tfbm <- function(treatment, controls) {
-  
+de_and_tfbm <- function(treatment, controls, de_only = FALSE) {
   
   # Specify whole-genome regression of rna on design
   y <- dat %>% Biobase::exprs()
@@ -19,6 +18,8 @@ de_and_tfbm <- function(treatment, controls) {
     lmFit(y, X) %>%
     eBayes %>%
     tidy_topTable(of_in = treatment)
+  
+  if(de_only) return(ttT)
   
   fig1 = DE_enrichplot(ttT)
   

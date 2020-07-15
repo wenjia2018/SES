@@ -15,6 +15,8 @@ abbreviations =
     "m7_vx", "PCA varimax rotated: regress PCs on covariates, one by one (see m6 for complementary analysis)",
     "m6_ob", "PCA oblimin rotated: multivariate outcome = top PCs in signature set",
     "m7_ob", "PCA oblimin rotated: regress PCs on covariates, one by one (see m6 for complementary analysis)",
+    "m8_fdr", "multiple testing (FDR) corrected over ALL genome",
+    "m8_fwer", "multiple testing (FWER) just within each signature set",
     "m97", "mediation (outcome = single gene mRNA in disease signature)",
     "m99", "mediation (outcome = mean mRNA)"
   )
@@ -241,7 +243,13 @@ fit_m5 = function(controls, treatment, gene_set){
   ttT
 }
 
-
+fit_m8 = function(controls, treatment, gene_set){
+  
+  ttT  = de_and_tfbm(treatment, controls, de_only = TRUE)
+  
+  ttT %>% filter(gene %in% gene_set)
+  
+  }
 ############################################################
 #  PCA: m6, m7
 ############################################################
