@@ -85,7 +85,7 @@ if(example0){
   # INSPECT MODELS WHICH HAVE SIGNIFICANT PCs
   interesting_PCS =
     example0 %>%
-    select(treatment, controls, gene_set_name, matches("well_loaded")) %>%
+    dplyr::select(treatment, controls, gene_set_name, matches("well_loaded")) %>%
     drop_na()
   print(interesting_PCS, n = Inf)
   
@@ -93,10 +93,10 @@ if(example0){
   particularly_interesting_row = 1
   
   # WHAT ARE THE WELL-LOADED GENES FOR EACH SIGNIFICANT PC IN THIS ROW?
-  interesting_PCS %>% slice(particularly_interesting_row) %>% pluck(4)
+  interesting_PCS %>% dplyr::slice(particularly_interesting_row) %>% pluck(4)
   
   # WHAT IS THE ENRICHMENT STATUS OF THESE PCs
-  interesting_PCS %>% slice(particularly_interesting_row) %>% pluck(5)
+  interesting_PCS %>% dplyr::slice(particularly_interesting_row) %>% pluck(5)
 }
 
 ############################################################
