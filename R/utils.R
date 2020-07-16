@@ -33,6 +33,8 @@ get_table1 = function(example){
     hoist(m3, pm3 = "p") %>% 
     hoist(m5, pm5 = "p") %>%
     hoist(m5b, pm5b = "p") %>%
+    hoist(m8_fwer, m8_fwer_p = "p") %>% 
+    hoist(m8_fdr, m8_fdr_p = "p") %>% 
     discard(is.list)
   
   # mediation

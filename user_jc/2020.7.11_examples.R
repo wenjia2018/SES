@@ -32,7 +32,7 @@ funcs = str_subset(abbreviations$shorthand, "^m") %>% setdiff(c("m4", "m97"))
 
 if(example0){
   
-  if(from_disk <- TRUE){
+  if(from_disk <- FALSE){
     
     example0 = readRDS("/home/share/scratch/example0.rds")
     
@@ -62,7 +62,7 @@ if(example0){
   
   # WHAT CAUSES ERROR? RELATE NA TO ARGS OF model_fit()
   example0 %>%
-    hoist(out, p = list("result", "m1", 1, "p")) %>%
+    hoist(out, p = list("result", "m5", 1, "p")) %>%
     with(table(gene_set_name, is.na(p)))
   
   # REMOVE MODELS THAT ERR
@@ -72,7 +72,7 @@ if(example0){
   # TABLE 1
   ############################################################
   
-   get_table1(example0)  
+   get_table1(example0)
   
   ############################################################
   # HARVEST SIGNIFICANT PCs and THEIR POSSIBLY SIGNIFICANT ENRICHMENT
@@ -81,6 +81,7 @@ if(example0){
   # FIRST PICK A PCA "ROTATION"
   m7_model = "m7_nn" # of "m7_nn", "m7_vx", "m7_ob"
   example0 = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs(m7_model)
+  detach("package:AnnotationDbi", unload = TRUE)
   
   # INSPECT MODELS WHICH HAVE SIGNIFICANT PCs
   interesting_PCS =

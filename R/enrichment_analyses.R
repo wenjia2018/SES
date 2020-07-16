@@ -30,17 +30,22 @@ DE_enrichplot = function(ttT){
     dplyr::pull(entrezgene_id)
   
   # pass entrezgene_id to enrich function, then plot
-  edo_DOSE <- DOSE::enrichDGN(de)
-  barplot(edo_DOSE, showCategory=20)
-  pathway_DOSE = edo_DOSE@result %>% filter(p.adjust<=0.05)
   
-  edo_ReactomePA <- ReactomePA::enrichPathway(de)
-  barplot(edo_ReactomePA, showCategory=20)
-  pathway_ReactomePA = edo_ReactomePA@result %>% filter(p.adjust<=0.05)
+  # edo_DOSE <- DOSE::enrichDGN(de)
+  # fig_DOSE = barplot(edo_DOSE, showCategory=20, title = "DOSE")
   
-  edo_clusterProfiler <- clusterProfiler::enrichKEGG(de)
-  barplot(edo_clusterProfiler, showCategory=20)
-  pathway_clusterProfiler = edo_clusterProfiler@result %>% filter(p.adjust<=0.05)
+  edo_reactome <- ReactomePA::enrichPathway(de)
+  fig_reactome = barplot(edo_reactome, showCategory=20, title = "Reactome")
+  
+  edo_kegg <- clusterProfiler::enrichKEGG(de)
+  fig_kegg = barplot(edo_kegg, showCategory=20, title = "Kegg")
+  
+  
+  # detach("package:clusterProfiler", unload=TRUE)
+  # detach("package:ReactomePA", unload=TRUE)
+  
+  fig = list(reactome = fig_reactome, kegg = fig_kegg)
+  return (fig)
 }
 
 
@@ -66,10 +71,20 @@ my_vis = function(DE_list, p_val_threshold = 0.05){
     left_join(results, by = c("gene" = "hgnc_symbol")) %>% 
     dplyr::pull(entrezgene_id)
   
-  edo <- DOSE::enrichDGN(de)
-  fig = barplot(edo, showCategory=20)
-  enriched_physiology = edo@result %>% filter(p.adjust <= p_val_threshold) %>% pull(Description)  
+  edo_reactome <- ReactomePA::enrichPathway(de)
+  fig_reactome = barplot(edo_reactome, showCategory=20, title = "Reactome")
+  enriched_physiology_reactome = edo_reactome@result %>% filter(p.adjust <= p_val_threshold) %>% pull(Description)  
   
+  edo_kegg <- clusterProfiler::enrichKEGG(de)
+  fig_kegg = barplot(edo_kegg, showCategory=20, title = "Kegg")
+  enriched_physiology_kegg = edo_kegg@result %>% filter(p.adjust <= p_val_threshold) %>% pull(Description)  
+  
+  fig = list(reactome = fig_reactome, kegg = fig_kegg)
+  enriched_physiology = list(reactome = enriched_physiology_reactome, kegg = enriched_physiology_kegg)
+  
+  # detach("package:clusterProfiler", unload=TRUE)
+  # detach("ReactomePA:clusterProfiler", unload=TRUE)
+  # 
   list(out = list(fig = fig, enriched_physiology = enriched_physiology))
 }
 
@@ -128,6 +143,6 @@ get_sig_PCs_and_sig_enrichment_on_those_PCs = function(example, m7_model){
   example = 
     example %>% 
     mutate(well_loaded_genes_on_significant_PCs = pmap(list(x = x, y = y), function(x,y)  y[x]),
-           enrichment_of_well_loaded_genes_on_significant_PCs= map_depth(well_loaded_genes_on_significant_PCs, 2, my_vis)) 
+           enrichment_of_well_loaded_genes_on_significant_PCs = map_depth(well_loaded_genes_on_significant_PCs, 2, my_vis)) 
   
 }

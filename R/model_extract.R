@@ -87,7 +87,7 @@ extract_m7 =  function(m, out = NULL){
 extract_m8_fwer = function(m, out = NULL){
   
   out$detail = NA # m
-  out$p = min(m$P.Value * length(m$P.Value)) # smallest FWER corrected pvalue
+  out$p = min( min(m$P.Value * length(m$P.Value)), 1) # smallest FWER corrected pvalue
   out$other = "empty"
   
   return(out = out)
