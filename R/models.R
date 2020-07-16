@@ -295,7 +295,7 @@ fit_m6 = function(datt, gene_set, rotate){
 
 
 fit_m7 = function(datt, gene_set, rotate){
-  
+  out = NULL
   pca_rotated = fit_pca_util(datt, gene_set, rotate) 
   datt = dplyr::select(datt, -gene_set) 
   gene_set = colnames(pca_rotated$scores)
@@ -319,11 +319,14 @@ fit_m7 = function(datt, gene_set, rotate){
           fit(datt_pca))
     }
   
-  gene_set %>% 
+  out$fit = gene_set %>% 
     set_names() %>% 
     map(workflow_reg, datt = datt) %>% 
     map(~ pluck(.x, "fit", "fit", "fit"))
   
+  out$varexplained = pca_rotated$Vaccounted[4,] %>% as.list()
+  
+  out
 }
 
 ############################################################

@@ -76,8 +76,9 @@ extract_m7 =  function(m, out = NULL){
   extract_anova = function(x) anova(x) %>% tidy %>% filter(str_detect(term, "treatment"))
   
   # Univariate parametric
-  out$detail = m %>% map(extract_anova)
+  out$detail = m$fit %>% map(extract_anova)
   out$p = out$detail %>% map_dbl(pluck("p.value"))
+  out$varexplained = m$varexplained
   out$other = "empty"
   
   return(out = out)
