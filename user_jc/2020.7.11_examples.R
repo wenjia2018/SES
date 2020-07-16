@@ -81,7 +81,6 @@ if(example0){
   # FIRST PICK A PCA "ROTATION"
   m7_model = "m7_nn" # of "m7_nn", "m7_vx", "m7_ob"
   example0 = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs(m7_model)
-  detach("package:AnnotationDbi", unload = TRUE)
   
   # INSPECT MODELS WHICH HAVE SIGNIFICANT PCs
   interesting_PCS =

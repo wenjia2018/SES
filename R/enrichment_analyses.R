@@ -40,9 +40,7 @@ DE_enrichplot = function(ttT){
   edo_kegg <- clusterProfiler::enrichKEGG(de)
   fig_kegg = barplot(edo_kegg, showCategory=20, title = "Kegg")
   
-  
-  # detach("package:clusterProfiler", unload=TRUE)
-  # detach("package:ReactomePA", unload=TRUE)
+  list("clusterProfiler", "DO.db", "ReactomePA", "reactome.db", "DOSE", "graphite", "enrichplot",  "GO.db", "GOSemSim", "AnnotationDbi") %>% map(detach_package)
   
   fig = list(reactome = fig_reactome, kegg = fig_kegg)
   return (fig)
@@ -82,9 +80,9 @@ my_vis = function(DE_list, p_val_threshold = 0.05){
   fig = list(reactome = fig_reactome, kegg = fig_kegg)
   enriched_physiology = list(reactome = enriched_physiology_reactome, kegg = enriched_physiology_kegg)
   
-  # detach("package:clusterProfiler", unload=TRUE)
-  # detach("ReactomePA:clusterProfiler", unload=TRUE)
-  # 
+  list("clusterProfiler", "DO.db", "ReactomePA", "reactome.db", "DOSE", "graphite", "enrichplot",  "GO.db", "GOSemSim") %>% map(detach_package)
+  
+ 
   list(out = list(fig = fig, enriched_physiology = enriched_physiology))
 }
 

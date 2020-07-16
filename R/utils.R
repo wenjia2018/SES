@@ -54,3 +54,17 @@ get_table1 = function(example){
     tab1a %>% left_join(tab1b)
   )
 }
+
+detach_package <- function(abcpkg, character.only = FALSE)
+  # https://stackoverflow.com/questions/6979917/how-to-unload-a-package-without-restarting-r
+{
+  if(!character.only)
+  {
+    abcpkg <- deparse(substitute(abcpkg))
+  }
+  search_item <- paste("package", abcpkg, sep = ":")
+  while(search_item %in% search())
+  {
+    detach(search_item, unload = TRUE, character.only = TRUE)
+  }
+}
