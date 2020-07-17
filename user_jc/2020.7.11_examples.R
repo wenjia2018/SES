@@ -40,7 +40,8 @@ if(example0){
     
     example0 =
       args %>%
-      filter(is.element(gene_set_name, table1)) %>%
+      filter(is.element(gene_set_name, table1),
+             controls == "all") %>%
       mutate(out = pmap(., safely(model_fit), funcs),
              controls = names(controls))
     
@@ -80,7 +81,10 @@ if(example0){
   
   # FIRST PICK A PCA "ROTATION"
   m7_model = "m7_nn" # of "m7_nn", "m7_vx", "m7_ob"
-  example0 = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs(m7_model)
+  example0 = 
+    example0 %>% 
+    filter(controls == "all") %>% 
+    get_sig_PCs_and_sig_enrichment_on_those_PCs(m7_model)
   
   # INSPECT MODELS WHICH HAVE SIGNIFICANT PCs
   interesting_PCS =
@@ -90,7 +94,7 @@ if(example0){
   print(interesting_PCS, n = Inf)
   
   # PICK YOUR FAVORITE ROW OF PRECEDING TABLE TO VISUALIZE
-  particularly_interesting_row = 1
+  particularly_interesting_row = 21
   
   # WHAT ARE THE WELL-LOADED GENES FOR EACH SIGNIFICANT PC IN THIS ROW?
   interesting_PCS %>% dplyr::slice(particularly_interesting_row) %>% pluck(4)

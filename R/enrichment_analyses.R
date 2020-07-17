@@ -116,6 +116,7 @@ get_sig_PCs_and_sig_enrichment_on_those_PCs = function(example, m7_model){
   n_args =   length(table1) # LESS CONSEVRATIVE: the number of signature sets
   n_pc_dims = 9 # number of dimensions on LHS
   bonferonni_threshold = 0.05 / (n_args * n_pc_dims) 
+  bonferonni_threshold = 0.05 / n_pc_dims
   tabPCA %>% 
     rowwise(treatment, gene_set_name, controls) %>%
     summarize(sum = sum(c_across(matches(m7_model)) < bonferonni_threshold)) %>% 
