@@ -24,15 +24,16 @@ load_data(reconciled = FALSE)
 define_treatments_and_controls()
 recode_variables_in_dat()
 print(abbreviations)
-funcs = str_subset(abbreviations$shorthand, "^m") %>% setdiff(c("m4", "m97"))  
- 
+funcs = str_subset(abbreviations$shorthand, "^m") 
+funcs = funcs %>% str_subset("m[6-8]")
+
 ############################################################
 # EXAMPLE: SIGNATURES
 ############################################################
 
 if(example0){
   
-  if(from_disk <- FALSE){
+  if(from_disk <- TRUE){
     
     example0 = readRDS("/home/share/scratch/example0.rds")
     
@@ -41,60 +42,34 @@ if(example0){
     example0 =
       args %>%
       filter(is.element(gene_set_name, table1),
-             controls == "all") %>%
+             names(controls) == "all") %>% 
       mutate(out = pmap(., safely(model_fit), funcs),
              controls = names(controls))
     
     saveRDS(example0, "/home/share/scratch/example0.rds")
     
   }
+   
+  example0 = remove_errors(example0) 
+  get_table1(example0)
   
-  ############################################################
-  # ANY ESTIMATION ERRORS?
-  ############################################################
+  # ESTIMATE VARIOUS PCA "ROTATIONS"
+  example0_m7_nn = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_nn")  
+  example0_m7_vx = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_vx")
+  example0_m7_ob = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_ob")
   
-  # ERRORS:
-  example0 %>%
-    hoist(out, "error") %>%
-    mutate(error = map(error, as.character)) %>%
-    unnest(error) %>%
-    group_by(error) %>%
-    slice(1)
-  
-  # WHAT CAUSES ERROR? RELATE NA TO ARGS OF model_fit()
-  example0 %>%
-    hoist(out, p = list("result", "m5", 1, "p")) %>%
-    with(table(gene_set_name, is.na(p)))
-  
-  # REMOVE MODELS THAT ERR
-  example0 = example0 %>% hoist(out, "result") %>% drop_na()
-
-  ############################################################
-  # TABLE 1
-  ############################################################
-  
-   get_table1(example0)
-  
-  ############################################################
-  # HARVEST SIGNIFICANT PCs and THEIR POSSIBLY SIGNIFICANT ENRICHMENT
-  ############################################################
-  
-  # FIRST PICK A PCA "ROTATION"
-  m7_model = "m7_nn" # of "m7_nn", "m7_vx", "m7_ob"
-  example0 = 
-    example0 %>% 
-    filter(controls == "all") %>% 
-    get_sig_PCs_and_sig_enrichment_on_those_PCs(m7_model)
+  # PICK A ROTATION
+  which_rotation = example0_m7_nn
   
   # INSPECT MODELS WHICH HAVE SIGNIFICANT PCs
   interesting_PCS =
-    example0 %>%
+    which_rotation %>%
     dplyr::select(treatment, controls, gene_set_name, matches("well_loaded")) %>%
     drop_na()
   print(interesting_PCS, n = Inf)
   
   # PICK YOUR FAVORITE ROW OF PRECEDING TABLE TO VISUALIZE
-  particularly_interesting_row = 21
+  particularly_interesting_row = 1
   
   # WHAT ARE THE WELL-LOADED GENES FOR EACH SIGNIFICANT PC IN THIS ROW?
   interesting_PCS %>% dplyr::slice(particularly_interesting_row) %>% pluck(4)

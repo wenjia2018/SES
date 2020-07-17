@@ -32,6 +32,18 @@ example0 =
   hoist(out, "result") %>% 
   drop_na()
 
+
+example0 %>%  
+  hoist(result, "m8_fdr_p")  %>% 
+  unnest(!!funcs) %>% 
+  hoist(m1, pm1 = "p") %>% 
+  hoist(m2, pm2 = "p") %>% 
+  hoist(m3, pm3 = "p") %>% 
+  hoist(m5, pm5 = "p") %>%
+  hoist(m5b, pm5b = "p") %>%
+  hoist(m8_fwer, m8_fwer_p = "p") %>% 
+  hoist(m8_fdr, m8_fdr_p = "p") %>% 
+
 ############################################################
 # TABLE 1
 ############################################################

@@ -82,7 +82,7 @@ my_vis = function(DE_list, p_val_threshold = 0.05){
   
   list("clusterProfiler", "DO.db", "ReactomePA", "reactome.db", "DOSE", "graphite", "enrichplot",  "GO.db", "GOSemSim") %>% map(detach_package)
   
- 
+  
   list(out = list(fig = fig, enriched_physiology = enriched_physiology))
 }
 
