@@ -78,8 +78,7 @@ extract_m7 =  function(m, out = NULL){
   # Univariate parametric
   out$detail = m$fit %>% map(extract_anova)
   out$p = out$detail %>% map_dbl(pluck("p.value"))
-  out$varexplained = m$varexplained
-  out$other = "empty"
+  out$other$varexplained = m$varexplained 
   
   return(out = out)
 }
