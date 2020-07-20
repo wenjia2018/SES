@@ -25,34 +25,38 @@ get_table1 = function(example){
   
   tab1a = 
     example %>% 
-    # hoist(out, "result") %>% 
     hoist(result, !!!funcs)  %>% 
     unnest(!!funcs) %>% 
-    hoist(m1, pm1 = "p") %>% 
-    hoist(m2, pm2 = "p") %>% 
-    hoist(m3, pm3 = "p") %>% 
-    hoist(m5, pm5 = "p") %>%
-    hoist(m5b, pm5b = "p") %>%
+    # hoist(m1, pm1 = "p") %>% 
+    # hoist(m2, pm2 = "p") %>% 
+    # hoist(m3, pm3 = "p") %>% 
+    # hoist(m5, pm5 = "p") %>%
+    # hoist(m5b, pm5b = "p") %>%
     hoist(m8_fwer, m8_fwer_p = "p") %>% 
     hoist(m8_fdr, m8_fdr_p = "p") %>% 
     discard(is.list)
   
-  # mediation
-  tab1b = 
-    example %>% 
-    # hoist(out, "result") %>% 
-    hoist(result, !!!funcs)  %>% 
-    unnest(m99) %>%
-    unnest_wider(m99) %>% 
-    hoist(w5bmi, w5bmi_p = c("result", "p"))  %>% 
-    hoist(bingedrink, bingedrink_p = c("result", "p"))  %>% 
-    hoist(currentsmoke, currentsmoke_p = c("result", "p"))  %>% 
-    hoist(phys_activ_ff5, phys_activ_ff5_p = c("result", "p"))  %>%   
-    discard(is.list)
-  
-  (
+  if(0){ 
+    
+    # mediation
+    tab1b = 
+      example %>% 
+      hoist(result, !!!funcs)  %>% 
+      unnest(m99) %>%
+      unnest_wider(m99) %>% 
+      hoist(w5bmi, w5bmi_p = c("result", "p"))  %>% 
+      hoist(bingedrink, bingedrink_p = c("result", "p"))  %>% 
+      hoist(currentsmoke, currentsmoke_p = c("result", "p"))  %>% 
+      hoist(phys_activ_ff5, phys_activ_ff5_p = c("result", "p"))  %>%   
+      discard(is.list)
+    
     tab1a %>% left_join(tab1b)
-  )
+    
+  } else {
+    
+    tab1a
+    
+  }
 }
 
 detach_package <- function(abcpkg, character.only = FALSE)
@@ -67,4 +71,25 @@ detach_package <- function(abcpkg, character.only = FALSE)
   {
     detach(search_item, unload = TRUE, character.only = TRUE)
   }
+}
+
+
+remove_errors = function(example){
+  
+  # ERRORS:
+  example %>%
+    hoist(out, "error") %>%
+    mutate(error = map(error, as.character)) %>%
+    unnest(error) %>%
+    group_by(error) %>%
+    slice(1) %>% 
+    print()
+  
+  # WHAT CAUSES ERROR? RELATE NA TO ARGS OF model_fit()
+  example %>%
+    hoist(out, p = list("result", "m5", 1, "p")) %>%
+    with(table(gene_set_name, is.na(p))) 
+  
+  # REMOVE MODELS THAT ERR
+  example = example %>% hoist(out, "result") %>% drop_na()
 }
