@@ -17,6 +17,7 @@ abbreviations =
     "m7_ob", "PCA oblimin rotated: regress PCs on covariates, one by one (see m6 for complementary analysis)",
     "m8_fdr", "multiple testing (FDR) corrected over ALL genome",
     "m8_fwer", "multiple testing (FWER) just within each signature set",
+    "m96", "cibersort cell type compositional analysis",
     "m97", "mediation (outcome = single gene mRNA in disease signature)",
     "m99", "mediation (outcome = mean mRNA)"
   )
