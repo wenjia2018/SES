@@ -18,7 +18,6 @@ celltype_cibersort <- function(treatment, controls) {
   data <- pData(dat) %>% dplyr::select(all_of(term)) %>% rename(treatment = treatment)
   rhs <- str_c(data %>% colnames(), collapse = " + ")
   keep <- data %>%
-    # dplyr::select(all_of(term)) %>%
     complete.cases() # keep only the complete cases
   nsubs <- sum(keep) # number of complete cases
 
