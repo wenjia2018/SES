@@ -106,3 +106,21 @@ if(example1){
     pluck("result")
   
 }
+
+############################################################
+# EXAMPLE: cibersort compositional 
+############################################################
+funcs = "m96"
+
+# note gene_set_name is not used in this example, but in order to be consistent
+# with the model_fit arguments, any gene_set_name needs to be filled, also controls
+# has to be fixed as basic for cell type compositional analysis
+# (no need to control cell type)
+# debugonce(model_fit)
+example3 =
+  args %>% 
+  filter(treatment == "ses_sss_composite",
+         names(controls) == "basic",
+         gene_set_name == "Rheumatoid_Arthritis_mRNA") %>%
+  mutate(out = pmap(., safely(model_fit), funcs),
+         controls = names(controls))

@@ -8,7 +8,7 @@ model_fit =
     ############################################################
     
     if(gene_set_name == "whole_genome_and_tfbm") return(de_and_tfbm(treatment, controls)) 
-    
+    if(funcs == "m96") return(celltype_cibersort(treatment, controls)) 
     ############################################################
     # OTHERWISE (FOR SMALLER GENE SETS OF INTEREST)
     ############################################################
@@ -73,7 +73,7 @@ model_fit =
       out$m8_fwer = fit_m8(controls, treatment, gene_set) %>% extract_m8_fwer()
       
     }
-
+   
     source("R/utils.R", local = TRUE)
     if(is.element("m97", funcs)) out$m97 = mediate_multiple(gene_set)
     if(is.element("m99", funcs)) out$m99 = mediators %>% set_names() %>% map(safely(mediate), gene_set = gene_set) 
