@@ -21,6 +21,27 @@ mediate_multiple = function(gene_set){
   
 }
 
+mediate_pca = function(mediator, gene_set, rotate){
+  datt_m = 
+    prepro(gene_set, treatment, c(controls, mediator)) %>%
+    rename(treatment = treatment,
+           mediator = mediator) %>% 
+    remove_diseased_subjects_from_datt(gene_set_name, controls)
+  
+  pca_rotated = fit_pca_util(datt_m, gene_set, rotate, ncomp = 9) 
+  
+  datt_m = dplyr::select(datt_m, -gene_set) 
+  outcome = colnames(pca_rotated$scores) %>% set_names()
+  
+  convert_outcome = function(outcome, datt_m){
+    datt_pca = bind_cols(datt_m, !!outcome := pca_rotated$scores[, outcome])
+  }
+  
+  datt_pca = outcome %>% map(convert_outcome, datt = datt_m)
+  
+ map2(datt_pca, outcome, fit_m99) %>% map(extract_m99)  
+}
+
 get_table1 = function(example){ 
   
   tab1a = 
