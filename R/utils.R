@@ -21,7 +21,7 @@ mediate_multiple = function(gene_set){
   
 }
 
-mediate_pca = function(mediator, gene_set, rotate){
+mediate_pca = function(mediator, gene_set, rotate, pca_out){
   datt_m = 
     prepro(gene_set, treatment, c(controls, mediator)) %>%
     rename(treatment = treatment,
@@ -38,8 +38,11 @@ mediate_pca = function(mediator, gene_set, rotate){
   }
   
   datt_pca = outcome %>% map(convert_outcome, datt = datt_m)
-  
- map2(datt_pca, outcome, fit_m99) %>% map(extract_m99)  
+  # only do mediation for significant PCs, p values are corrected by bonferonni
+  threshold = 0.05 / length(pca_out$p)
+  sig = pca_out$p < threshold
+  print("please be aware: p value correction is bonferonni for now")
+ map2(datt_pca[sig], outcome[sig], fit_m99) %>% map(extract_m99)  
 }
 
 get_table1 = function(example){ 
