@@ -66,9 +66,9 @@ model_fit =
       out$m7_ob$other$well_loaded <- get_well_loaded_genes(datt, gene_set, "oblimin")
       
       # for each of the pca, do mediational analysis for each pc
-      out$m7_nn$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "none")
-      out$m7_vx$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "varimax")
-      out$m7_ob$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "oblimin")
+      out$m7_nn$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "none", out$m7_nn)
+      out$m7_vx$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "varimax", out$m7_vx)
+      out$m7_ob$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "oblimin", out$m7_ob)
     } 
     
     if(any(str_detect(funcs, "m8"))){
