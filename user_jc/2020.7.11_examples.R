@@ -5,7 +5,7 @@
 #'      toc: true
 #'      highlight: zenburn
 #' ---
-
+#' <!-- rmarkdown::render("supervised_play/nice_code.R") -->
 #' <!-- [See here.](http://brooksandrew.github.io/simpleblog/articles/render-reports-directly-from-R-scripts/) -->
 #+ warning=FALSE, message=FALSE
 
@@ -27,9 +27,9 @@ library(dbr) # my package
 walk(dir(path = here("R"),full.names = TRUE), source)
 fit_m4 = partial(fit_m4, n_perm = 1000) # specify n_perm
 
-# WHICH EXAMPLES TO RUN?
+# WHICH EXAMPLES TO RUN? 
 example4 <- example3 <- example2 <- example1 <- example0 <- FALSE
-example4 <- TRUE
+example4 <- TRUE 
 
 ############################################################
 # LOAD DATA, DEFINE VARIABLES, RECODE VARIABLES
@@ -75,6 +75,9 @@ if(example0){
   
   # PICK A ROTATION
   which_rotation = example0_m7_nn
+  # remove unused packages (including dependency) in this session which has conflicts with tidyverse
+  list("clusterProfiler", "DO.db", "ReactomePA", "reactome.db", "DOSE", "graphite", "enrichplot",  "GO.db", "GOSemSim" ,
+       "org.Hs.eg.db", "AnnotationDbi", "IRanges", "S4Vectors") %>% map(detach_package, TRUE)
   
   # INSPECT MODELS WHICH HAVE SIGNIFICANT PCs
   interesting_PCS =
@@ -184,4 +187,4 @@ if(example4){
   
 }
 
-#' <!-- rmarkdown::render("supervised_play/nice_code.R") -->
+ 
