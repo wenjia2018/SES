@@ -14,7 +14,7 @@ walk(dir(path = "R",full.names = TRUE), source)
 fit_m4 = partial(fit_m4, n_perm = 1000) # specify n_perm
 
 # WHICH EXAMPLES TO RUN?
-example1 <- example0 <- TRUE
+example4 <- example1 <- example0 <- TRUE
 
 ############################################################
 # LOAD DATA, DEFINE VARIABLES, RECODE VARIABLES
@@ -49,7 +49,7 @@ if(example0){
     saveRDS(example0, "/home/share/scratch/example0.rds")
     
   }
-   
+  
   example0 = remove_errors(example0) 
   get_table1(example0)
   
@@ -129,31 +129,39 @@ example3 =
 ############################################################
 # EXAMPLE: PCA component mediational analysis
 ############################################################
-if(example4 <- FALSE){
-  funcs = "m7"
-  
-  # debugonce(model_fit)
-  example4 =
-    args %>% 
-    filter(treatment == "ses_sss_composite",
-           names(controls) == "all",
-           gene_set_name == "Rheumatoid_Arthritis_mRNA") %>%
-    mutate(out = pmap(., safely(model_fit), funcs),
-           controls = names(controls))
-  
-  example4 %>% saveRDS("/home/share/scratch/example4.rds")
-  
+if(example4){
+  if(from_disk <- TRUE){
+    
+    example4 = readRDS("/home/share/scratch/example4.rds")
+    example4 %>%
+      hoist(out, "error") %>%
+      mutate(error = map(error, as.character)) %>%
+      unnest(error)
+    
+    example4 %>%
+      hoist(out, mediation = list("result", "m7_nn", 1, "mediation")) %>% 
+      unnest_wider("mediation") %>% 
+      hoist(phys_activ_ff5, "result") %>% 
+      unnest_wider("result") %>% 
+      unnest(matches("^d")) %>%
+      unnest(matches("^d"))
+    
+  } else { 
+    
+    funcs = "m7" # rename please: lets keep try to keep most variables immutable to reduce unintended side effects
+    
+    # debugonce(model_fit)
+    example4 =
+      args %>% 
+      filter(treatment == "ses_sss_composite",
+             names(controls) == "all",
+             gene_set_name == "Rheumatoid_Arthritis_mRNA") %>%
+      mutate(out = pmap(., safely(model_fit), funcs),
+             controls = names(controls))
+    
+    example4 %>% saveRDS("/home/share/scratch/example4.rds")
+    
+  }
 }
 
-example4 = readRDS("/home/share/scratch/example4.rds")
-example4 %>%
-  hoist(out, "error") %>%
-  mutate(error = map(error, as.character)) %>%
-  unnest(error)
 
-  example4 %>%
-  hoist(out, mediation = list("result", "m7_nn", 1, "mediation")) %>% 
-  unnest_wider("mediation") %>% 
-  hoist(phys_activ_ff5, "result") %>% 
-  unnest_wider("result")
-  
