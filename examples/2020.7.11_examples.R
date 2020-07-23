@@ -1,5 +1,5 @@
 #' ---
-#' title: Nice code
+#' title: Examples
 #' output:
 #'    html_document:
 #'      toc: true
@@ -7,7 +7,9 @@
 #' ---
 #' <!-- rmarkdown::render("supervised_play/nice_code.R") -->
 #' <!-- [See here.](http://brooksandrew.github.io/simpleblog/articles/render-reports-directly-from-R-scripts/) -->
-#+ warning=FALSE, message=FALSE
+#' Set global options 
+#+ setup, warning=FALSE, message=FALSE
+# knitr::opts_chunk$set(echo = FALSE)
 
 set.seed(123)
 library(here)
@@ -23,6 +25,7 @@ library(Biobase)
 library(enrichplot)
 library(dbr) # my package
 
+#+ new_chunk
 walk(dir(path = here("R"),full.names = TRUE), source)
 fit_m4 = partial(fit_m4, n_perm = 1000) # specify n_perm
 

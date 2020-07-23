@@ -61,9 +61,9 @@ model_fit =
       out$m7_ob  = fit_m7(datt, gene_set, "oblimin") %>% extract_m7()
       
       # for each of the results just calculated above, append the genes loading high in this dimension
-      out$m7_nn$other <- get_well_loaded_genes(datt, gene_set, "none")
-      out$m7_vx$other <- get_well_loaded_genes(datt, gene_set, "varimax")
-      out$m7_ob$other <- get_well_loaded_genes(datt, gene_set, "oblimin")
+      out$m7_nn$other$well_loaded <- get_well_loaded_genes(datt, gene_set, "none")
+      out$m7_vx$other$well_loaded <- get_well_loaded_genes(datt, gene_set, "varimax")
+      out$m7_ob$other$well_loaded <- get_well_loaded_genes(datt, gene_set, "oblimin")
       
       # for each of the pca, do mediational analysis for each pc
       out$m7_nn$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "none")
