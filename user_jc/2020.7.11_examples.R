@@ -124,3 +124,36 @@ example3 =
          gene_set_name == "Rheumatoid_Arthritis_mRNA") %>%
   mutate(out = pmap(., safely(model_fit), funcs),
          controls = names(controls))
+
+
+############################################################
+# EXAMPLE: PCA component mediational analysis
+############################################################
+if(example4 <- FALSE){
+  funcs = "m7"
+  
+  # debugonce(model_fit)
+  example4 =
+    args %>% 
+    filter(treatment == "ses_sss_composite",
+           names(controls) == "all",
+           gene_set_name == "Rheumatoid_Arthritis_mRNA") %>%
+    mutate(out = pmap(., safely(model_fit), funcs),
+           controls = names(controls))
+  
+  example4 %>% saveRDS("/home/share/scratch/example4.rds")
+  
+}
+
+example4 = readRDS("/home/share/scratch/example4.rds")
+example4 %>%
+  hoist(out, "error") %>%
+  mutate(error = map(error, as.character)) %>%
+  unnest(error)
+
+  example4 %>%
+  hoist(out, mediation = list("result", "m7_nn", 1, "mediation")) %>% 
+  unnest_wider("mediation") %>% 
+  hoist(phys_activ_ff5, "result") %>% 
+  unnest_wider("result")
+  

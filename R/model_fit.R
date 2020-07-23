@@ -53,7 +53,7 @@ model_fit =
       out$m6_ob = fit_m6(datt, gene_set, "oblimin") %>% extract_m6()
       
     }
-    
+    source("R/utils.R", local = TRUE)
     if(any(str_detect(funcs, "m7"))) {
       
       out$m7_nn  = fit_m7(datt, gene_set, "none"   ) %>% extract_m7()
@@ -65,6 +65,10 @@ model_fit =
       out$m7_vx$other <- get_well_loaded_genes(datt, gene_set, "varimax")
       out$m7_ob$other <- get_well_loaded_genes(datt, gene_set, "oblimin")
       
+      # for each of the pca, do mediational analysis for each pc
+      out$m7_nn$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "none")
+      out$m7_vx$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "varimax")
+      out$m7_ob$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "oblimin")
     } 
     
     if(any(str_detect(funcs, "m8"))){
@@ -74,7 +78,6 @@ model_fit =
       
     }
    
-    source("R/utils.R", local = TRUE)
     if(is.element("m97", funcs)) out$m97 = mediate_multiple(gene_set)
     if(is.element("m99", funcs)) out$m99 = mediators %>% set_names() %>% map(safely(mediate), gene_set = gene_set) 
 
