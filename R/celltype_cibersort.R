@@ -34,7 +34,8 @@ celltype_cibersort <- function(treatment, controls) {
   m <- lm(str_c("outcomes ~ ", rhs) %>% as.formula(), data = data[keep, ])
   Manova <- extract_m1(m)
   # partial effect
-  b <- coef(m)["treatment", ] %>% compositions::ilrInv()
+  include_list <- coef(m) %>% rownames() %>% str_subset("treatment")
+  b <- coef(m)[include_list, ] %>% compositions::ilrInv()
   names(b) <- cell_types
 
   out <- list(b = b, Manova = Manova)
