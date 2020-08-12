@@ -95,7 +95,7 @@ extract_m8_fwer = function(m, out = NULL){
 
 extract_m8_fdr = function(m, out = NULL){
   
-  out$detail = NA # m
+  out$detail = m %>% slice(which.min(adj.P.Val)) # m
   out$p = min(m$adj.P.Val) # smallest FWER corrected pvalue
   out$other = "empty"
   
