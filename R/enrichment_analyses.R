@@ -71,12 +71,12 @@ my_vis = function(DE_list, p_val_threshold = 0.05){
   
   edo_reactome <- ReactomePA::enrichPathway(de)
   fig_reactome = barplot(edo_reactome, showCategory=20, title = "Reactome")
-  enriched_physiology_reactome = edo_reactome@result %>% filter(p.adjust <= p_val_threshold) %>% pull(Description)  
-  
+  # enriched_physiology_reactome = edo_reactome@result %>% filter(p.adjust <= p_val_threshold) %>% pull(Description)  
+  enriched_physiology_reactome = edo_reactome@result %>% filter(p.adjust <= p_val_threshold)
   edo_kegg <- clusterProfiler::enrichKEGG(de)
   fig_kegg = barplot(edo_kegg, showCategory=20, title = "Kegg")
-  enriched_physiology_kegg = edo_kegg@result %>% filter(p.adjust <= p_val_threshold) %>% pull(Description)  
-  
+  # enriched_physiology_kegg = edo_kegg@result %>% filter(p.adjust <= p_val_threshold) %>% pull(Description)  
+  enriched_physiology_kegg = edo_kegg@result %>% filter(p.adjust <= p_val_threshold) 
   fig = list(reactome = fig_reactome, kegg = fig_kegg)
   enriched_physiology = list(reactome = enriched_physiology_reactome, kegg = enriched_physiology_kegg)
   
@@ -88,16 +88,15 @@ my_vis = function(DE_list, p_val_threshold = 0.05){
 
 
 
-get_sig_PCs_and_sig_enrichment_on_those_PCs = function(example, m7_model){ 
+get_sig_PCs_and_sig_enrichment_on_those_PCs = function(example, m7_model, threshold){ 
   
   ( 
     tabPCA =
       example %>% 
       # hoist(out, result = list("result" )) %>%
       unnest(result) %>% 
-      unnest(matches("m6|m7")) %>%
+      unnest(matches("m7")) %>%
       filter(names(m7_nn) == "p") %>%
-      unnest(matches("m6")) %>%
       unnest_wider(m7_nn, names_sep = "_") %>% 
       unnest_wider(m7_vx, names_sep = "_") %>% 
       unnest_wider(m7_ob, names_sep = "_")
@@ -112,11 +111,12 @@ get_sig_PCs_and_sig_enrichment_on_those_PCs = function(example, m7_model){
   
   # HOW MANY SIGNIFICANT PCs
   
-  n_args =   dim(tabPCA)[1]  # MORE CONSERVATIVE: number of treatment/outcome/control on RHS
-  n_args =   length(table1) # LESS CONSEVRATIVE: the number of signature sets
-  n_pc_dims = 9 # number of dimensions on LHS
-  bonferonni_threshold = 0.05 / (n_args * n_pc_dims) 
-  bonferonni_threshold = 0.05 / n_pc_dims
+  # n_args =   dim(tabPCA)[1]  # MORE CONSERVATIVE: number of treatment/outcome/control on RHS
+  # n_args =   length(table1) # LESS CONSEVRATIVE: the number of signature sets
+  # n_pc_dims = 9 # number of dimensions on LHS
+  # bonferonni_threshold = 0.05 / (n_args * n_pc_dims) 
+  # bonferonni_threshold = 0.05 / n_pc_dims
+  bonferonni_threshold = threshold
   tabPCA %>% 
     rowwise(treatment, gene_set_name, controls) %>%
     summarize(sum = sum(c_across(matches(m7_model)) < bonferonni_threshold)) %>% 
@@ -136,7 +136,8 @@ get_sig_PCs_and_sig_enrichment_on_those_PCs = function(example, m7_model){
     example %>% 
     unnest(result) %>% 
     unnest_wider(m7_model) %>% 
-    pluck("other") 
+    hoist(other,"well_loaded") %>% 
+    pluck("well_loaded")
   
   # TAKE WELL-LOADED GENES OF SIGNIFICANT PCs, THEN DO ENRICHMENT
   example = 

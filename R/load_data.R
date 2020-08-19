@@ -1,4 +1,4 @@
-load_data = function(reconciled){ 
+load_data = function(reconciled, remove_inflam){ 
   
   # COMPARE WX AND JC RESULTS
   if(reconciled){
@@ -9,6 +9,12 @@ load_data = function(reconciled){
     # the analyses *before* ensuring all the differently normalized datasets have identical genes
     dat = readRDS("/home/share/preprocessed_two_batches/wx/dt_batches1_2_steve_waves_21042020.rds")
     signatures = readRDS("/home/share/preprocessed_two_batches/for_cecilia/dt_batches1_2_steve_waves_21042020_signature.rds") # from Wenjia
+  }
+  
+  if(remove_inflam) {
+    # remove inflamation genes in each signatures
+    sigs = signatures$outcome_set %>% within(rm("inflam1k_mRNA"))
+    signatures$outcome_set[names(sigs)] = map(sigs, ~setdiff(.x, signatures$outcome_set$inflam1k_mRNA))
   }
   
   signature_names = signatures$outcome_signature %>% names(.) %>% `[`(-1)
