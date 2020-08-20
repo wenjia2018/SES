@@ -28,7 +28,7 @@ mediate_pca = function(mediator, gene_set, rotate, pca_out){
            mediator = mediator) %>% 
     remove_diseased_subjects_from_datt(gene_set_name, controls)
   
-  pca_rotated = fit_pca_util(datt_m, gene_set, rotate, ncomp = 9) 
+  pca_rotated = fit_pca_util(datt_m, gene_set, rotate) 
   
   datt_m = dplyr::select(datt_m, -gene_set) 
   outcome = colnames(pca_rotated$scores) %>% set_names()
