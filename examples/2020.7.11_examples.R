@@ -7,9 +7,8 @@
 #' ---
 #' <!-- rmarkdown::render("supervised_play/nice_code.R") -->
 #' <!-- [See here.](http://brooksandrew.github.io/simpleblog/articles/render-reports-directly-from-R-scripts/) -->
-#' Set global options 
-#+ setup, warning=FALSE, message=FALSE
-# knitr::opts_chunk$set(echo = FALSE)
+#+ warning=FALSE, message=FALSE
+
 
 set.seed(123)
 library(here)
@@ -25,11 +24,10 @@ library(Biobase)
 library(enrichplot)
 library(dbr) # my package
 
-#+ new_chunk
 walk(dir(path = here("R"),full.names = TRUE), source)
 fit_m4 = partial(fit_m4, n_perm = 1000) # specify n_perm
 
-# WHICH EXAMPLES TO RUN?
+# WHICH EXAMPLES TO RUN? 
 example4 <- example3 <- example2 <- example1 <- example0 <- FALSE
 example4 <- TRUE 
 
@@ -37,13 +35,16 @@ example4 <- TRUE
 # LOAD DATA, DEFINE VARIABLES, RECODE VARIABLES
 ############################################################
 
-load_data(reconciled = FALSE)
+load_data(reconciled = FALSE, remove_inflam = TRUE)
 define_treatments_and_controls()
 recode_variables_in_dat()
 print(abbreviations)
 funcs = str_subset(abbreviations$shorthand, "^m") 
 funcs = funcs %>% str_subset("m[6-8]")
+# explicitly assign ncomp as the smallest number of table signatures gene numbers
 
+ncomp = signatures$outcome_set[table1]%>% map_dfc(length) %>% unlist() %>%  min
+fit_pca_util = partial(fit_pca_util, ncomp = ncomp) # specify n_perm
 ############################################################
 # EXAMPLE: SIGNATURES
 ############################################################
@@ -69,14 +70,19 @@ if(example0){
   
   example0 = remove_errors(example0) 
   get_table1(example0)
-  
+  # make threshold here instead inside of function get_sig...
+  # 4: number of treatment, 9: number of PCs
+  threshold = 0.05/4/9
   # ESTIMATE VARIOUS PCA "ROTATIONS"
-  example0_m7_nn = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_nn")  
-  example0_m7_vx = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_vx")
-  example0_m7_ob = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_ob")
+  example0_m7_nn = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_nn", threshold = threshold)  
+  example0_m7_vx = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_vx", threshold = threshold)
+  example0_m7_ob = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_ob", threshold = threshold)
   
   # PICK A ROTATION
   which_rotation = example0_m7_nn
+  # remove unused packages (including dependency) in this session which has conflicts with tidyverse
+  list("clusterProfiler", "DO.db", "ReactomePA", "reactome.db", "DOSE", "graphite", "enrichplot",  "GO.db", "GOSemSim" ,
+       "org.Hs.eg.db", "AnnotationDbi", "IRanges", "S4Vectors") %>% map(detach_package, TRUE)
   
   # INSPECT MODELS WHICH HAVE SIGNIFICANT PCs
   interesting_PCS =

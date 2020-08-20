@@ -42,7 +42,7 @@ DE_enrichplot = function(ttT){
   
   
   
-  fig = list(reactome = fig_reactome, kegg = fig_kegg)
+  fig = list(reactome_fig = fig_reactome, reactome_pathway = edo_reactome, kegg = fig_kegg, kegg_pathway = edo_kegg)
   return (fig)
 }
 
