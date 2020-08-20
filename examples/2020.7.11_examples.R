@@ -31,7 +31,7 @@ fit_m4 = partial(fit_m4, n_perm = 1000) # specify n_perm
 
 # WHICH EXAMPLES TO RUN?
 example4 <- example3 <- example2 <- example1 <- example0 <- FALSE
-example4 <- TRUE 
+example4 <- TRUE
 
 ############################################################
 # LOAD DATA, DEFINE VARIABLES, RECODE VARIABLES
