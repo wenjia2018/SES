@@ -255,14 +255,14 @@ fit_m8 = function(controls, treatment, gene_set){
 #  PCA: m6, m7
 ############################################################
 
-fit_pca_util = function(datt, gene_set, rotate, ncomp = 9){
+fit_pca_util = function(datt, gene_set, rotate){
   # ncomp chosen to be smaller than the smallest gene set: kidney_transplant_tolerance_mRNA with 9 elements
   pca_rotated <- psych::principal(datt[gene_set], 
                                   rotate = rotate,
                                   nfactors = ncomp, 
                                   scores = TRUE)
   
-  pca_rotated$scores = pca_rotated$scores %>%  as_tibble() %>%  set_names(str_c("d", 1:9))
+  pca_rotated$scores = pca_rotated$scores %>%  as_tibble() %>%  set_names(str_c("d", 1:ncomp))
   print(mean(pca_rotated$communality))
   plot(pca_rotated$values)
   pca_rotated
