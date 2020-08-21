@@ -2,7 +2,7 @@ de_and_tfbm <- function(treatment, controls, de_only = FALSE) {
   
   # Specify whole-genome regression of rna on design
   y <- dat %>% Biobase::exprs()
-  X <- dat %>% Biobase::pData() %>% select(all_of(controls), all_of(treatment))
+  X <- dat %>% Biobase::pData() %>% dplyr::select(all_of(controls), all_of(treatment))
   
   keep = X %>% complete.cases()
   X = X[keep, ]

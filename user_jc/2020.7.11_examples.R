@@ -35,13 +35,15 @@ example4 <- TRUE
 # LOAD DATA, DEFINE VARIABLES, RECODE VARIABLES
 ############################################################
 
-load_data(reconciled = FALSE)
+load_data(reconciled = FALSE, remove_inflam = TRUE)
 define_treatments_and_controls()
 recode_variables_in_dat()
 print(abbreviations)
 funcs = str_subset(abbreviations$shorthand, "^m") 
 funcs = funcs %>% str_subset("m[6-8]")
+# explicitly assign ncomp as the smallest number of table signatures gene numbers
 
+ncomp = signatures$outcome_set[table1]%>% map_dfc(length) %>% unlist() %>%  min
 ############################################################
 # EXAMPLE: SIGNATURES
 ############################################################
@@ -69,9 +71,9 @@ if(example0){
   get_table1(example0)
   
   # ESTIMATE VARIOUS PCA "ROTATIONS"
-  example0_m7_nn = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_nn")  
-  example0_m7_vx = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_vx")
-  example0_m7_ob = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_ob")
+  example0_m7_nn = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_nn", threshold = 0.05/36)  
+  example0_m7_vx = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_vx", threshold = 0.05/36)
+  example0_m7_ob = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_ob", threshold = 0.05/36)
   
   # PICK A ROTATION
   which_rotation = example0_m7_nn
