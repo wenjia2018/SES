@@ -97,7 +97,7 @@ extract_m8_fdr = function(m, out = NULL){
   
   out$detail = m %>% slice(which.min(adj.P.Val)) # m
   out$p = min(m$adj.P.Val) # smallest FWER corrected pvalue
-  out$other = "empty"
+  out$other = list(m = m, avg_logFC = mean(m$logFC))
   
   return(out = out)
 }
