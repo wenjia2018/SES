@@ -72,7 +72,7 @@ if(example0){
   get_table1(example0)
   # make threshold here instead inside of function get_sig...
   # 4: number of treatment, 9: number of PCs
-  threshold = 0.05/4/9
+  threshold = (0.05/4)/9
   # ESTIMATE VARIOUS PCA "ROTATIONS"
   example0_m7_nn = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_nn", threshold = threshold)  
   example0_m7_vx = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_vx", threshold = threshold)
