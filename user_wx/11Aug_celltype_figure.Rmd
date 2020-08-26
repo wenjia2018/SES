@@ -1,0 +1,145 @@
+---
+title: "SES4 celltype compositional analysis"
+output: pdf_document
+classoption: landscape
+date: '`r paste("Updated on", Sys.Date())`'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F,comment=NULL,message=FALSE)
+library(tidyverse)
+library(rlang)
+library(skimr)
+library(furrr)
+library(limma)
+library(recipes)
+library(parsnip)
+library(workflows)
+library(Biobase)
+library(enrichplot)
+library(dbr)# my package
+library(here)
+library(compositions)
+walk(dir(path = here("R"),full.names = TRUE), source)
+```
+
+```{r include=T,comment=NULL,message=FALSE, warning=FALSE}
+library(tidyverse)
+library(compositions)
+# library(easyCODA)
+example3 = readRDS("/home/share/scratch/xu/example3_celltype.rds")
+cat("Manova:","\n")
+example3 %>% filter(treatment =="ses_sss_composite") %>% hoist(out, Manova = list("result","Manova","detail")) %>% pull(Manova) %>% `[[`(1)
+b = example3 %>% filter(treatment =="ses_sss_composite") %>% hoist(out,b = list("result","b")) %>% pull(b) %>% `[[`(1)
+cat("coefficients :","\n")
+b
+# for better visulization
+b = b*10
+```
+
+<!-- ```{r include=F,comment=NULL,message=FALSE, warning=FALSE} -->
+<!-- barplot(b, args.legend = list(x = "topright", cex = 0.72),  main = "Cell type distribution (proportion)") -->
+
+
+<!-- ``` -->
+
+<!-- ```{r include=F,comment=NULL,message=FALSE, warning=FALSE} -->
+<!-- barplot(b %>% sort(), -->
+<!--         las=2, -->
+<!--         font.lab = 2,  -->
+<!--         cex.names=0.4, -->
+<!--                 # col = heat.colors(21), -->
+<!--                 # col = rainbow(21), -->
+<!--                 # col =RColorBrewer::brewer.pal(1:length(b),"Purples"), -->
+<!--         beside = TRUE, -->
+<!--         horiz = TRUE, -->
+<!--         legend.text = NULL, -->
+<!--         main =  "eFigure S3. Cell composition \n as a function of adult child’s socioeconomic status (composite),\n Add Health (n=xxxx)", -->
+<!--         font.main = 4 -->
+<!--         ) -->
+<!-- ``` -->
+
+\newpage
+```{r include=T,comment=NULL,message=FALSE, warning=FALSE, fig.width=12, fig.height=6}
+data = data.frame(celltype=names(b %>% sort()), value = b %>% sort(), row.names=NULL)
+data$celltype = data$celltype %>% str_replace_all("\\.", " ") %>% str_to_title() %>% str_squish()
+
+data$celltype <- factor(data$celltype, # Factor levels in decreasing order
+                  levels = data$celltype[order(data$value, decreasing = FALSE)])
+
+
+
+levels(data$celltype) = c(
+"T Cells Cd4 Memory, Resting", "B Cells Naive", 
+"Macrophages M2",               "Macrophages M0",              
+"Dendritic Cells, Resting",      "T Cells Regulatory (Tregs)",      
+"Eosinophils",                  "Monocytes",                  
+"T Cells Gamma Delta",          "T Cells Follicular Helper",     
+ "Macrophages M1",                 "Plasma Cells",                  
+"T Cells Cd4 Naive",              "Nk Cells, Resting",              
+"Dendritic Cells, Activated",      "Neutrophils",                   
+ "Mast Cells, Resting",             "T Cells Cd4 Memory, Activated",  
+ "B Cells Memory",                 "T Cells Cd8",                   
+ "Nk Cells, Activated")     
+
+ggplot(data = data, aes(x = celltype, y = value, fill=celltype))+
+        geom_bar(stat="identity")+
+        scale_fill_grey()+
+        ylim(0, 0.06)+
+        geom_hline(yintercept = 1/21, color = "red") +
+        coord_flip()+
+        labs(caption = "Figure S3. Cell composition as a function of adult child's socioeconomic status,\n Add Health (n = 2197)", face="bold", x = "Cell Types", y = "Magnitude") +
+  geom_vline(xintercept = 1/21, linetype="dotted", 
+                color = "red", size=1.5) +
+  
+        theme(
+        axis.ticks.y = element_blank(),
+        legend.position = "none",
+        panel.background = element_rect(fill = "transparent"), # bg of the panel
+        plot.background = element_rect(fill = "transparent", color = NA), # bg of the plot
+        panel.grid.major = element_blank(), # get rid of major grid
+        panel.grid.minor = element_blank(), # get rid of minor grid
+        legend.background = element_rect(fill = "transparent"), # get rid of legend bg
+        legend.box.background = element_rect(fill = "transparent"), # get rid of
+    # LABLES APPEARANCE
+        plot.caption = element_text(hjust = 0.5, size=14, face= "bold", colour= "black", margin = margin(t = 20, unit = "pt")),
+        axis.title.x = element_text(size=12, face="bold", colour = "black"),
+        axis.title.y = element_text(size=12, face="bold",colour = "black"),
+        axis.text.x = element_text(size=12, face="bold", colour = "black"), 
+        axis.text.y = element_text(size=12, face="bold", colour = "black") 
+  )
+# + ggsave("Test.pdf",device=cairo_pdf, width=10, height=7)
+
+```
+
+<!-- ```{r include=F,comment=NULL,message=FALSE, warning=FALSE, fig.width=15, fig.height=7} -->
+<!-- data = data.frame(celltype=names(b %>% sort()), value = b %>% sort(), row.names=NULL) -->
+<!-- data$celltype <- factor(data$celltype, # Factor levels in decreasing order -->
+<!--                   levels = data$celltype[order(data$value, decreasing = FALSE)]) -->
+<!-- ggplot(data = data, aes(x = celltype, y = value, fill=celltype))+ -->
+<!--         geom_bar(stat="identity")+ -->
+<!--         scale_fill_grey()+ -->
+<!--         ylim(0, 0.06)+ -->
+<!--         # coord_flip()+ -->
+<!--         labs(title = "eFigure S3. Cell composition \n as a function of adult child's socioeconomic status (composite),\n Add Health (n=xxxx)", face="bold", -->
+<!--              x = "cell type", y = "magnitude")+ -->
+<!--         theme( -->
+<!--         # axis.ticks = element_blank(), -->
+<!--         legend.position = "none", -->
+<!--         panel.background = element_rect(fill = "transparent"), # bg of the panel -->
+<!--         plot.background = element_rect(fill = "transparent", color = NA), # bg of the plot -->
+<!--         panel.grid.major = element_blank(), # get rid of major grid -->
+<!--         panel.grid.minor = element_blank(), # get rid of minor grid -->
+<!--         legend.background = element_rect(fill = "transparent"), # get rid of legend bg -->
+<!--         legend.box.background = element_rect(fill = "transparent"), # get rid of -->
+<!--     # LABLES APPEARANCE -->
+<!--         plot.title = element_text(hjust = 0.5, size=14, face= "bold", colour= "black" ), -->
+<!--         axis.title.x = element_text(size=14, face="bold", colour = "black"), -->
+<!--         axis.title.y = element_text(size=14, face="bold",colour = "black"), -->
+<!--         axis.text.x = element_text(size=12, face="bold", colour = "black", -->
+<!--     angle = 65, vjust = 1, hjust=1), -->
+<!--         axis.text.y = element_text(size=12, face="bold", colour = "black")  -->
+<!--   ) -->
+<!-- # + ggsave("Test.pdf",device=cairo_pdf, width=10, height=7) -->
+
+<!-- ``` -->

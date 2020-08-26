@@ -47,4 +47,4 @@ barplot(b %>% sort(),
 #         )
 
 
-# rmarkdown::render("/home/xu/ses-1/user_wx/celltype_render.R")
+#'  rmarkdown::render("/home/xu/ses-1/user_wx/celltype_render.R")

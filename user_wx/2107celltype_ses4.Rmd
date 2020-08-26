@@ -1,0 +1,104 @@
+---
+title: "SES celltype compositional analysis"
+output: html_document
+classoption: landscape
+date: '`r paste("Updated on", Sys.Date())`'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F,comment=NULL,message=FALSE)
+library(tidyverse)
+library(rlang)
+library(skimr)
+library(furrr)
+library(limma)
+library(recipes)
+library(parsnip)
+library(workflows)
+library(Biobase)
+library(enrichplot)
+library(dbr)# my package
+library(here)
+library(compositions)
+walk(dir(path = here("R"),full.names = TRUE), source)
+
+
+# WHICH EXAMPLES TO RUN?
+example1 <- example0 <- TRUE
+
+############################################################
+# LOAD DATA, DEFINE VARIABLES, RECODE VARIABLES
+############################################################
+
+load_data(reconciled = FALSE)
+define_treatments_and_controls()
+
+
+```
+
+
+```{r include=T,comment=NULL,message=FALSE, warning=FALSE}
+treatment = "ses_sss_composite"
+
+  cell_types <- controls$biological
+  cell_types <- c( 
+    "B.cells.naive", "B.cells.memory", "Plasma.cells",
+    "T.cells.CD8", "T.cells.CD4.naive", "T.cells.CD4.memory.resting",
+    "T.cells.CD4.memory.activated",
+    "T.cells.follicular.helper",
+    "T.cells.regulatory..Tregs.", "T.cells.gamma.delta",
+    "NK.cells.resting", "NK.cells.activated", "Monocytes", "Macrophages.M0", 
+    "Macrophages.M1",
+    "Macrophages.M2", "Dendritic.cells.resting",
+    "Dendritic.cells.activated", "Mast.cells.resting",
+    # "Mast.cells.activated", # all zeros
+    "Eosinophils", "Neutrophils" 
+  )
+
+term = c(controls$basic, treatment)
+
+rhs   = str_c(term, collapse = " + ")
+keep  = pData(dat) %>% dplyr::select(all_of(term)) %>% complete.cases   #keep only the complete cases
+nsubs = sum(keep)  #number of complete cases
+
+########################################################
+# DEFINE DEPENDENT VARIABLE SETS AND LOAD INTO THE GLOBAL ENV
+########################################################
+
+outcomes =  pData(dat) %>%
+  dplyr::select(all_of(cell_types)) %>% 
+  compositions::acomp() %>%
+  compositions::ilr()
+
+# ALSO SAVE ALL INTO ONE LIST
+
+
+
+m =  
+  lm(str_c("outcomes[keep, ] ~ ", rhs), 
+     data = pData(dat)[keep, ])
+m %>%  car::Manova() 
+# partial effect
+b = coef(m)[treatment, ] %>% compositions::ilrInv() 
+names(b) = cell_types
+b = b %>% sort()
+print("coefficient:",b)
+# figure
+# barplot(10*b)
+# bb =data.frame(b=b %>% as.vector(),names = cell_types)
+                     barplot(b*10,
+                             # names.arg = cell_types,
+                             # las=2,
+                             # cex.names=0.4,
+                             # col = heat.colors(21),
+                             # col = rainbow(21),
+                             # col =RColorBrewer::brewer.pal(1:length(b),"Purples"),
+                             # beside = TRUE,
+                             # horiz = TRUE,
+                             # legend.text = NULL,
+                             # xaxt = "n",#remove x label
+                             # args.legend = list(x = "topright", cex = 0.35),
+                             main = "Cell type distribution"
+                            )
+
+```
