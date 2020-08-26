@@ -1,0 +1,47 @@
+example0_m7_ob = example0 %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_ob")
+[1] "0.287577520124614  please wait: calculating enrichment for the well-loaded genes of significant PCs ..."
+Loading required package: org.Hs.eg.db
+Loading required package: AnnotationDbi
+Loading required package: stats4
+Loading required package: IRanges
+Loading required package: S4Vectors
+
+Attaching package: ‘S4Vectors’
+
+The following object is masked from ‘package:future’:
+  
+  values
+
+The following objects are masked from ‘package:dplyr’:
+  
+  first, rename
+
+The following object is masked from ‘package:tidyr’:
+  
+  expand
+
+The following object is masked from ‘package:base’:
+  
+  expand.grid
+
+
+Attaching package: ‘IRanges’
+
+The following objects are masked from ‘package:dplyr’:
+  
+  collapse, desc, slice
+
+The following object is masked from ‘package:purrr’:
+  
+  reduce
+
+
+Attaching package: ‘AnnotationDbi’
+
+The following object is masked from ‘package:dplyr’:
+  
+  select
+  
+  solution:
+    list("clusterProfiler", "DO.db", "ReactomePA", "reactome.db", "DOSE", "graphite", "enrichplot",  "GO.db", "GOSemSim" ,
+       "org.Hs.eg.db", "AnnotationDbi", "IRanges", "S4Vectors") %>% map(detach_package, TRUE)

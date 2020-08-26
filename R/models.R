@@ -460,7 +460,7 @@ fit_m99 = function(datt, gene_set){
     out.y = lm(formula_y, data = datt_keep)
     
     formula_m = str_c("mediator", " ~ .") %>% as.formula()
-    out.m = glm(formula_m, family = "binomial", data = datt_keep %>% dplyr::select(-gene_set))
+    out.m = glm(formula_m, family = binomial(link = "probit"), data = datt_keep %>% dplyr::select(-gene_set))
     
   } else if(datt$mediator %>% table() %>% length() > 2){
     

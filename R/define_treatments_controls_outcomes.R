@@ -9,12 +9,15 @@ define_treatments_and_controls = function(){
     c(
       "CVD_mRNA",
       "diabetes_mRNA",
-      "inflam1k_mRNA", "breast_cancer_mRNA",
-      "Lupus_mRNA", "Colorectal_mRNA",
+      "inflam1k_mRNA",
+      # "breast_cancer_mRNA",
+      # "Lupus_mRNA", "Colorectal_mRNA",
       "Rheumatoid_Arthritis_mRNA", "Alzheimers_mRNA",
       "Aortic_Aneurysm_mRNA", "COPD_mRNA",
       "Asthma_mRNA","Hypertension_mRNA",
-      "kidney_transplant_tolerance_mRNA"
+      "Depression_mRNA",
+      "CKD_mRNA"
+      # "kidney_transplant_tolerance_mRNA"
     )
   
   treatment = c(
@@ -65,10 +68,11 @@ define_treatments_and_controls = function(){
   
   mediators = 
     c(
-      "phys_activ_ff5",
-      "bingedrink",
+      "stress_perceived",
+      "bills",
       "currentsmoke",
-      "w5bmi"
+      "w5bmi",
+      "insurance_lack"
     )
   
   immune_tfbms = 
