@@ -3,21 +3,26 @@ load_data = function(reconciled, remove_inflam){
   # COMPARE WX AND JC RESULTS
   if(reconciled){
     # ... after reconciling
-    signatures = readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_21042020_signature.rds") # from Wenjia
-    dat = readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_21042020.rds")
+    # signatures = readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_21042020_signature.rds") # from Wenjia
+    # dat = readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_21042020.rds")
+    signatures <- readRDS("/home/share/preprocessed_two_batches/recon_25.08.2020/dt_batches1_2_steve_waves_25.08.2020_signature.rds")
+    dat <- readRDS("/home/share/preprocessed_two_batches/recon_25.08.2020/dt_batches1_2_steve_waves_25.08.2020.rds")
+    
   } else {  
     # the analyses *before* ensuring all the differently normalized datasets have identical genes
-    dat = readRDS("/home/share/preprocessed_two_batches/wx/dt_batches1_2_steve_waves_21042020.rds")
-    signatures = readRDS("/home/share/preprocessed_two_batches/for_cecilia/dt_batches1_2_steve_waves_21042020_signature.rds") # from Wenjia
+    # dat = readRDS("/home/share/preprocessed_two_batches/wx/dt_batches1_2_steve_waves_21042020.rds")
+    # signatures = readRDS("/home/share/preprocessed_two_batches/for_cecilia/dt_batches1_2_steve_waves_21042020_signature.rds") # from Wenjia
+    # after adding two new signatures and several pheno data
+    signatures <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_25.08.2020_signature.rds")
+    dat <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_25.08.2020.rds")
   }
   
   if(remove_inflam) {
     # remove inflamation genes in each signatures
-    sigs = signatures$outcome_set %>% within(rm("inflam1k_mRNA"))
-    signatures$outcome_set[names(sigs)] = map(sigs, ~setdiff(.x, signatures$outcome_set$inflam1k_mRNA))
+    signatures$outcome_set = map(signatures$outcome_set, ~setdiff(.x, signatures$outcome_set$inflam1k_mRNA))
   }
   
-  signature_names = signatures$outcome_signature %>% names(.) %>% `[`(-1)
+  signature_names = signatures$outcome_set %>% names(.)
   
   # POSSIBLY?
   signatures$outcome_set = signatures$outcome_set %>% map(str_replace_all, "-", "_") # otherwise problems downstream
