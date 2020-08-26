@@ -16,7 +16,7 @@ library(here)
 library(tidyverse) 
 library(Biobase) 
 
-walk(dir(path = here("R"),full.names = TRUE), source) 
+walk(dir(path = here("R"), full.names = TRUE), source) 
 
 ############################################################
 # LOAD DATA, DEFINE VARIABLES, RECODE VARIABLES
