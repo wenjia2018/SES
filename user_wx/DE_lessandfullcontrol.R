@@ -29,23 +29,24 @@ ncomp = signatures$outcome_set[table1]%>% map_dfc(length) %>% unlist() %>%  min
 
 example1_fullcontrol =
   args %>%
-  filter(treatment %in%c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5"),
+  filter(treatment %in%c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5",
+                         "ses_composite_pp1", "edu_p", "SEI_max_p_w12", "income_pp1_log"),
          gene_set_name == "whole_genome_and_tfbm",
          names(controls) == "all") %>%
   mutate(out = pmap(., safely(model_fit), funcs),
          controls = names(controls))
 
-# less control
-
-controls$basic = c("sex_interv", "re", "Plate", "AvgCorrelogram100")
-
-  example1_lesscontrol =
-    args %>%
-    filter(treatment %in%c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5"),
-           gene_set_name == "whole_genome_and_tfbm",
-           names(controls) == "basic") %>%
-    mutate(out = pmap(., safely(model_fit), funcs),
-           controls = names(controls))
+# # less control
+# 
+# controls$basic = c("sex_interv", "re", "Plate", "AvgCorrelogram100")
+# 
+#   example1_lesscontrol =
+#     args %>%
+#     filter(treatment %in%c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5"),
+#            gene_set_name == "whole_genome_and_tfbm",
+#            names(controls) == "basic") %>%
+#     mutate(out = pmap(., safely(model_fit), funcs),
+#            controls = names(controls))
 
   
   

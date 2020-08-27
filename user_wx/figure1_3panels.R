@@ -192,7 +192,7 @@ panelC = grid.arrange(panelT1, panelT2, panelT3, nrow =1)
 #                       )
 # ggarrange can label each element
 figure = ggarrange(
-  ggarrange(panelA, panelB, ncol = 2, labels = c("A", "B")), 
+  ggarrange(panelA, panelB, ncol = 2, labels = c("A", "B"), common.legend = TRUE, legend="right"), 
   panelC,
   nrow = 2,
   heights = c(2, 0.7),
