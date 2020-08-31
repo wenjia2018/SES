@@ -42,4 +42,4 @@ example0 =
 
 # saveRDS(example0, "/home/share/scratch/xu/example0_w5bmi_removeinflam.rds")
 # change in utils.R and  models.R fit_pca_util ncomp = 6
-saveRDS(example0, "/home/share/scratch/xu/example0_new2signature_withinflam.rds")
+saveRDS(example0, "/home/share/scratch/xu/example0_new2signature_withinflam_sens.rds")
