@@ -25,7 +25,9 @@ abbreviations =
 
 # PREDICTION
 fit_m0 = 
-  function(outcomes) {
+  function(outcomes, ...) {
+    
+    list2env(c(...), current_env())
     
     ############################################################
     # 0. DATA
@@ -34,7 +36,7 @@ fit_m0 =
     data = select(training, y, all_of(controls), all_of(outcomes))
     
     ############################################################
-    # 1. VARIABLE DATA PREPROCESSING
+    # 1. VARIABLE DATA PREPROCESSING OF DATA
     ############################################################
     
     prep = 
@@ -48,9 +50,10 @@ fit_m0 =
     
     preprocessor =
       list(
-        controls_genes     = recipe(y ~ ., data) %>% prep(),
-        controls_genes_pca = recipe(y ~ ., data) %>% prep() %>% step_pca(all_predictors()),
-        controls           = recipe(y ~ ., select(data, -all_of(outcomes))) %>% prep()
+        # controls_genes     = recipe(y ~ ., data) %>% prep(),
+        # controls_genes_pca = recipe(y ~ ., data) %>% prep() %>% step_pca(all_predictors()),
+        # controls           = recipe(y ~ ., select(data, -all_of(outcomes))) %>% prep()
+        genes              = recipe(y ~ ., select(data, -all_of(controls))) %>% prep()
       )
     
     ############################################################
@@ -62,14 +65,14 @@ fit_m0 =
         logist = 
           linear_reg() %>%
           set_engine("lm"),
-        nearest =
-          nearest_neighbor() %>%
-          set_engine("kknn") %>%
-          set_mode("regression"),
-        forest = 
-          rand_forest() %>%
-          set_engine("ranger") %>%
-          set_mode("regression"), 
+        # nearest =
+        #   nearest_neighbor() %>%
+        #   set_engine("kknn") %>%
+        #   set_mode("regression"),
+        # forest = 
+        #   rand_forest() %>%
+        #   set_engine("ranger") %>%
+        #   set_mode("regression"), 
         svm = 
           svm_rbf() %>%
           set_engine("kernlab") %>%
