@@ -1,0 +1,32 @@
+---
+title: "Significant GO terms accompanying Fig 2 Network Topology analyses"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+ 
+```{r include=FALSE}
+library(tidyverse)
+ses4 = read_tsv("ses4_down/wg_result1598968174.network_PPI_BIOGRID.Network_Expansion_enrichedResult.txt")
+ses4_income = read_tsv("ses4_income_intersection_down/wg_result1598968501.network_PPI_BIOGRID.Network_Expansion_enrichedResult.txt")
+```
+ 
+# SES4 (down)
+
+```{r, echo=FALSE}
+select(ses4, -interestGene) %>%  
+  # dplyr::mutate(dplyr::across(is.numeric, ~ signif(., 3))) %>% 
+  knitr::kable()
+
+```
+
+# SES4 income intersection (down)
+
+```{r, echo=FALSE}
+
+select(ses4_income, -interestGene) %>% knitr::kable()
+
+```
