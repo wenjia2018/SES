@@ -22,6 +22,84 @@ abbreviations =
     "m99", "mediation (outcome = mean mRNA)"
   )
 
+
+# PREDICTION
+fit_m0 = 
+  function(outcomes, ...) {
+    
+    list2env(c(...), current_env())
+    
+    ############################################################
+    # 0. DATA
+    ############################################################
+    
+    data = select(training, y, all_of(controls), all_of(outcomes))
+    
+    ############################################################
+    # 1. VARIABLE DATA PREPROCESSING OF DATA
+    ############################################################
+    
+    prep = 
+      function(rec) {
+        rec %>%  
+          step_dummy(all_nominal()) %>%
+          step_nzv(all_predictors()) %>%
+          step_zv(all_predictors()) %>%
+          step_naomit(all_predictors(), all_outcomes())
+      }
+    
+    preprocessor =
+      list(
+        # controls_genes     = recipe(y ~ ., data) %>% prep(),
+        # controls_genes_pca = recipe(y ~ ., data) %>% prep() %>% step_pca(all_predictors()),
+        # controls           = recipe(y ~ ., select(data, -all_of(outcomes))) %>% prep()
+        genes              = recipe(y ~ ., select(data, -all_of(controls))) %>% prep()
+      )
+    
+    ############################################################
+    # 2. VARIABLE MODEL SPECIFICATION
+    ############################################################
+    
+    object = 
+      list(
+        logist = 
+          linear_reg() %>%
+          set_engine("lm"),
+        # nearest =
+        #   nearest_neighbor() %>%
+        #   set_engine("kknn") %>%
+        #   set_mode("regression"),
+        # forest = 
+        #   rand_forest() %>%
+        #   set_engine("ranger") %>%
+        #   set_mode("regression"), 
+        svm = 
+          svm_rbf() %>%
+          set_engine("kernlab") %>%
+          set_mode("regression") 
+      )
+    
+    ############################################################
+    # 3. DESIGN SPACE IS THE CARTESIAN PRODUCT OF (1) and (2) ABOVE
+    ############################################################
+    
+    out = 
+      crossing(preprocessor, object) %>% 
+      mutate(
+        fits = pmap(., fit_resamples, 
+                    control = control,
+                    resamples = folds),
+        metrics = map(fits, collect_metrics),
+        preds = map(fits, collect_predictions),
+        preds = map(preds, ~ arrange(.x, .row) %>%
+                      bind_cols(training)),
+        preprocessor = names(preprocessor),
+        object = names(object)
+      )  
+    
+    return(out = out)
+  }
+
 fit_m1 = function(datt, gene_set){ 
   # workhorse
   (rec = 
