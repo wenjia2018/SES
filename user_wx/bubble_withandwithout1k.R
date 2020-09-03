@@ -60,8 +60,7 @@ ex0_with1k <- example0_with1k %>%
          gene_set_name = gene_set_name %>% replace(gene_set_name == "Copd", "COPD"),
          gene_set_name = gene_set_name %>% replace(gene_set_name == "Ckd", "CKD"),
          gene_set_name = gene_set_name %>% replace(gene_set_name == "Inflam1k", "1KI"),
-         inflam = "with inflamation",
-         inflam = inflam %>% as.factor())
+         "1KI Genes" = "With 1KI Genes" %>% as.factor())
 
 ex0_without1k <- example0_without1k %>%
   hoist(out, p = list("result", "m8_fdr", 1, "p")) %>% 
@@ -102,8 +101,7 @@ ex0_without1k <- example0_without1k %>%
          gene_set_name = gene_set_name %>% replace(gene_set_name == "Copd", "COPD"),
          gene_set_name = gene_set_name %>% replace(gene_set_name == "Ckd", "CKD"),
          gene_set_name = gene_set_name %>% replace(gene_set_name == "Inflam1k", "1KI"),
-         inflam = "without inflamation",
-         inflam = inflam %>% as.factor())
+         "1KI Genes" = "Without 1KI Genes"%>% as.factor())
 
 ex_0 = bind_rows(ex0_with1k, ex0_without1k)
 # need to specify shape, because some shape does not have borders. 
@@ -139,8 +137,8 @@ ex_0$gene_set_name <- factor(ex_0$gene_set_name, levels = c("1KI",
 
 #+ echo=F, eval=F, warning=FALSE, message=FALSE
 
-with1k = ex0_with1k %>% mutate(p_withinflam = p) %>% select(1,2,7)
-without1k = ex0_without1k %>% mutate(p_withoutinflam = p) %>% select(1,2,7)
+with1k = ex0_with1k %>% mutate(p_withinflam = p) %>% dplyr::select(1,2,7)
+without1k = ex0_without1k %>% mutate(p_withoutinflam = p) %>% dplyr::select(1,2,7)
   with1k %>% left_join(without1k, by.x = treatment, by.y = gene_set_name) %>% 
     kableExtra::kable() %>% kableExtra::kable_styling()
 
@@ -184,7 +182,7 @@ without1k = ex0_without1k %>% mutate(p_withoutinflam = p) %>% select(1,2,7)
                                                     "Occupation", "Subjective Social Status","Occupation Work Collar"
     ))) %>%
     mutate(gene_set_name = gene_set_name %>% str_replace_all("_mRNA","")) %>% 
-    mutate(inflam = "with inflamation") %>% 
+    mutate("1KI Genes" = "With 1KI Genes") %>% 
     mutate(gene_set_name = gene_set_name %>% str_remove("_d.*$") %>% str_trim,
            gene_set_name = gene_set_name %>% str_replace_all("_"," ") %>% str_to_title(),
            gene_set_name = gene_set_name %>% replace(gene_set_name == "Cvd", "CVD"),
@@ -229,7 +227,7 @@ without1k = ex0_without1k %>% mutate(p_withoutinflam = p) %>% select(1,2,7)
                                                     "Occupation", "Subjective Social Status","Occupation Work Collar"
     ))) %>%
     mutate(gene_set_name = gene_set_name %>% str_replace_all("_mRNA","")) %>% 
-    mutate(inflam = "without inflamation") %>% 
+    mutate("1KI Genes" = "Without 1KI Genes") %>% 
     mutate(gene_set_name = gene_set_name %>% str_remove("_d.*$") %>% str_trim,
            gene_set_name = gene_set_name %>% str_replace_all("_"," ") %>% str_to_title(),
            gene_set_name = gene_set_name %>% replace(gene_set_name == "Cvd", "CVD"),
@@ -281,15 +279,54 @@ if(0){
     unnest_longer(enrichment_of_well_loaded_genes_on_significant_PCs) %>%
     hoist(enrichment_of_well_loaded_genes_on_significant_PCs, pathway = list("out","enriched_physiology","reactome")) 
   
-  temp_with = all_pathway$pathway %>%
-    map(function(x) as_tibble(x) %>% dplyr::select(Description, p.adjust) %>% dplyr::top_n(-4)) %>%
-    set_names(all_pathway$gene_set_name) %>% 
-    .[c(1,2,5,6,14)] %>% 
-    map_df(~as.data.frame(.x), .id="Signature") %>%
-    as_tibble() %>% 
-    unique() %>% 
-    .[c(1,2,3,4,5,7,8,9,10,11,12,14,15,16),]
+  names = all_pathway$gene_set_name
   
+  temp_with = all_pathway$pathway %>%
+    map(function(x) as_tibble(x) %>%
+          dplyr::select(Description, p.adjust) #%>%
+          # dplyr::top_n(-4)
+        ) #%>%
+    # set_names(all_pathway$gene_set_name) %>% 
+    # .[c(1,2,5,6,14)] %>% 
+    # map_df(~as.data.frame(.x), .id="Signature") %>%
+    # as_tibble() %>% 
+    # unique() %>% 
+    # .[c(1,2,3,4,5,7,8,9,10,11,12,14,15,16),]
+  # depression
+  # depr=temp_with[c(2,4,7,10,16)] %>% bind_rows() %>% dplyr::distinct(Description, .keep_all = TRUE)
+  depr = temp_with[c(2,4,7,10,16)] %>%
+    bind_rows() %>% 
+    arrange(Description, p.adjust) %>% 
+    dplyr::distinct(Description, .keep_all = TRUE) %>% 
+    arrange(p.adjust) %>% 
+    mutate_at(.vars =c("p.adjust"),
+              .funs = list(~ .x %>% format(digits = 3, scientific =T))) 
+    
+  
+  depr %>% kableExtra::kable() %>% kableExtra::kable_styling()
+  # copd
+  copd = temp_with[c(1,3,8,9,15)] %>%
+    bind_rows() %>%
+    arrange(Description, p.adjust) %>% 
+    dplyr::distinct(Description, .keep_all = TRUE) %>% 
+    arrange(p.adjust) %>% 
+    mutate_at(.vars =c("p.adjust"),
+              .funs = list(~ .x %>% format(digits = 3, scientific =T))) 
+  
+  copd %>% kableExtra::kable() %>% kableExtra::kable_styling()
+  # inflam1k
+  i1k=temp_with[c(5,11,12)] %>%
+    bind_rows() %>%
+    arrange(Description, p.adjust) %>% 
+    dplyr::distinct(Description, .keep_all = TRUE) %>% 
+    arrange(p.adjust) %>% 
+    mutate_at(.vars =c("p.adjust"),
+              .funs = list(~ .x %>% format(digits = 3, scientific =T))) 
+  
+  i1k %>% kableExtra::kable() %>% kableExtra::kable_styling()
+  
+  
+  temp_with = rbind(depr,copd,i1k)
   rownames(temp_with) <- NULL
   
 
@@ -339,21 +376,23 @@ if(0){
   panelT2 = tableGrob(temp[6:10, ] %>% dplyr::select(2,3), rows = NULL, theme = mytheme)
   panelT3 = tableGrob(temp[11:14, ] %>% dplyr::select(2,3), rows = NULL, theme = mytheme)
 
-  dd1 <- ggplot() + annotation_custom(panelT1) + labs(caption = 'COPD') + theme_void() +
-    theme(plot.caption = element_text(hjust = 0.5, vjust=6))
-  dd2 <- ggplot() + annotation_custom(panelT2) + labs(caption = 'Depression')+ theme_void() +
-    theme(plot.caption = element_text(hjust = 0.5, vjust=6))
-  dd3 <- ggplot() + annotation_custom(panelT3) + labs(caption = '1KI')+ theme_void() +
-    theme(plot.caption = element_text(hjust = 0.5, vjust=6))
+  dd1 <- ggplot() + annotation_custom(panelT1) + labs(title = 'COPD') + theme_void() +
+    theme(plot.title = element_text(hjust = 0.5, vjust= 4))
+  dd2 <- ggplot() + annotation_custom(panelT2) + labs(title = 'Depression')+ theme_void() +
+    theme(plot.title = element_text(hjust = 0.5, vjust= 4))
+  dd3 <- ggplot() + annotation_custom(panelT3) + labs(title = '1KI')+ theme_void() +
+    theme(plot.title = element_text(hjust = 0.5, vjust= 4))
   
   # grid.arrange(bottom = "cv",panelT1)
   
   panelC = grid.arrange(dd1, dd2, dd3, ncol = 3)
   # panelC = grid.arrange(panelT1, panelT2, panelT3, nrow =1)
-  panelA = ggplot(ex_0, aes(treatment, gene_set_name, size = pval2, fill = inflam, colour = inflam)) +
+  panelA = ggplot(ex_0, aes(treatment, gene_set_name, size = pval2,
+                            fill = `1KI Genes`,
+                            colour = `1KI Genes`)) +
     geom_point(stroke = 1.5, shape = 21, alpha = 0.4) +
-    scale_fill_manual(values = c("red", "cornflowerblue")) +
-    scale_color_manual(values = c( "darkred","darkblue")) +
+    scale_fill_manual(values = c("darkblue", "goldenrod3")) +
+    scale_color_manual(values = c("darkblue", "goldenrod3")) +
     # geom_jitter(height = 0.00000025) +
     # gghighlight(class == "inflam") +
     theme_bw() +
@@ -363,7 +402,7 @@ if(0){
       #         (p-values reported, FDR-corrected for whole genome)",
       y = "mRNA Signatures",
       x = "SES Indicators") +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+    theme(axis.text.x = element_text(angle = 30, hjust = 1),
           # plot.margin=unit(c(1, 1, 0.1, 1), "cm"),
           text = element_text(size=10, face = "bold")) +
     scale_size_continuous(name = "P-value",
@@ -372,10 +411,12 @@ if(0){
                           labels = c("n.s.", "p<0.05", "p<0.01", "p<0.001", "p<0.0001"))+
     scale_alpha(guide = 'none')
   
-  panelB = ggplot(exB_data, aes(treatment, gene_set_name, size = pval2, fill = inflam, colour = inflam)) +
+  panelB = ggplot(exB_data, aes(treatment, gene_set_name, size = pval2, fill =`1KI Genes`, colour = `1KI Genes`)) +
     geom_point(stroke = 1.5, shape = 21, alpha = 0.4) +
-    scale_fill_manual(values = c("red", "cornflowerblue")) +
-    scale_color_manual(values = c( "darkred","darkblue")) +  
+    scale_fill_manual(values = c("darkblue", "goldenrod3")) +
+    scale_color_manual(values = c("darkblue", "goldenrod3")) +
+    # scale_fill_manual(values = c("red", "cornflowerblue")) +
+    # scale_color_manual(values = c( "darkred","darkblue")) +  
     theme_bw() +
     labs(
       # title = "Figure 1. Associations between Indicators of Socioeconomic Status 
@@ -383,15 +424,15 @@ if(0){
       #         (p-values reported, FDR-corrected for whole genome)",
       y = "mRNA Signatures",
       x = "SES Indicators") +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1), 
+    theme(axis.text.x = element_text(angle = 30, hjust = 1), 
           # plot.margin=unit(c(1, 1, 0.1, 1), "cm"),
           text = element_text(size=10, face = "bold")) +
     scale_size_continuous(name = "P-value",
-                          range = c(0, 14),
+                          range = c(0, 16),
                           limits = c(0.0000001, 100000), breaks = c(15000, 25000),
                           labels = c("p<0.005", "p<0.001"))+
     scale_alpha(guide = 'none')
-  
+  ggpubr::ggarrange(panelA, panelB, ncol = 2, labels = c("A", "B"), common.legend = TRUE, legend="right")
   figure = ggpubr::ggarrange(
     ggpubr::ggarrange(panelA, panelB, ncol = 2, labels = c("A", "B"), common.legend = TRUE, legend="right"), 
     panelC,
@@ -411,7 +452,7 @@ if(0){
   # atop("panel A:Associations between Indicators of Socioeconomic Status and mRNA-Based Disease Signatures, Add Health (p-values reported, FDR-corrected for whole genome) \n panel B: Significant PCs \n panel C: pathways")))
 
   annotate_figure(figure, bottom = text_grob(title))
-  
+  annotate_figure(figure, fig.lab = "Figure 1:",fig.lab.pos = "bottom")
   
 #'`rmarkdown::render("/home/xu/ses-1/user_wx/bubble_withandwithout1k.R")`
 
