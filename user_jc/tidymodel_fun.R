@@ -10,5 +10,4 @@
 
 library(tidymodels)
 
-
-plot(1:10)
+ 
