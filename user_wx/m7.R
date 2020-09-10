@@ -12,19 +12,22 @@
 #+ warning=FALSE, message=FALSE
 
 
-#' We do PCA for each disease signature using 3 rotations and then do mediational analysis
-#'  for significant PCs using w5bmi as mediator
+#' We do PCA for two new disease signature, which are constructed by DE ses, using oblique rotation and then do mediational analysis
+#'  for significant PCs using 5 mediators
 #'  
 #' p: p value for indirected effect / mediated effect;
-#' result_id: which pc is significant 
+#' result_id: which pc is significant;
+#' adjP is adjusted for 13 disease signatures and 5 mediators, ie. adjP = p /65;
+#' results are presented for adjP<0.05 
 library(here)
 library(tidyverse)
-example0_with1k = readRDS("/home/share/scratch/xu/example0_new2signature_withinflam.rds")
+# example0_with1k = readRDS("/home/share/scratch/xu/example0_new2signature_withinflam.rds")
 
+example0_with1k <- readRDS("/home/share/scratch/m7_desig_withinflam.rds")
 #' ## keep inflamation signatures
 #' 
-threshold_with1k = 0.05/11/4
-threshold_med = 0.05/11/5
+threshold_with1k = 0.05/10/5
+threshold_med = 13*5
 fig1panelB <- example0_with1k %>%
   hoist(out, p = list("result", "m7_ob", 1, "p")) %>% 
   unnest_longer(p) %>% 
@@ -47,8 +50,12 @@ w5bmi = example0_with1k %>%
   select(1:4,6) %>% 
   filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>% 
   mutate(id = str_c(treatment,"_",gene_set_name,"_",result_id)) %>% 
-  right_join(fig1panelB %>% select(id))
-
+  right_join(fig1panelB %>% select(id))  %>% 
+  mutate(p = p %>% str_remove("<") %>% as.numeric() %>% format(digits = 3, scientific =T),
+         adjP = ((p %>% str_remove("<") %>% as.numeric()) * threshold_med),
+         adjP = ifelse(adjP>1, 1, adjP)) %>% 
+  filter(adjP<0.05) %>% 
+  mutate(adjP = adjP %>% format(digits = 3, scientific =T)) # convert from strings to numeric
 w5bmi %>% kableExtra::kable() %>% kableExtra::kable_styling()
 
 #' ### perceived stress
@@ -65,7 +72,12 @@ stress_perceived = example0_with1k %>%
   select(1:4,6) %>% 
   filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>% 
   mutate(id = str_c(treatment,"_",gene_set_name,"_",result_id)) %>% 
-  right_join(fig1panelB %>% select(id))
+  right_join(fig1panelB %>% select(id)) %>% 
+  mutate(p = p %>% str_remove("<") %>% as.numeric() %>% format(digits = 3, scientific =T),
+         adjP = ((p %>% str_remove("<") %>% as.numeric()) * threshold_med),
+         adjP = ifelse(adjP>1, 1, adjP)) %>% 
+  filter(adjP<0.05) %>% 
+  mutate(adjP = adjP %>% format(digits = 3, scientific =T)) # convert from strings to numeric
 
 stress_perceived %>% kableExtra::kable() %>% kableExtra::kable_styling()
 
@@ -83,7 +95,12 @@ bills = example0_with1k %>%
   select(1:4,6) %>% 
   filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>% 
   mutate(id = str_c(treatment,"_",gene_set_name,"_",result_id)) %>% 
-  right_join(fig1panelB %>% select(id))
+  right_join(fig1panelB %>% select(id))  %>% 
+  mutate(p = p %>% str_remove("<") %>% as.numeric() %>% format(digits = 3, scientific =T),
+         adjP = ((p %>% str_remove("<") %>% as.numeric()) * threshold_med),
+         adjP = ifelse(adjP>1, 1, adjP)) %>% 
+  filter(adjP<0.05) %>% 
+  mutate(adjP = adjP %>% format(digits = 3, scientific =T)) # convert from strings to numeric
 
 bills %>% kableExtra::kable() %>% kableExtra::kable_styling()
 
@@ -101,7 +118,12 @@ currentsmoke = example0_with1k %>%
   select(1:4,6) %>% 
   filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>% 
   mutate(id = str_c(treatment,"_",gene_set_name,"_",result_id)) %>% 
-  right_join(fig1panelB %>% select(id))
+  right_join(fig1panelB %>% select(id))  %>% 
+  mutate(p = p %>% str_remove("<") %>% as.numeric() %>% format(digits = 3, scientific =T),
+         adjP = ((p %>% str_remove("<") %>% as.numeric()) * threshold_med),
+         adjP = ifelse(adjP>1, 1, adjP)) %>% 
+  filter(adjP<0.05) %>% 
+  mutate(adjP = adjP %>% format(digits = 3, scientific =T)) # convert from strings to numeric
 
 currentsmoke %>% kableExtra::kable() %>% kableExtra::kable_styling()
 
@@ -119,7 +141,12 @@ insurance_lack = example0_with1k %>%
   select(1:4,6) %>% 
   filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>% 
   mutate(id = str_c(treatment,"_",gene_set_name,"_",result_id)) %>% 
-  right_join(fig1panelB %>% select(id))
+  right_join(fig1panelB %>% select(id))  %>% 
+  mutate(p = p %>% str_remove("<") %>% as.numeric() %>% format(digits = 3, scientific =T),
+         adjP = ((p %>% str_remove("<") %>% as.numeric()) * threshold_med),
+         adjP = ifelse(adjP>1, 1, adjP)) %>% 
+  filter(adjP<0.05) %>% 
+  mutate(adjP = adjP %>% format(digits = 3, scientific =T)) # convert from strings to numeric
 
 insurance_lack %>% kableExtra::kable() %>% kableExtra::kable_styling()
 
@@ -127,9 +154,8 @@ insurance_lack %>% kableExtra::kable() %>% kableExtra::kable_styling()
 
 
 example0_no1k = readRDS("/home/share/scratch/xu/example0_new2signature_noinflam.rds")
+example0_no1k = readRDS("/home/share/scratch/m7_desig_noinflam.rds")
 
-threshold_with1k = 0.05/11/4
-threshold_med = 0.05/11/5
 fig1panelB <- example0_no1k %>%
   hoist(out, p = list("result", "m7_ob", 1, "p")) %>% 
   unnest_longer(p) %>% 
@@ -152,7 +178,12 @@ w5bmi = example0_no1k %>%
   select(1:4,6) %>% 
   filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>% 
   mutate(id = str_c(treatment,"_",gene_set_name,"_",result_id)) %>% 
-  right_join(fig1panelB %>% select(id))
+  right_join(fig1panelB %>% select(id))  %>% 
+  mutate(p = p %>% str_remove("<") %>% as.numeric() %>% format(digits = 3, scientific =T),
+         adjP = ((p %>% str_remove("<") %>% as.numeric()) * threshold_med),
+         adjP = ifelse(adjP>1, 1, adjP)) %>% 
+  filter(adjP<0.05) %>% 
+  mutate(adjP = adjP %>% format(digits = 3, scientific =T)) # convert from strings to numeric
 
 w5bmi %>% kableExtra::kable() %>% kableExtra::kable_styling()
 
@@ -170,7 +201,12 @@ stress_perceived = example0_no1k %>%
   select(1:4,6) %>% 
   filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>% 
   mutate(id = str_c(treatment,"_",gene_set_name,"_",result_id)) %>% 
-  right_join(fig1panelB %>% select(id))
+  right_join(fig1panelB %>% select(id))  %>% 
+  mutate(p = p %>% str_remove("<") %>% as.numeric() %>% format(digits = 3, scientific =T),
+         adjP = ((p %>% str_remove("<") %>% as.numeric()) * threshold_med),
+         adjP = ifelse(adjP>1, 1, adjP)) %>% 
+  filter(adjP<0.05) %>% 
+  mutate(adjP = adjP %>% format(digits = 3, scientific =T)) # convert from strings to numeric
 
 stress_perceived %>% kableExtra::kable() %>% kableExtra::kable_styling()
 
@@ -188,8 +224,12 @@ bills = example0_no1k %>%
   select(1:4,6) %>% 
   filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>% 
   mutate(id = str_c(treatment,"_",gene_set_name,"_",result_id)) %>% 
-  right_join(fig1panelB %>% select(id))
-
+  right_join(fig1panelB %>% select(id))  %>% 
+  mutate(p = p %>% str_remove("<") %>% as.numeric() %>% format(digits = 3, scientific =T),
+         adjP = ((p %>% str_remove("<") %>% as.numeric()) * threshold_med),
+         adjP = ifelse(adjP>1, 1, adjP)) %>% 
+  filter(adjP<0.05) %>% 
+  mutate(adjP = adjP %>% format(digits = 3, scientific =T)) # convert from strings to numeric
 bills %>% kableExtra::kable() %>% kableExtra::kable_styling()
 
 #' ### current smoke
@@ -206,7 +246,12 @@ currentsmoke = example0_no1k %>%
   select(1:4,6) %>% 
   filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>% 
   mutate(id = str_c(treatment,"_",gene_set_name,"_",result_id)) %>% 
-  right_join(fig1panelB %>% select(id))
+  right_join(fig1panelB %>% select(id)) %>% 
+  mutate(p = p %>% str_remove("<") %>% as.numeric() %>% format(digits = 3, scientific =T),
+         adjP = ((p %>% str_remove("<") %>% as.numeric()) * threshold_med),
+         adjP = ifelse(adjP>1, 1, adjP)) %>% 
+  filter(adjP<0.05) %>% 
+  mutate(adjP = adjP %>% format(digits = 3, scientific =T)) # convert from strings to numeric
 
 currentsmoke %>% kableExtra::kable() %>% kableExtra::kable_styling()
 
@@ -224,7 +269,12 @@ insurance_lack = example0_no1k %>%
   select(1:4,6) %>% 
   filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>% 
   mutate(id = str_c(treatment,"_",gene_set_name,"_",result_id)) %>% 
-  right_join(fig1panelB %>% select(id))
+  right_join(fig1panelB %>% select(id)) %>% 
+  mutate(p = p %>% str_remove("<") %>% as.numeric() %>% format(digits = 3, scientific =T),
+         adjP = ((p %>% str_remove("<") %>% as.numeric()) * threshold_med),
+         adjP = ifelse(adjP>1, 1, adjP)) %>% 
+  filter(adjP<0.05) %>% 
+  mutate(adjP = adjP %>% format(digits = 3, scientific =T)) # convert from strings to numeric
 
 insurance_lack %>% kableExtra::kable() %>% kableExtra::kable_styling()
 
