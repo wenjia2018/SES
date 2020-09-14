@@ -19,14 +19,22 @@ library(dbr) # my package
 walk(dir(path = here("R"),full.names = TRUE), source)
 example0_with1k = readRDS("/home/share/scratch/xu/example0_new2signature_withinflam.rds")
 example0_without1k = readRDS("/home/share/scratch/xu/example0_new2signature_noinflam.rds")
-# example0_with1k<- readRDS("/home/share/scratch/xu/example0_with_1KI.rds")
-# example0_without1k <- readRDS("/home/share/scratch/xu/example0_without_1KI.rds")
+example0_with1k<- readRDS("/home/share/scratch/example0_with_1KI.rds")
+example0_without1k <- readRDS("/home/share/scratch/example0_without_1KI.rds")
 threshold_with1k = 0.05/10/5
+gene_set = c("1KI",
+             "Alzheimers","Aortic Aneurysm", "Asthma", 
+             "CKD", "COPD", "CVD",
+             "Depression", "Diabetes",
+             "Hypertension",
+             "Rheumatoid Arthritis"
+)
 
 ex0_with1k <- example0_with1k %>%
   hoist(out, p = list("result", "m8_fdr", 1, "p")) %>% 
   filter(controls=="all") %>% 
   dplyr::select(treatment, gene_set_name, p) %>% 
+  filter(p<0.05) %>% 
   dplyr::filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>% 
   mutate(pval=case_when(p<0.0001 ~ 0.0001,
                         p<0.001 ~ 0.001,
@@ -68,6 +76,7 @@ ex0_without1k <- example0_without1k %>%
   hoist(out, p = list("result", "m8_fdr", 1, "p")) %>% 
   filter(controls=="all") %>% 
   dplyr::select(treatment, gene_set_name, p) %>% 
+  filter(p<0.05) %>% 
   dplyr::filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>% 
   mutate(pval=case_when(p<0.0001 ~ 0.0001,
                         p<0.001 ~ 0.001,
@@ -105,7 +114,7 @@ ex0_without1k <- example0_without1k %>%
          gene_set_name = gene_set_name %>% replace(gene_set_name == "Inflam1k", "1KI"),
          "1KI Genes" = "Without 1KI Genes"%>% as.factor())
 
-ex_0 = bind_rows(ex0_with1k, ex0_without1k)
+ex_0 = bind_rows(ex0_with1k, ex0_without1k) %>% filter(gene_set_name %in% gene_set)
 # need to specify shape, because some shape does not have borders. 
 
   # ex_0  %>% 
@@ -241,6 +250,7 @@ without1k = ex0_without1k %>% mutate(p_withoutinflam = p) %>% dplyr::select(1,2,
   exB_data = full_join(exB_data_with1k %>% dplyr::select(1,2,3,6),
                        exB_data_without1k %>% dplyr::select(1,2,3,6),
                        by.x = treatment, by.y = "gene_set_name") %>% 
+    filter(gene_set_name %in% gene_set) %>% 
     mutate(gene_set_name = gene_set_name %>% str_c(" ","PC"),
            pval2 = case_when(p<0.0001 ~ 100000,
                            p<0.001 ~ 25000,
@@ -491,9 +501,11 @@ if(0){
           text = element_text(size=10, face = "bold")) +
     scale_size_continuous(name = "P-value",
                           range = c(0, 16),
-                          limits = c(0.0000001, 100000), breaks = c(0.0000001, 10000, 15000, 25000, 100000),
-                          labels = c("n.s.", "p<0.05", "p<0.01", "p<0.001", "p<0.0001"))+
-    scale_alpha(guide = 'none')
+                          limits = c(0.0000001, 100000), breaks = c(10000, 15000, 25000, 100000),
+                          labels = c("p<0.05", "p<0.01", "p<0.001", "p<0.0001"))+
+    scale_alpha(guide = 'none') +
+    guides(shape = guide_legend(override.aes = list(size = 10)),
+           fill = guide_legend(override.aes = list(size = 8)))
   
   # color order from bottom to top
   axiscolor = c("grey30", "grey30", "grey30", "darkseagreen1","darkseagreen4" ,"grey30","red", "darkred")
@@ -518,7 +530,9 @@ if(0){
                           range = c(0, 16),
                           limits = c(0.0000001, 100000), breaks = c(15000, 25000),
                           labels = c("p<0.005", "p<0.001"))+
-    scale_alpha(guide = 'none')
+    scale_alpha(guide = 'none')+
+    guides(shape = guide_legend(override.aes = list(size = 10)),
+           fill = guide_legend(override.aes = list(size = 8)))
   ggpubr::ggarrange(panelA, panelB, ncol = 2, labels = c("A", "B"), common.legend = TRUE, legend="right")
   figure = ggpubr::ggarrange(
     ggpubr::ggarrange(panelA, panelB, ncol = 2, labels = c("A", "B"), common.legend = TRUE, legend="right"), 
