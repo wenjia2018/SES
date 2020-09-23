@@ -17,6 +17,7 @@ ses4_income = read_tsv("ses4_income_intersection_down/wg_result1598968501.networ
 # SES4 (down)
 
 ```{r, echo=FALSE}
+
 select(ses4, -interestGene) %>%  
   # dplyr::mutate(dplyr::across(is.numeric, ~ signif(., 3))) %>% 
   knitr::kable()
