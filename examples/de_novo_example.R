@@ -36,7 +36,7 @@ gene_set_name = gene_set_name %>% append(de_novo_geneset)
 
 args = crossing(treatment, gene_set_name, controls)
 
-debugonce(model_fit)
+# debugonce(model_fit)
 example0 =
   args %>%
   filter(is.element(gene_set_name, de_novo_geneset),
@@ -45,3 +45,4 @@ example0 =
   mutate(out = pmap(., safely(model_fit), funcs),
          controls = names(controls))
 
+example0 %>% saveRDS("/home/share/scratch/example0_without_1KI_de_novo.rds")
