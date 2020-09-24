@@ -23,7 +23,7 @@ model_fit =
     
     datt =
       prepro(gene_set, treatment, controls) %>% 
-      rename(treatment = treatment) %>% 
+      dplyr::rename(treatment = treatment) %>% 
       remove_diseased_subjects_from_datt(gene_set_name, controls)
     
     if(is.element("m1", funcs)){
