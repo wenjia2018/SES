@@ -39,16 +39,17 @@ ncomp = signatures$outcome_set[table1]%>% map_dfc(length) %>% unlist() %>%  min
 if(0){
   example1 =
   args %>%
-    filter(treatment %in%c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5", "sss_5",
+    filter(treatment %in%c("ses_sss_composite",
+                           "edu_max", "income_hh_ff5", "SEI_ff5", "sss_5"
                            # "ses_composite_pp1", "edu_p", "SEI_max_p_w12", "income_pp1_log"
                            ),
            gene_set_name == "whole_genome_and_tfbm",
-           names(controls) == "all") %>% slice_(2) %>% 
+           names(controls) == "all") %>% 
     mutate(out = pmap(., safely(model_fit), funcs),
            controls = names(controls))
 }
-example1 = example1 %>% filter(treatment %in%c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5"))
 
+example1 %>% saveRDS("/home/xu/ses-1/user_wx/DE_withbmi.rds")
 #' ## DE results for ses4, edu, income, SEI
 #+ echo=F, eval=T, warning=FALSE, message=FALSE
 
@@ -72,12 +73,16 @@ result = temp %>%
   pluck("result") %>%
   set_names(temp$treatment)
 
+
+DE_full = result %>% 
+  map(pluck("ttT")) %>% 
+  map(~ filter(.x,adj.P.Val<=0.05))
 #' #### ses DE genes
 #' 
 #+ echo=F, eval=T, warning=FALSE, message=FALSE
 DE_updown = result %>% 
   map(pluck("ttT")) %>% 
-  map(~ filter(.x,adj.P.Val<=0.05) %>% mutate(updown = ifelse(logFC>0,"up","down")) %>% select(1,8))
+  map(~ filter(.x,adj.P.Val<=0.05) %>% mutate(updown = ifelse(logFC>0,"up","down")) %>% dplyr::select(1,8))
       
 DE = result %>% 
   map(pluck("ttT")) %>% 
@@ -139,7 +144,7 @@ pathway %>% print(row.names = FALSE)
 #' #### ses DE genes
 
 #+ echo=F, eval=T, warning=FALSE, message=FALSE
-sig = Reduce(union, signatures$outcome_set[table1])
+sig = Reduce(union, signatures$outcome_set[table1[1:11]])
 
 DE_remove1k = map(DE, ~ setdiff(.x, sig))
 
@@ -181,23 +186,50 @@ income_unique = Reduce(setdiff, list(DE_remove1k$income_hh_ff5, DE_remove1k$ses_
 ses4_up = DE_updown$ses_sss_composite %>% filter(updown =="up") %>% pull(gene) %>% intersect(DE_remove1k$ses_sss_composite)
 ses4_down = DE_updown$ses_sss_composite %>% filter(updown =="down") %>% pull(gene) %>% intersect(DE_remove1k$ses_sss_composite)
 
+# income up and down
+income_up = DE_updown$income_hh_ff5 %>% filter(updown =="up") %>% pull(gene) %>% intersect(DE_remove1k$income_hh_ff5)
+income_down = DE_updown$income_hh_ff5 %>% filter(updown =="down") %>% pull(gene) %>% intersect(DE_remove1k$income_hh_ff5)
+
+# ses4 unique up and down
+ses4_unique_up = DE_updown$ses_sss_composite %>% filter(updown =="up") %>% pull(gene) %>% intersect(ses4_unique)
+ses4_unique_down = DE_updown$ses_sss_composite %>% filter(updown =="down") %>% pull(gene) %>% intersect(ses4_unique)
+
+
 # income unique up and down
 income_unique_up = DE_updown$income_hh_ff5 %>% filter(updown =="up") %>% pull(gene) %>% intersect(income_unique)
 income_unique_down = DE_updown$income_hh_ff5 %>% filter(updown =="down") %>% pull(gene) %>% intersect(income_unique)
 
 # ses 4 and income intersection up and down
 
-ses_income_intersection = intersect(DE_remove1k$ses_sss_composite, DE_remove1k$income_hh_ff5)
-ses4_income_intersection_up = DE_updown$income_hh_ff5 %>% filter(updown =="up") %>% pull(gene) %>% intersect(ses_income_intersection)
-ses4_income_intersection_down = DE_updown$income_hh_ff5 %>% filter(updown =="down") %>% pull(gene) %>% intersect(ses_income_intersection)
+ses4_income_intersection = intersect(DE_remove1k$ses_sss_composite, DE_remove1k$income_hh_ff5)
+ses4_income_intersection_up = intersect(ses4_up, income_up)
+ses4_income_intersection_down = intersect(ses4_down, income_down)
 
-list(ses4_up = ses4_up,
-     ses4_down = ses4_down,
-     income_unique_up = income_unique_up,
-     income_unique_down = income_unique_down,
-     ses4_income_intersection_up = ses4_income_intersection_up,
-     ses4_income_intersection_down = ses4_income_intersection_down
-       ) %>% openxlsx::write.xlsx("./user_wx/DE_removetable1signatures_ses4income.xlsx")
+
+a = list(ses4 = DE_remove1k$ses_sss_composite,
+         ses4_up = ses4_up,
+         ses4_down = ses4_down,
+         ses4_unique = ses4_unique, ses4_unique_up = ses4_unique_up, ses4_unique_down = ses4_unique_down,
+         income = DE_remove1k$income_hh_ff5,
+         income_up = income_up,
+         income_down = income_down,
+         income_unique = income_unique,
+         income_unique_up = income_unique_up,
+         income_unique_down =income_unique_down,
+         ses4_income_intersection = ses4_income_intersection,
+         ses4_income_intersection_up = ses4_income_intersection_up,
+         ses4_income_intersection_down = ses4_income_intersection_down)
+a %>%  openxlsx::write.xlsx("./user_wx/DE_removetable1signatures_ses4income_fulllist_withw5bmi.xlsx")
+a %>%  openxlsx::write.xlsx("./user_wx/DE_removetable1signatures_ses4income_fulllist.xlsx")
+
+b = list(ses4_unique_down = tibble(gene = ses4_unique_down) %>% left_join(DE_full$ses_sss_composite),
+         income_unique_down = tibble(gene = income_unique_down) %>% left_join(DE_full$income_hh_ff5),
+         ses4_income_intersection_down = tibble(gene = ses4_income_intersection_down)%>% left_join(DE_full$ses_sss_composite))
+
+b %>%  openxlsx::write.xlsx("./user_wx/DE_removetable1signatures_ses4income_fulllist.xlsx")
+
+c = list(ses4 = DE_full$ses_sss_composite, income = DE_full$income_hh_ff5)
+c %>%  openxlsx::write.xlsx("./user_wx/DE_removetable1signatures_ses4income_fulllist_filter_Brandt.xlsx")
 
 # sss
 
@@ -230,6 +262,25 @@ pathway = list(ses4 = ses4_unique, income = income_unique) %>%
   map( ~ dplyr::select(.x, 2, 6))
 
 pathway %>% print(row.names = FALSE)
+
+#+ echo=F, eval=T, warning=FALSE, message=FALSE
+
+ses4_unique_up = data.frame("hgnc_symbol" = ses4_unique_up)
+ses4_unique_down = data.frame("hgnc_symbol" = ses4_unique_down)
+income_unique_up = data.frame("hgnc_symbol" = income_unique_up)
+income_unique_down = data.frame("hgnc_symbol" = income_unique_down)
+
+pathway = list(ses4_unique_up = ses4_unique_up, ses4_unique_down = ses4_unique_down,
+               income_unique_up = income_unique_up,
+               income_unique_down =income_unique_down) %>% 
+  map(~ left_join(.x, entrezgeneid, by = "hgnc_symbol"))%>% 
+  map(~ dplyr::pull(.x,entrezgene_id)) %>% 
+  map(~ ReactomePA::enrichPathway(.x)) %>% 
+  map(pluck("result")) %>% 
+  map( ~ dplyr::filter(.x, p.adjust<=0.05)) %>% 
+  map( ~ dplyr::select(.x, 2, 6))
+pathway %>% print(row.names = FALSE)
+
 
 
 #'`rmarkdown::render("/home/xu/ses-1/user_wx/DE_withandwithout1K.R")`
