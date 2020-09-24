@@ -1,9 +1,9 @@
-add_de_novo = function(signatures, de_novo_treatments, control = "all", remove_inflam = TRUE){
+add_de_novo = function(signatures, treatment, control = "all", remove_inflam = TRUE){
   
   ttT_table = 
     args %>%
     filter(gene_set_name == "whole_genome_and_tfbm",
-           treatment %in%  de_novo_treatment, 
+           treatment %in%  treatment, 
            names(controls) == control) %>% 
     mutate(out = pmap(., safely(model_fit), funcs),
            controls = control) %>% 
