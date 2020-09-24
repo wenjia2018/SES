@@ -8,6 +8,6 @@ prepro = function(gene_set, treatment, controls){
   datt <-pheno %>% 
     cbind(genes) %>% 
     as_tibble() %>% 
-    select(-AID)
+    dplyr::select(-AID)
   
 }

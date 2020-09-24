@@ -41,8 +41,8 @@ mediate_pca = function(mediator, gene_set, rotate, pca_out){
   # only do mediation for significant PCs, p values are corrected by bonferonni
   # actually should divided by 4 the treatment numbers, but Mike sometimes keep some
   # signatures when their p value is close and a little bigger to the cut off, so here
-  # choose 2 so mediational analysis will be done to less cases, save time.
-  threshold = (0.05 / length(pca_out$p))/2 
+  # choose correcting pca component numbers only so mediational analysis will be done to less cases, save time.
+  threshold = 0.05 / length(pca_out$p)
   sig = pca_out$p < threshold
   print("please be aware: p value correction is bonferonni for now")
  map2(datt_pca[sig], outcome[sig], fit_m99) %>% map(extract_m99)  
