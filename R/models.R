@@ -342,7 +342,7 @@ fit_pca_util = function(datt, gene_set, rotate, ncomp){
   
   pca_rotated$scores = pca_rotated$scores %>%  as_tibble() %>%  set_names(str_c("d", 1:ncomp))
   print(mean(pca_rotated$communality))
-  plot(pca_rotated$values)
+  # plot(pca_rotated$values)
   pca_rotated
 }
 

@@ -1,4 +1,3 @@
-# mediation for significant PCs
 
 set.seed(123)
 library(here)
@@ -30,16 +29,17 @@ funcs = str_subset(abbreviations$shorthand, "^m")
 funcs = funcs %>% str_subset("m[7-8]")
 # explicitly assign ncomp as the smallest number of table signatures gene numbers
 
-ncomp = 10
+ncomp = signatures$outcome_set[table1]%>% map_dfc(length) %>% unlist() %>%  min
+ncomp = 4
 fit_pca_util = partial(fit_pca_util, ncomp = ncomp) # specify n_perm
 
-example0 =
-  args %>%
-  filter(is.element(gene_set_name, table1),
-         names(controls) == "all") %>% 
+
+# debugonce(model_fit)
+example4 =
+  args %>% 
+  filter(names(controls) == "all",
+         gene_set_name %in% c("g2_mRNA")) %>%
   mutate(out = pmap(., safely(model_fit), funcs),
          controls = names(controls))
 
-# saveRDS(example0, "/home/share/scratch/xu/example0_w5bmi_removeinflam.rds")
-# change in utils.R and  models.R fit_pca_util ncomp = 6
-saveRDS(example0, "/home/share/scratch/xu/example0_new2signature_withinflam_sens.rds")
+example4 %>% saveRDS("/home/share/scratch/m7_g2.rds")

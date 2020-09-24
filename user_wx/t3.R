@@ -22,7 +22,7 @@ fit_m4 = partial(fit_m4, n_perm = 1000) # specify n_perm
 # LOAD DATA, DEFINE VARIABLES, RECODE VARIABLES
 ############################################################
 
-load_data(reconciled = FALSE, remove_inflam = FALSE)
+load_data(reconciled = FALSE, remove_inflam = TRUE)
 define_treatments_and_controls()
 recode_variables_in_dat()
 print(abbreviations)
@@ -42,4 +42,4 @@ example0 =
 
 # saveRDS(example0, "/home/share/scratch/xu/example0_w5bmi_removeinflam.rds")
 # change in utils.R and  models.R fit_pca_util ncomp = 6
-saveRDS(example0, "/home/share/scratch/xu/example0_new2signature_withinflam_sens.rds")
+saveRDS(example0, "/home/share/scratch/xu/example0_new2signature_noinflam_trial3.rds")

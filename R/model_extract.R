@@ -74,10 +74,11 @@ extract_m6 = extract_m1
 extract_m7 =  function(m, out = NULL){
   
   extract_anova = function(x) anova(x) %>% tidy %>% filter(str_detect(term, "treatment"))
-  
+  extract_t = function(x) broom::tidy(x) %>% filter(str_detect(term, "treatment"))
   # Univariate parametric
-  out$detail = m$fit %>% map(extract_anova)
-  out$p = out$detail %>% map_dbl(pluck("p.value"))
+  out$detail$anova = m$fit %>% map(extract_anova)
+  out$detail$t = m$fit %>% map(extract_t)
+  out$p = out$detail$anova %>% map_dbl(pluck("p.value"))
   out$other$varexplained = m$varexplained 
   
   return(out = out)
