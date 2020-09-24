@@ -1,4 +1,5 @@
-get_de_novo = function(de_novo_treatment, control, remove_inflam){
+add_de_novo = function(signatures, de_novo_treatments, control = "all", remove_inflam = TRUE){
+  
   ttT_table = 
     args %>%
     filter(gene_set_name == "whole_genome_and_tfbm",
@@ -9,7 +10,8 @@ get_de_novo = function(de_novo_treatment, control, remove_inflam){
     hoist(out, "result")
   
   
-  de_novo_signatures = ttT_table %>%
+  de_novo_signatures = 
+    ttT_table %>%
     pluck("result") %>%
     set_names(ttT_table$treatment %>% str_c("_","de_novo")) %>% 
     map(pluck("ttT")) %>% 
@@ -17,9 +19,10 @@ get_de_novo = function(de_novo_treatment, control, remove_inflam){
           pull(gene))
  
    if(remove_inflam == TRUE){
+     
     sig = Reduce(union, signatures$outcome_set[table1[1:11]])
-    
     de_novo_signatures = map(de_novo_signatures, ~ setdiff(.x, sig))
+    
    }
   
   signatures$outcome_set = c(signatures$outcome_set, de_novo_signatures)
