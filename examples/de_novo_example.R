@@ -27,8 +27,8 @@ funcs = funcs %>% str_subset("m[7-8]")
 
 de_novo_treatment = c("ses_sss_composite", "income_hh_ff5", "sss_5")
 de_novo_geneset = de_novo_treatment %>% str_c("_","de_novo")
-signatures = get_de_novo(de_novo_treatment, control = "all", remove_inflam = TRUE)
-
+# signatures = get_de_novo(de_novo_treatment, control = "all", remove_inflam = TRUE)
+signatures = readRDS("./user_wx/signatures.rds")
 ncomp = signatures$outcome_set[de_novo_geneset] %>% map_dfc(length) %>% unlist() %>% min
 fit_pca_util = partial(fit_pca_util, ncomp = ncomp) # specify n_perm
 
