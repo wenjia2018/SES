@@ -1,0 +1,31 @@
+---
+title: "Significant GO terms accompanying Fig 2 Network Topology analyses"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r include=FALSE}
+library(tidyverse)
+library(here)
+ses4_down = read_tsv(
+  here(
+    "ext", "web_gestalt", "23.9.2020_analysis", "ses4_down",  "wg_result1600862357.network_PPI_BIOGRID.Network_Expansion_enrichedResult.txt"
+  )
+)
+
+ ```
+
+# SES4 (down)
+
+```{r, echo=FALSE}
+
+select(ses4_down, -interestGene) %>%  
+  # dplyr::mutate(dplyr::across(is.numeric, ~ signif(., 3))) %>% 
+  knitr::kable()
+
+```
+ 

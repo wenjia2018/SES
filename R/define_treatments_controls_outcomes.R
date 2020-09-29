@@ -22,18 +22,18 @@ define_treatments_and_controls = function(){
   
   treatment = c(
     "ses_sss_composite",
-    "ses_composite_ff5",
     "sss_5",
     "SEI_ff5",
     "edu_max",
-    "income_hh_ff5",
-    "work_collar_ff5",
-    "work_collar_rf_f12",
-    "work_collar_rm_f12",
-    "ses_composite_pp1",
-    "edu_p",
-    "SEI_max_p_w12",
-    "income_pp1_log"
+    "income_hh_ff5"
+    # "ses_composite_ff5",
+    # "work_collar_ff5",
+    # "work_collar_rf_f12",
+    # "work_collar_rm_f12",
+    # "ses_composite_pp1",
+    # "edu_p",
+    # "SEI_max_p_w12",
+    # "income_pp1_log"
   )
   
   controls = 

@@ -21,19 +21,18 @@ recode_variables_in_dat()
 print(abbreviations)
 funcs = str_subset(abbreviations$shorthand, "^m") 
 funcs = funcs %>% str_subset("m[7-8]")
+signatures =  add_de_novo(signatures, treatment)
+de_novo_geneset = str_c(treatment, "_de_novo")
+
 # explicitly assign ncomp as the smallest number of table signatures gene numbers
+ncomp = 
+  signatures$outcome_set[de_novo_geneset] %>% 
+  map_int(length) %>%
+  keep(~ length(.x) > 5) %>% 
+  min()
 
-
-
-de_novo_treatment = c("ses_sss_composite", "income_hh_ff5", "sss_5")
-de_novo_geneset = de_novo_treatment %>% str_c("_","de_novo")
-signatures = get_de_novo(de_novo_treatment, control = "all", remove_inflam = TRUE)
-
-ncomp = signatures$outcome_set[de_novo_geneset] %>% map_dfc(length) %>% unlist() %>% min
 fit_pca_util = partial(fit_pca_util, ncomp = ncomp) # specify n_perm
-
 gene_set_name = gene_set_name %>% append(de_novo_geneset) 
-
 args = crossing(treatment, gene_set_name, controls)
 
 # debugonce(model_fit)
