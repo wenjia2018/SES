@@ -1,0 +1,317 @@
+# panel A
+library(tidyverse)
+
+example0_with1k = readRDS("/home/share/scratch/xu/example0_new2signature_withinflam.rds")
+
+example0_no1k = readRDS("/home/share/scratch/xu/example0_new2signature_noinflam.rds")
+threshold_with1k = (0.05/11)/5
+threshold_without1k = (0.05/10)/5
+
+fig1panelB <- example0_with1k %>%
+  hoist(out, p = list("result", "m7_ob", 1, "p")) %>%
+  unnest_longer(p) %>%
+  dplyr::filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>%
+  dplyr::filter(p < threshold_with1k) %>%
+  dplyr::select(treatment, gene_set_name, p_id) %>%
+  mutate(id = str_c(treatment,"_",gene_set_name,"_",p_id))
+
+w5bmi = example0_with1k %>%
+  hoist(out, "result") %>%
+  hoist(result, "m7_ob") %>%
+  unnest(matches("^m7")) %>%
+  hoist(m7_ob, result = list("mediation","w5bmi", "result")) %>%
+  filter(result!="NULL") %>%
+  unnest_longer(result) %>%
+  hoist(result,p = "p")%>%
+  dplyr::select(1:4,6) %>%
+  filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>%
+  mutate(id = str_c(treatment,"_",gene_set_name,"_",result_id)) %>%
+  right_join(fig1panelB %>% 
+               dplyr::select(id))
+w5bmi %>% kableExtra::kable() %>% kableExtra::kable_styling()
+w5bmi = w5bmi %>% as_tibble()
+
+w5bmi = w5bmi %>% mutate(p= p %>% str_remove("<") %>% as.numeric()) # convert from strings to numeric
+w5bmi= w5bmi %>% mutate( p_adj = p * dim(.)[1])  
+threshold_med= 0.05/ dim(w5bmi)[1]
+
+exB <- w5bmi %>% 
+  mutate(pval2=case_when(p_adj<0.0001 ~ 100000,
+                         p_adj<0.001 ~ 25000,
+                         p_adj<0.01 ~ 15000,
+                         p_adj<0.05 ~ 10000,
+                         p_adj>0.05 ~ 0.0000001)
+  ) %>% 
+  dplyr::select(treatment, gene_set_name, p, p_adj, id, pval2) %>%  dplyr::filter(p < threshold_med) 
+
+exB_data_with = exB %>% 
+  mutate(treatment= case_when(treatment == "edu_p" ~ "Parental Education",
+                         treatment =="income_pp1_log" ~  "Parental Income" ,
+                         treatment =="SEI_max_p_w12" ~ "Parental SEI",
+                         treatment =="ses_composite_pp1" ~ "Parental SES Composite",
+                         treatment =="work_collar_rm_f12" ~ "Mother's Occupation",
+                         treatment =="work_collar_rf_f12" ~ "Father's Occupation" ,
+                         treatment =="work_collar_ff5" ~ "Occupation Work Collar",
+                         treatment =="edu_max" ~ "Education" ,
+                         treatment =="income_hh_ff5" ~ "Income"     ,
+                         treatment =="SEI_ff5" ~ "Occupation"      ,
+                         treatment =="ses_sss_composite" ~ "SES Composite"  ,
+                         treatment =="sss_5" ~ "Subjective Social Status",
+                         treatment =="ses_composite_ff5"  ~ "SES Composite 3"))  %>%
+  mutate(treatment = factor(treatment, levels = c("Parental SES Composite", "Parental Education","Parental Income",
+                                                  "Parental SEI", "Mother's Occupation", "Father's Occupation",
+                                                  "SES Composite 3", "SES Composite", "Education", "Income",
+                                                  "Occupation", "Subjective Social Status","Occupation Work Collar"
+  ))) %>%
+  mutate(gene_set_name = gene_set_name %>% str_replace_all("_mRNA",""),
+         gene_set_name = gene_set_name %>% str_replace_all("_"," ") %>% str_to_title(),
+         gene_set_name = gene_set_name %>% replace(gene_set_name == "Cvd", "CVD"),
+         gene_set_name = gene_set_name %>% replace(gene_set_name == "Copd", "COPD"),
+         gene_set_name = gene_set_name %>% replace(gene_set_name == "Ckd", "CKD"),
+         gene_set_name = gene_set_name %>% replace(gene_set_name == "Inflam1k", "1KI"),
+         "1KI Genes" = "With 1KI Genes" %>% as.factor())
+
+fig1panelB_without  <- example0_no1k %>%
+  hoist(out, p = list("result", "m7_ob", 1, "p")) %>%
+  unnest_longer(p) %>%
+  dplyr::filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>%
+  dplyr::filter(p < threshold_without1k) %>%
+  dplyr::select(treatment, gene_set_name, p_id) %>%
+  mutate(id = str_c(treatment,"_",gene_set_name,"_",p_id))
+
+w5bmi_without  = example0_no1k %>%
+  hoist(out, "result") %>%
+  hoist(result, "m7_ob") %>%
+  unnest(matches("^m7")) %>%
+  hoist(m7_ob, result = list("mediation","w5bmi", "result")) %>%
+  filter(result!="NULL") %>%
+  unnest_longer(result) %>%
+  hoist(result,p = "p")%>%
+  dplyr::select(1:4,6) %>%
+  filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>%
+  mutate(id = str_c(treatment,"_",gene_set_name,"_",result_id)) %>%
+  right_join(fig1panelB_without  %>% 
+               dplyr::select(id))
+w5bmi_without  %>% kableExtra::kable() %>% kableExtra::kable_styling()
+w5bmi_without  = w5bmi_without  %>% as_tibble()
+
+w5bmi_without  = w5bmi_without  %>% mutate(p= p %>% str_remove("<") %>% as.numeric()) # convert from strings to numeric
+
+threshold_med= 0.05/ dim(w5bmi_without)[1]
+w5bmi_without= w5bmi_without %>% mutate( p_adj = p * dim(.)[1])  
+
+exB_without <- w5bmi_without %>% 
+  mutate(pval2=case_when(p_adj<0.0001 ~ 100000,
+                         p_adj<0.001 ~ 25000,
+                         p_adj<0.01 ~ 15000,
+                         p_adj<0.05 ~ 10000,
+                         p_adj>0.05 ~ 0.0000001)
+  ) %>% 
+  dplyr::select(treatment, gene_set_name, p, p_adj, id, pval2) %>%  dplyr::filter(p < threshold_med) 
+
+
+
+exB_data_without = exB_without %>% 
+  mutate(treatment= case_when(treatment == "edu_p" ~ "Parental Education",
+                         treatment =="income_pp1_log" ~  "Parental Income" ,
+                         treatment =="SEI_max_p_w12" ~ "Parental SEI",
+                         treatment =="ses_composite_pp1" ~ "Parental SES Composite",
+                         treatment =="work_collar_rm_f12" ~ "Mother's Occupation",
+                         treatment =="work_collar_rf_f12" ~ "Father's Occupation" ,
+                         treatment =="work_collar_ff5" ~ "Occupation Work Collar",
+                         treatment =="edu_max" ~ "Education" ,
+                         treatment =="income_hh_ff5" ~ "Income"     ,
+                         treatment =="SEI_ff5" ~ "Occupation"      ,
+                         treatment =="ses_sss_composite" ~ "SES Composite"  ,
+                         treatment =="sss_5" ~ "Subjective Social Status",
+                         treatment =="ses_composite_ff5"  ~ "SES Composite 3"))  %>%
+  mutate(treatment = factor(treatment, levels = c("Parental SES Composite", "Parental Education","Parental Income",
+                                                  "Parental SEI", "Mother's Occupation", "Father's Occupation",
+                                                  "SES Composite 3", "SES Composite", "Education", "Income",
+                                                  "Occupation", "Subjective Social Status","Occupation Work Collar"
+  ))) %>%
+  mutate(gene_set_name = gene_set_name %>% str_replace_all("_mRNA",""),
+         gene_set_name = gene_set_name %>% str_replace_all("_"," ") %>% str_to_title(),
+         gene_set_name = gene_set_name %>% replace(gene_set_name == "Cvd", "CVD"),
+         gene_set_name = gene_set_name %>% replace(gene_set_name == "Copd", "COPD"),
+         gene_set_name = gene_set_name %>% replace(gene_set_name == "Ckd", "CKD"),
+         gene_set_name = gene_set_name %>% replace(gene_set_name == "Inflam1k", "1KI"),
+         "1KI Genes" = "Without 1KI Genes" %>% as.factor())
+
+exB_data = full_join(exB_data_with %>% dplyr::select(1,2,3,4,6,7), exB_data_without %>% dplyr::select(1,2,3,4,6, 7), by.x = treatment, by.y = "gene_set_name") %>% 
+  mutate(gene_set_name = gene_set_name %>% str_c(" ","PC"))
+
+
+# plot pca dimention seprately, for depression and 1KI there are two dimentions significant
+exB_data[6,2] = "COPD PC1"
+exB_data[7,2] = "COPD PC2"
+exB_data[9,2] = "1KI PC1"
+exB_data[10,2] = "1KI PC2"
+
+
+exB_data = exB_data %>% mutate(gene_set_name = gene_set_name %>% replace(gene_set_name == "COPD PC", "COPD PC1"),
+                               gene_set_name = gene_set_name %>% replace(gene_set_name == "1KI PC", "1KI PC1"))
+
+exB_data = exB_data %>% mutate(gene_set_name = factor(gene_set_name, levels = c("1KI PC1", "1KI PC2", "Alzheimers PC",
+                                                                                "Aortic Aneurysm PC", "Asthma PC", "CKD PC",
+                                                                                "COPD PC1","COPD PC2", "CVD PC",
+                                                                                "Depression PC",
+                                                                                "Diabetes PC",
+                                                                                "Hypertension PC", "Rheumatoid Arthritis PC")) %>% fct_rev)
+
+exB_data = exB_data %>%  mutate(treatment = factor(treatment, levels = c("SES Composite",
+                                                                         "Education",
+                                                                         "Income",
+                                                                         "Occupation",
+                                                                         "Subjective Social Status")))
+
+
+# color order from bottom to top
+axiscolor = c("grey30", "grey30", "grey30", "darkseagreen1","darkseagreen4" ,"grey30","red", "darkred")
+
+panelA <-ggplot(exB_data, aes(treatment, gene_set_name, size = pval2, fill = `1KI Genes`, colour = `1KI Genes`)) +
+  geom_point(stroke = 1.5, shape = 21, alpha = 0.4) +
+  scale_color_manual(values = c("darkblue", "goldenrod3")) + 
+  theme_bw() +
+  labs(
+    # title = "Figure 1. Associations between Indicators of Socioeconomic Status 
+    #         and mRNA-Based Disease Signatures, Add Health 
+    #         (p-values reported, FDR-corrected for whole genome)",
+    y = "mRNA Signatures",
+    x = "SES Indicators") +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1),
+        text = element_text(size=10, face = "bold")) +
+  scale_size_continuous(name = "P-value",
+                        range = c(0, 16),
+                        limits = c(10000, 100000), breaks = c(10000, 15000, 25000, 100000),
+                        labels = c("p<0.05", "p<0.01", "p<0.001", "p<0.0001"))+
+  scale_alpha(guide = 'none')+
+  guides(#shape = guide_legend(override.aes = list(size = 10)),
+    fill = guide_legend(override.aes = list(size = 10)))+
+  scale_fill_manual(values = c("darkblue", "goldenrod3"))
+
+
+
+# panel B
+
+example0_without_1KI_de_novo <- readRDS("/home/share/scratch/example0_without_1KI_de_novo.rds")
+threshold_without1k = 0.05/7 #the denominator is the number of PC per treatment
+
+
+fig1panelB_without  <- example0_without_1KI_de_novo %>%
+  hoist(out, p = list("result", "m7_ob", 1, "p")) %>%
+  unnest_longer(p) %>%
+  dplyr::filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>%
+  dplyr::filter(p < threshold_without1k) %>%
+  dplyr::select(treatment, gene_set_name, p_id) %>%
+  mutate(id = str_c(treatment,"_",gene_set_name,"_",p_id))
+
+w5bmi_without  = example0_without_1KI_de_novo %>%
+  hoist(out, "result") %>%
+  hoist(result, "m7_ob") %>%
+  unnest(matches("^m7")) %>%
+  hoist(m7_ob, result = list("mediation","w5bmi", "result")) %>%
+  filter(result!="NULL") %>%
+  unnest_longer(result) %>%
+  hoist(result,p = "p")%>%
+  dplyr::select(1:4,6) %>%
+  filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>%
+  mutate(id = str_c(treatment,"_",gene_set_name,"_",result_id),
+         id_pc= str_c(gene_set_name," ",result_id)) %>%
+  right_join(fig1panelB_without  %>% 
+               dplyr::select(id))
+w5bmi_without  %>% kableExtra::kable() %>% kableExtra::kable_styling()
+w5bmi_without  = w5bmi_without  %>% as_tibble()
+
+w5bmi_without  = w5bmi_without  %>% mutate(p= p %>% str_remove("<") %>% as.numeric()) # convert from strings to numeric
+
+
+w5bmi_without= w5bmi_without %>% filter(str_detect(gene_set_name, treatment)) %>% mutate( p_adj = p * dim(.)[1])  
+
+exB_without <- w5bmi_without %>% 
+  mutate(pval2=case_when(p_adj<0.0001 ~ 100000,
+                         p_adj<0.001 ~ 25000,
+                         p_adj<0.01 ~ 15000,
+                         p_adj<0.05 ~ 10000,
+                         p_adj>0.05 ~ 0.0000001)
+  ) %>% dplyr::select(treatment, gene_set_name, p, p_adj, id_pc, pval2) %>%   dplyr::filter(p_adj < 0.05) 
+
+exB_data_without = exB_without %>% 
+  mutate(treatment= case_when(treatment == "edu_p" ~ "Parental Education",
+                         treatment =="income_pp1_log" ~  "Parental Income" ,
+                         treatment =="SEI_max_p_w12" ~ "Parental SEI",
+                         treatment =="ses_composite_pp1" ~ "Parental SES Composite",
+                         treatment =="work_collar_rm_f12" ~ "Mother's Occupation",
+                         treatment =="work_collar_rf_f12" ~ "Father's Occupation" ,
+                         treatment =="work_collar_ff5" ~ "Occupation Work Collar",
+                         treatment =="edu_max" ~ "Education" ,
+                         treatment =="income_hh_ff5" ~ "Income"     ,
+                         treatment =="SEI_ff5" ~ "Occupation"      ,
+                         treatment =="ses_sss_composite" ~ "SES Composite"  ,
+                         treatment =="sss_5" ~ "Subjective Social Status",
+                         treatment =="ses_composite_ff5"  ~ "SES Composite 3"))  %>%
+  mutate(treatment = factor(treatment, levels = c("Parental SES Composite", "Parental Education","Parental Income",
+                                                  "Parental SEI", "Mother's Occupation", "Father's Occupation",
+                                                  "SES Composite 3", "SES Composite", "Education", "Income",
+                                                  "Occupation", "Subjective Social Status","Occupation Work Collar"
+  ))) %>%
+  mutate(id_pc = id_pc %>% str_replace_all("D","PC"),
+    "1KI Genes" = "Without 1KI Genes" %>% as.factor())
+
+
+exB_data = exB_data_without %>%  mutate(treatment = factor(treatment, levels = c("SES Composite",
+                                                                                 "Education",
+                                                                                 "Income",
+                                                                                 "Occupation",
+                                                                                 "Subjective Social Status")))
+
+exB_data = exB_data %>% mutate(denovo= case_when(gene_set_name=="income_hh_ff5_de_novo"  ~ "Income PC",
+                                                 gene_set_name=="ses_sss_composite_de_novo"  ~ "SES Composite PC",
+                                                 gene_set_name=="sss_5_de_novo"~ "Subjective Social Status PC")) %>%
+                        group_by(denovo) %>%
+                        mutate(cons_pc=1:n()) %>% 
+                        ungroup() %>% 
+                        mutate(denovo_pc= str_c(denovo, cons_pc))
+
+exB_data = exB_data %>% add_row(treatment="Education",
+                                gene_set_name="Income PC1",
+                                p=10,
+                                p_adj=0,
+                                `1KI Genes`= "Without 1KI Genes",
+                                pval2= 0,
+                                denovo_pc= "Income PC1") %>% 
+                        add_row(treatment="Occupation",
+                                gene_set_name="Income PC1",
+                                p=10,
+                                p_adj=0,
+                                `1KI Genes`= "Without 1KI Genes",
+                                pval2= 0,
+                                denovo_pc= "Income PC1") 
+
+# color order from bottom to top
+axiscolor = c("grey30", "grey30", "grey30", "darkseagreen1","darkseagreen4" ,"grey30","red", "darkred")
+
+panelB <- ggplot(exB_data, aes(treatment, denovo_pc, size = pval2, fill = `1KI Genes`, colour = `1KI Genes`)) +
+  geom_point(stroke = 1.5, shape = 21, alpha = 0.4) +
+  scale_color_manual(values = c("goldenrod3", "darkblue")) + 
+  theme_bw() +
+  labs(
+    # title = "Figure 1. Associations between Indicators of Socioeconomic Status 
+    #         and mRNA-Based Disease Signatures, Add Health 
+    #         (p-values reported, FDR-corrected for whole genome)",
+    y = "DE Genes",
+    x = "SES Indicators") +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1),
+        text = element_text(size=10, face = "bold")) +
+  scale_size_continuous(name = "P-value",
+                        range = c(0, 16),
+                        limits = c(10000, 100000), breaks = c(10000, 15000, 25000, 100000),
+                        labels = c("p<0.05", "p<0.01", "p<0.001", "p<0.0001"))+
+  scale_alpha(guide = 'none')+
+  guides(shape = guide_legend(override.aes = list(size = 10)),
+         fill = guide_legend(override.aes = list(size = 10)))+
+  scale_fill_manual(values = c("goldenrod3", "darkblue")) 
+
+
+ggpubr::ggarrange(panelA, panelB, ncol = 2, labels = c("A", "B"), common.legend = TRUE, legend="right")
+figure =  ggpubr::ggarrange(panelA, panelB, ncol = 2, labels = c("A", "B"), common.legend = TRUE, legend="right")
