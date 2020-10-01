@@ -1,3 +1,13 @@
+set.seed(123)
+library(here)
+library(tidyverse)
+library(rlang)
+library(skimr)
+library(furrr)
+library(limma)
+library(recipes)
+library(parsnip)
+library(workflows)
 library(Biobase)
 library(enrichplot)
 library(dbr) # my package
@@ -13,12 +23,10 @@ funcs = str_subset(abbreviations$shorthand, "^m")
 funcs = funcs %>% str_subset("m[7-8]")
 # explicitly assign ncomp as the smallest number of table signatures gene numbers
 
-
-
 de_novo_treatment = c("ses_sss_composite", "income_hh_ff5", "sss_5")
 de_novo_geneset = de_novo_treatment %>% str_c("_","de_novo")
 # signatures = get_de_novo(de_novo_treatment, control = "all", remove_inflam = TRUE)
-signatures = readRDS("./user_wx/signatures.rds")
+signatures = readRDS("./user_wx_RESTORED/signatures.rds")
 ncomp = signatures$outcome_set[de_novo_geneset] %>% map_dfc(length) %>% unlist() %>% min
 fit_pca_util = partial(fit_pca_util, ncomp = ncomp) # specify n_perm
 
@@ -35,4 +43,4 @@ example0 =
   mutate(out = pmap(., safely(model_fit), funcs),
          controls = names(controls))
 
-example0 %>% saveRDS("/home/share/scratch/example0_without_1KI_de_novo.rds")
+example0 %>% saveRDS("/home/share/scratch/example0_without_1KI_de_novo_0110.rds")
