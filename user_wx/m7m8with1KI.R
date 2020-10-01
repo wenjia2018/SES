@@ -43,4 +43,4 @@ example0 =
 
 # saveRDS(example0, "/home/share/scratch/xu/example0_w5bmi_removeinflam.rds")
 # change in utils.R and  models.R fit_pca_util ncomp = 6
-saveRDS(example0, "/home/share/scratch/example0_with_1KI.rds")
+saveRDS(example0, "/home/share/scratch/example0_with_1KI_0110.rds")

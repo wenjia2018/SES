@@ -36,7 +36,7 @@ walk(dir(path = here("R"),full.names = TRUE), source)
 #+ echo=F, eval=T, warning=FALSE, message=FALSE 
 
 
-m7_ob = readRDS("/home/xu/ses-1/user_wx/m7_ob.rds")
+m7_ob = readRDS("/home/xu/ses-1/user_wx_RESTORED/m7_ob.rds")
 # a = m7_ob %>%
 #   dplyr::select(well_loaded_genes_on_significant_PCs) %>%
 #   pull(well_loaded_genes_on_significant_PCs) %>%
