@@ -39,3 +39,20 @@ example0 =
          names(controls) == "all") %>% 
   mutate(out = pmap(., safely(model_fit), funcs),
          controls = names(controls))
+
+example0 %>% saveRDS("./user_wx/example_MR_table1.rds")
+
+a = example0 %>%
+  mutate(treatment = "w5bmi") %>% 
+  hoist(out, "result") %>%
+  unnest_longer(result) %>%
+  filter(gene_set_name!="inflam1k_mRNA") %>% 
+  mutate(result = result %>% unlist(use.names=FALSE)) %>% 
+  hoist(result, p_unadj = "Pvalue") %>% 
+  hoist(result, estimate = "Estimate") %>% 
+  dplyr::select(1:5, 7) 
+# %>% 
+#   mutate(adjP = p* dim(.)[1],
+#          adjP = ifelse(adjP>1, 1, adjP)) %>% 
+#   filter(adjP<0.05) %>% 
+#   mutate(adjP = adjP %>% format(digits = 3, scientific =T)) # convert from strings to numeric
