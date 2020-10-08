@@ -9,8 +9,8 @@ model_fit =
     
     if(gene_set_name == "whole_genome_and_tfbm") return(de_and_tfbm(treatment, controls)) 
     if(funcs == "m96") return(celltype_cibersort(treatment, controls)) 
-    
-    if(funcs == "m95") return(model_MR(gene_set_name, "w5bmi", "PGSBMI.x", controls)) 
+    # controls: NULL or controls + ses predictor
+    if(funcs == "m95") return(model_MR(gene_set_name, "w5bmi", "PGSBMI.x", controls=NULL)) 
     
     ############################################################
     # OTHERWISE (FOR SMALLER GENE SETS OF INTEREST)
