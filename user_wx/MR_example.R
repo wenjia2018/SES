@@ -35,24 +35,38 @@ fit_pca_util = partial(fit_pca_util, ncomp = ncomp) # specify n_perm
 example0 =
   args %>%
   filter(is.element(gene_set_name, table1),
-         treatment =="ses_sss_composite", 
+         treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5", "sss_5"), 
          names(controls) == "all") %>% 
   mutate(out = pmap(., safely(model_fit), funcs),
          controls = names(controls))
 
-example0 %>% saveRDS("./user_wx/example_MR_table1.rds")
+example0 %>% saveRDS("./user_wx/example_MR_table1_completecontrols.rds")
 
-a = example0 %>%
-  mutate(treatment = "w5bmi") %>% 
+example_MR_table1_completecontrols %>%
   hoist(out, "result") %>%
   unnest_longer(result) %>%
-  filter(gene_set_name!="inflam1k_mRNA") %>% 
-  mutate(result = result %>% unlist(use.names=FALSE)) %>% 
-  hoist(result, p_unadj = "Pvalue") %>% 
-  hoist(result, estimate = "Estimate") %>% 
-  dplyr::select(1:5, 7) 
-# %>% 
-#   mutate(adjP = p* dim(.)[1],
-#          adjP = ifelse(adjP>1, 1, adjP)) %>% 
-#   filter(adjP<0.05) %>% 
-#   mutate(adjP = adjP %>% format(digits = 3, scientific =T)) # convert from strings to numeric
+  filter(gene_set_name!="inflam1k_mRNA") %>%
+  mutate(result = result %>% unlist(use.names=FALSE)) %>%
+  hoist(result, p_unadj = "Pvalue") %>%
+  hoist(result, estimate = "Estimate") %>%
+  mutate(controls = str_c(controls, "+", treatment),
+         treatment = "w5bmi",
+         IV = "PGSBMI") %>%
+  dplyr::select(1:5, 9) %>%
+  select(IV, everything()) %>%
+  filter(p_unadj < 0.05)
+example_MR_table1_nocontrols %>%
+  mutate(treatment = "w5bmi") %>%
+  hoist(out, "result") %>%
+  unnest_longer(result) %>%
+  filter(gene_set_name!="inflam1k_mRNA") %>%
+  mutate(result = result %>% unlist(use.names=FALSE)) %>%
+  hoist(result, p_unadj = "Pvalue") %>%
+  hoist(result, estimate = "Estimate") %>%
+  mutate(controls = "NULL",
+         IV = "PGSBMI") %>%
+  filter(p_unadj <0.05) %>%
+  dplyr::select(1:5, 9) %>%
+  select(IV, everything()) %>%
+  kableExtra::kable() %>%
+  kableExtra::kable_styling()
