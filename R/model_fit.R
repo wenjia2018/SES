@@ -9,6 +9,9 @@ model_fit =
     
     if(gene_set_name == "whole_genome_and_tfbm") return(de_and_tfbm(treatment, controls)) 
     if(funcs == "m96") return(celltype_cibersort(treatment, controls)) 
+    # controls: NULL or controls + ses predictor
+    if(funcs == "m95") return(model_MR(gene_set_name, "w5bmi", "PGSBMI.x", controls=NULL)) 
+    
     ############################################################
     # OTHERWISE (FOR SMALLER GENE SETS OF INTEREST)
     ############################################################
@@ -56,25 +59,25 @@ model_fit =
     source("R/utils.R", local = TRUE)
     if(any(str_detect(funcs, "m7"))) {
       
-      out$m7_nn  = fit_m7(datt, gene_set, "none"   ) %>% extract_m7()
-      out$m7_vx  = fit_m7(datt, gene_set, "varimax") %>% extract_m7()
+      # out$m7_nn  = fit_m7(datt, gene_set, "none"   ) %>% extract_m7()
+      # out$m7_vx  = fit_m7(datt, gene_set, "varimax") %>% extract_m7()
       out$m7_ob  = fit_m7(datt, gene_set, "oblimin") %>% extract_m7()
       
       # for each of the results just calculated above, append the genes loading high in this dimension
-      out$m7_nn$other$well_loaded <- get_well_loaded_genes(datt, gene_set, "none")
-      out$m7_vx$other$well_loaded <- get_well_loaded_genes(datt, gene_set, "varimax")
+      # out$m7_nn$other$well_loaded <- get_well_loaded_genes(datt, gene_set, "none")
+      # out$m7_vx$other$well_loaded <- get_well_loaded_genes(datt, gene_set, "varimax")
       out$m7_ob$other$well_loaded <- get_well_loaded_genes(datt, gene_set, "oblimin")
       
       # for each of the pca, do mediational analysis for each pc
-      out$m7_nn$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "none", out$m7_nn)
-      out$m7_vx$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "varimax", out$m7_vx)
+      # out$m7_nn$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "none", out$m7_nn)
+      # out$m7_vx$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "varimax", out$m7_vx)
       out$m7_ob$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "oblimin", out$m7_ob)
     } 
     
     if(any(str_detect(funcs, "m8"))){
       
       out$m8_fdr  = fit_m8(controls, treatment, gene_set) %>% extract_m8_fdr()
-      out$m8_fwer = fit_m8(controls, treatment, gene_set) %>% extract_m8_fwer()
+      # out$m8_fwer = fit_m8(controls, treatment, gene_set) %>% extract_m8_fwer()
       
     }
    
