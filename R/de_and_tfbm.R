@@ -20,8 +20,13 @@ de_and_tfbm <- function(treatment, controls, de_only = FALSE) {
     tidy_topTable(of_in = treatment)
   
   if(de_only) return(ttT)
+  # gene set tests self contained
+  sets = signatures$outcome_set[table1[1:11]]
+  gene_set_test = mroast(y, index = sets, design = X, contrast = treatment)
+  # optional gene.weights = ttT$logFC
+  # ttT = ttT %>% mutate(weight = ifelse(logFC>0,1,-1)) gene.weights = ttT$weight
   
-  fig1 = DE_enrichplot(ttT)
+  # fig1 = DE_enrichplot(ttT)
   
   # genes whose uncorrected p-values below 0.05 (not an inference):
   ttT_sub = filter(ttT, P.Value <= 0.05)
@@ -33,5 +38,5 @@ de_and_tfbm <- function(treatment, controls, de_only = FALSE) {
     pluck("telis", "par", "p_over") %>% # tfbms over represented in DNA of genes labeled with high mRNA relation to treatment
     enframe(name = "tfbm", value = "tellis p.value for over-represented tfbms")
   
-  return(list(ttT = ttT, tfbm = tfbm, fig1 = fig1))
+  return(list(ttT = ttT, tfbm = tfbm, gene_set_test = gene_set_test))
 }
