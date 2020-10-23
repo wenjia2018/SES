@@ -1,6 +1,6 @@
 abbreviations =
   tribble(
-    ~shorthand,  ~meaning,                
+    ~shorthand,  ~meaning,
     "ttT", "DE: ranked genes",
     "tfbm", "TFBM: uncorrected p-values",
     "m1", "multivariate outcome = set of individual genes",       
