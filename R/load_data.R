@@ -13,8 +13,8 @@ load_data = function(reconciled, remove_inflam){
     # dat = readRDS("/home/share/preprocessed_two_batches/wx/dt_batches1_2_steve_waves_21042020.rds")
     # signatures = readRDS("/home/share/preprocessed_two_batches/for_cecilia/dt_batches1_2_steve_waves_21042020_signature.rds") # from Wenjia
     # after adding two new signatures and several pheno data
-    signatures <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_10.09.2020_signature.rds")
-    dat <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_10.09.2020.rds")
+    signatures <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_06.11.2020_signature.rds")
+    dat <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_12.11.2020.rds")
   }
   
   if(remove_inflam) {
