@@ -21,8 +21,8 @@ de_and_tfbm <- function(treatment, controls, de_only = FALSE) {
   
   if(de_only) return(ttT)
   # gene set tests self contained
-  sets = signatures$outcome_set[table1[1:11]]
-  gene_set_test = mroast(y, index = sets, design = X, contrast = treatment)
+  sets = signatures$outcome_set[table1]
+  gene_set_test = mroast(y, index = sets, design = X, contrast = treatment) %>% rownames_to_column("gene_set_name")
   # optional gene.weights = ttT$logFC
   # ttT = ttT %>% mutate(weight = ifelse(logFC>0,1,-1)) gene.weights = ttT$weight
   

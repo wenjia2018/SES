@@ -8,6 +8,17 @@ recode_variables_in_dat <- function(){
     # mutate_at(.vars = vars(matches("income|composite|SEI")),
     #           .funs = list(~ .x %>% ntile(4) %>% as.factor())
     # ) %>% 
+    mutate(raceethnicity = re %>% fct_recode(
+      NonHwhite = "1",
+      #white nonhispanic
+      NonHblack = "2",
+      # black nonhispanic
+      NULL = "3",
+      #asian nonhispanic
+      NULL = "4",
+      #other nonhispanic
+      Hispanic = "5"
+    ))%>% 
     mutate_at(.vars = vars(matches("^edu_p$|^edu_max$")),
               .funs = list(~ .x %>%
                              factor %>%
