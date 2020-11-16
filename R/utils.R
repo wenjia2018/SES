@@ -24,8 +24,9 @@ mediate_multiple = function(gene_set){
 mediate_pca = function(mediator, gene_set, rotate, pca_out){
   datt_m = 
     prepro(gene_set, treatment, c(controls, mediator)) %>%
-    rename(treatment = treatment,
-           mediator = mediator) %>% 
+    rename(treatment = treatment
+           # mediator = mediator
+           ) %>% 
     remove_diseased_subjects_from_datt(gene_set_name, controls)
   
   pca_rotated = fit_pca_util(datt_m, gene_set, rotate) 
@@ -45,7 +46,8 @@ mediate_pca = function(mediator, gene_set, rotate, pca_out){
   threshold = 0.05 / length(pca_out$p)
   sig = pca_out$p < threshold
   print("please be aware: p value correction is bonferonni for now")
- map2(datt_pca[sig], outcome[sig], fit_m99) %>% map(extract_m99)  
+ # map2(datt_pca[sig], outcome[sig], fit_m99) %>% map(extract_m99)
+ pmap(list(datt_pca[sig], outcome[sig], mediator), fit_m99) %>% map(extract_m99)
 }
 
 get_table1 = function(example){ 
