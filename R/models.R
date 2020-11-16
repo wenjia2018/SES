@@ -419,20 +419,33 @@ fit_m99 = function(datt, gene_set, mediator){
   gene_set = "gene_set"
   keep = datt %>% complete.cases()
   datt_keep = datt[keep,]
-  
-  formula_y = str_c("gene_set", " ~ .") %>% as.formula()
-  out.y = lm(formula_y, data = datt_keep)
+
   
   if(mediator %>% str_detect("_gamma")) {
     datt_keep = datt_keep %>%
-      rename(mediator = mediator) 
+      rename(mediator = mediator) %>% 
+      mutate(mediator = mediator %>% as.numeric)
+    formula_y = str_c("gene_set", " ~ .") %>% as.formula()
+    out.y = lm(formula_y, data = datt_keep)
+    
     formula_m = str_c("mediator", " ~ .") %>% as.formula()
     out.m = glm(formula_m, family = Gamma(), data = datt_keep %>% dplyr::select(-gene_set))
-  }else if(mediator %>% str_detect("_lm") ) {
+  } else if(mediator %>% str_detect("_pois")) {
+    datt_keep = datt_keep %>%
+      rename(mediator = mediator) %>% 
+      mutate(mediator = mediator %>% as.numeric)
+    formula_y = str_c("gene_set", " ~ .") %>% as.formula()
+    out.y = lm(formula_y, data = datt_keep)
+    
+    formula_m = str_c("mediator", " ~ .") %>% as.formula()
+    out.m = glm(formula_m, family = poisson(), data = datt_keep %>% dplyr::select(-gene_set))
+  } else if(mediator %>% str_detect("_lm") ) {
     datt_keep = datt_keep %>%
       rename(mediator = mediator) 
-    formula_m = str_c("mediator", " ~ .") %>% as.formula()
+    formula_y = str_c("gene_set", " ~ .") %>% as.formula()
+    out.y = lm(formula_y, data = datt_keep)
     
+    formula_m = str_c("mediator", " ~ .") %>% as.formula()
     out.m = lm(formula_m, data = datt_keep %>% dplyr::select(-gene_set))
     
   } else if(mediator %>% str_detect("_binary") ){
@@ -441,7 +454,9 @@ fit_m99 = function(datt, gene_set, mediator){
       mutate(
         mediator = mediator %>% as.character() %>%  as.numeric()
       )
-
+    formula_y = str_c("gene_set", " ~ .") %>% as.formula()
+    out.y = lm(formula_y, data = datt_keep)
+    
     formula_m = str_c("mediator", " ~ .") %>% as.formula()
     out.m = glm(formula_m, family = binomial(), data = datt_keep %>% dplyr::select(-gene_set))
     
@@ -449,7 +464,8 @@ fit_m99 = function(datt, gene_set, mediator){
     datt_keep = datt_keep %>%
       rename(mediator = mediator) %>% 
       mutate(mediator = mediator %>% as.factor())
-
+    formula_y = str_c("gene_set", " ~ .") %>% as.formula()
+    out.y = lm(formula_y, data = datt_keep)
     # has met some numerical problem with the starting value for optimization
     # therefore not stable, might have again for other mediators outcome combination.
     # https://stackoverflow.com/questions/28916377/r-error-with-polr-initial-value-in-vmmin-is-not-finite
