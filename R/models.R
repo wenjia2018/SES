@@ -412,65 +412,58 @@ fit_m7 = function(datt, gene_set, rotate){
 # MEDIATION
 ############################################################
 
-fit_m99 = function(datt, gene_set){
+fit_m99 = function(datt, gene_set, mediator){
   
   datt = bind_cols(dplyr::select(datt, -gene_set),
                    gene_set = apply(datt[gene_set], 1, mean))
   gene_set = "gene_set"
+  keep = datt %>% complete.cases()
+  datt_keep = datt[keep,]
+
   
-  if (is.numeric(datt$mediator)){
-    
-    # gene_set outcome is dependent measure
-    (rec =
-       str_c(gene_set) %>%
-       str_c(" ~ .") %>%
-       as.formula() %>%
-       recipe(datt))
-    (mod = linear_reg() %>%
-        set_engine("lm"))
-    (wf =
-        workflow() %>%
-        add_recipe(rec) %>%
-        add_model(mod) %>%
-        fit(datt))
-    out.y = pluck(wf, "fit", "fit", "fit")
-    
-    # mediate is dependent measure    
-    (rec =
-        str_c("mediator") %>%
-        str_c(" ~ .") %>%
-        as.formula() %>%
-        recipe(datt %>% dplyr::select(-gene_set)))
-    
-    (mod = linear_reg() %>%
-        set_engine("lm"))
-    
-    (wf =
-        workflow() %>%
-        add_recipe(rec) %>%
-        add_model(mod) %>%
-        fit(datt %>% dplyr::select(-gene_set)))
-    
-    out.m = pluck(wf, "fit", "fit", "fit")
-    
-  } else if(datt$mediator %>% table() %>% length() == 2){
-    
-    datt$mediator = datt$mediator %>% as.character() %>%  as.numeric()
-    keep = datt %>% complete.cases()
-    datt_keep = datt[keep,]
-    
+  if(mediator %>% str_detect("_gamma")) {
+    datt_keep = datt_keep %>%
+      rename(mediator = mediator) %>% 
+      mutate(mediator = mediator %>% as.numeric)
     formula_y = str_c("gene_set", " ~ .") %>% as.formula()
     out.y = lm(formula_y, data = datt_keep)
     
     formula_m = str_c("mediator", " ~ .") %>% as.formula()
-    out.m = glm(formula_m, family = binomial(link = "probit"), data = datt_keep %>% dplyr::select(-gene_set))
+    out.m = glm(formula_m, family = Gamma(), data = datt_keep %>% dplyr::select(-gene_set))
+  } else if(mediator %>% str_detect("_pois")) {
+    datt_keep = datt_keep %>%
+      rename(mediator = mediator) %>% 
+      mutate(mediator = mediator %>% as.numeric)
+    formula_y = str_c("gene_set", " ~ .") %>% as.formula()
+    out.y = lm(formula_y, data = datt_keep)
     
-  } else if(datt$mediator %>% table() %>% length() > 2){
+    formula_m = str_c("mediator", " ~ .") %>% as.formula()
+    out.m = glm(formula_m, family = poisson(), data = datt_keep %>% dplyr::select(-gene_set))
+  } else if(mediator %>% str_detect("_lm") ) {
+    datt_keep = datt_keep %>%
+      rename(mediator = mediator) 
+    formula_y = str_c("gene_set", " ~ .") %>% as.formula()
+    out.y = lm(formula_y, data = datt_keep)
     
-    datt$mediator = datt$mediator %>% as.factor()
-    keep = datt %>% complete.cases()
-    datt_keep = datt[keep,]
+    formula_m = str_c("mediator", " ~ .") %>% as.formula()
+    out.m = lm(formula_m, data = datt_keep %>% dplyr::select(-gene_set))
     
+  } else if(mediator %>% str_detect("_binary") ){
+    datt_keep = datt_keep %>%
+      rename(mediator = mediator) %>% 
+      mutate(
+        mediator = mediator %>% as.character() %>%  as.numeric()
+      )
+    formula_y = str_c("gene_set", " ~ .") %>% as.formula()
+    out.y = lm(formula_y, data = datt_keep)
+    
+    formula_m = str_c("mediator", " ~ .") %>% as.formula()
+    out.m = glm(formula_m, family = binomial(), data = datt_keep %>% dplyr::select(-gene_set))
+    
+  } else if(mediator %>% str_detect("_category")){
+    datt_keep = datt_keep %>%
+      rename(mediator = mediator) %>% 
+      mutate(mediator = mediator %>% as.factor())
     formula_y = str_c("gene_set", " ~ .") %>% as.formula()
     out.y = lm(formula_y, data = datt_keep)
     # has met some numerical problem with the starting value for optimization
@@ -480,7 +473,6 @@ fit_m99 = function(datt, gene_set){
     out.m = MASS::polr(formula_m, data = datt_keep %>% dplyr::select(-gene_set), Hess=TRUE)
     
   }
-  
   
   out<- mediation::mediate(out.m, out.y, treat = "treatment", mediator = "mediator")
   out
