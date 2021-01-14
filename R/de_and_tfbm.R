@@ -8,9 +8,10 @@ de_and_tfbm <- function(treatment, controls, de_only = FALSE) {
   X = X[keep, ]
   y = y[, keep]
   
-  # X = model.matrix(~ ., data = X)
-  # MatrixModels::model.Matrix can drop unused levels 
-  X = MatrixModels::model.Matrix(~., data = X, sparse = TRUE, drop.unused.levels = TRUE)
+  X = model.matrix(~ ., data = X)
+  # MatrixModels::model.Matrix can drop unused levels, but has error when the variable names contains some special characters 
+  # https://stackoverflow.com/questions/44114391/error-in-sparse-model-matrix
+  # X = MatrixModels::model.Matrix(~., data = X, sparse = TRUE, drop.unused.levels = TRUE)
   # needed for limma::topTables() to work with factors
   treatment = X %>% colnames() %>% str_detect(treatment) %>% which()
   
