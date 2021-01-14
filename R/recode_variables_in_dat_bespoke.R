@@ -71,7 +71,6 @@ recode_variables_in_dat_bespoke <- function(custom_PCA) {
                        "0" = "none"
                      ))
     ) %>% 
-    fastDummies::dummy_cols(select_columns = c("raceethnicity")) %>% 
     mutate(
       totdiscrim1_category = case_when(
         totdiscrim1 %in% c(0, 1, 2, 3) ~ totdiscrim1,
@@ -114,7 +113,7 @@ recode_variables_in_dat_bespoke <- function(custom_PCA) {
            keep = .$famid_fullsib %in% .$famid_fullsib[duplicated(.$famid_fullsib)],
            # https://stackoverflow.com/questions/16905425/find-duplicate-values-in-r
            famid_fullsib = ifelse(keep == TRUE, famid_fullsib, NA) %>% as.factor,
-           color_byinterviewer = H3IR17 %>%
+           color_byinterviewer3 = H3IR17 %>%
              as.character() %>% 
              as.factor %>% 
              fct_collapse(
@@ -122,7 +121,9 @@ recode_variables_in_dat_bespoke <- function(custom_PCA) {
                LightMed = c("3", "4"),
                White = "5") %>%
              relevel(ref = "White")
-    ) %>% fastDummies::dummy_cols(select_columns = c("color_byinterviewer")) %>% 
+    ) %>%
+    finalfit::ff_interaction(raceethnicity, color_byinterviewer3, levels_sep = "|", var_sep = "__") %>% 
+    fastDummies::dummy_cols(select_columns = c("raceethnicity", "color_byinterviewer3", "raceethnicity__color_byinterviewer3")) %>% 
     dplyr::select(-starts_with("AncestryPC")) %>% 
     dplyr::left_join(custom_PCA) %>% 
     dplyr::left_join(dt_color_snp)
