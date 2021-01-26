@@ -80,7 +80,7 @@ extract_m7 =  function(m, out = NULL){
   out$detail$t = m$fit %>% map(extract_t)
   out$p = out$detail$anova %>% map_dbl(pluck("p.value"))
   out$other$varexplained = m$varexplained 
-  
+  out$other$loadings = m$loadings
   return(out = out)
 }
 
