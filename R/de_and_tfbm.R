@@ -19,11 +19,13 @@ de_and_tfbm <- function(treatment, controls, de_only = FALSE) {
   ttT <-
     lmFit(y, X) %>%
     eBayes %>%
-    tidy_topTable(of_in = treatment)
+    tidy_topTable(of_in = treatment, confint = TRUE)
   
   if(de_only) return(ttT)
   # gene set tests self contained
   sets = signatures$outcome_set[table1]
+  # drop columns to make sure X is full rank
+  X = ordinal::drop.coef(X)
   gene_set_test = mroast(y, index = sets, design = X, contrast = treatment) %>% rownames_to_column("gene_set_name")
   # optional gene.weights = ttT$logFC
   # ttT = ttT %>% mutate(weight = ifelse(logFC>0,1,-1)) gene.weights = ttT$weight
