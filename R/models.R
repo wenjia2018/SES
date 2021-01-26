@@ -404,7 +404,7 @@ fit_m7 = function(datt, gene_set, rotate){
     map(~ pluck(.x, "fit", "fit", "fit"))
   
   out$varexplained = pca_rotated$Vaccounted[4,] %>% as.list()
-  
+  out$loadings = pca_rotated$loadings
   out
 }
 
