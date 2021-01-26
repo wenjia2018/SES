@@ -19,7 +19,8 @@ recode_variables_in_dat_bespoke <- function(custom_PCA) {
                NULL = "4",
                # other nonhispanic
                Hispanic = "5"
-             ),
+             ) %>%
+             relevel(ref = "NonHwhite"),
            raceethnicity2 = re %>%
              fct_recode(
                NonHwhite = "1",
@@ -120,15 +121,29 @@ recode_variables_in_dat_bespoke <- function(custom_PCA) {
                DarkBlack = c("1", "2"),
                LightMed = c("3", "4"),
                White = "5") %>%
+             relevel(ref = "White"),
+           color_byinterviewer5 = H3IR17 %>%
+             as.character() %>% 
+             as.factor %>% 
+             fct_recode(
+               White = "5",
+               Light = "4",
+               Medium = "3",
+               Dark = "2",
+               Black = "1"
+             ) %>% 
              relevel(ref = "White")
     ) %>%
     finalfit::ff_interaction(raceethnicity, color_byinterviewer3, levels_sep = "|", var_sep = "__") %>% 
-    fastDummies::dummy_cols(select_columns = c("raceethnicity", "color_byinterviewer3", "raceethnicity__color_byinterviewer3")) %>% 
+    fastDummies::dummy_cols(select_columns = c("raceethnicity", "color_byinterviewer3", "color_byinterviewer5", "raceethnicity__color_byinterviewer3")) %>% 
     dplyr::select(-starts_with("AncestryPC")) %>% 
     dplyr::left_join(custom_PCA) %>% 
-    dplyr::left_join(dt_color_snp)
+    dplyr::left_join(dt_color_snp) 
   # mutate_at(.vars = vars("sss_5"),
   #           .funs = list(~ .x %>% factor))
-  
+  # subset samples for specific needs
+  keep = (pData(dat)$raceethnicity =="Hispanic" & !is.na(pData(dat)$color_byinterviewer5)) %>% ifelse(is.na(.), FALSE, .)
+  dat <- dat[, keep]
+
   dat <<- dat
 }
