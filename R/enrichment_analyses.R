@@ -96,9 +96,9 @@ get_sig_PCs_and_sig_enrichment_on_those_PCs = function(example, m7_model, thresh
       # hoist(out, result = list("result" )) %>%
       unnest(result) %>% 
       unnest(matches("m7")) %>%
-      filter(names(m7_nn) == "p") %>%
-      unnest_wider(m7_nn, names_sep = "_") %>% 
-      unnest_wider(m7_vx, names_sep = "_") %>% 
+      filter(names(m7_ob) == "p") %>%
+      # unnest_wider(m7_nn, names_sep = "_") %>% 
+      # unnest_wider(m7_vx, names_sep = "_") %>% 
       unnest_wider(m7_ob, names_sep = "_")
   )
   
@@ -142,7 +142,8 @@ get_sig_PCs_and_sig_enrichment_on_those_PCs = function(example, m7_model, thresh
   # TAKE WELL-LOADED GENES OF SIGNIFICANT PCs, THEN DO ENRICHMENT
   example = 
     example %>% 
-    mutate(well_loaded_genes_on_significant_PCs = pmap(list(x = x, y = y), function(x,y)  y[x]),
-           enrichment_of_well_loaded_genes_on_significant_PCs = map_depth(well_loaded_genes_on_significant_PCs, 2, my_vis)) 
+    mutate(well_loaded_genes_on_significant_PCs = pmap(list(x = x, y = y), function(x,y)  y[x])#,
+           # enrichment_of_well_loaded_genes_on_significant_PCs = map_depth(well_loaded_genes_on_significant_PCs, 2, my_vis)
+           ) 
   
 }

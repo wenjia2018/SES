@@ -22,7 +22,7 @@ walk(dir(path = here("R"), full.names = TRUE), source)
 # LOAD DATA, DEFINE VARIABLES, RECODE VARIABLES
 ############################################################
 
-load_data(reconciled = FALSE)
+load_data(reconciled = FALSE, remove_inflam = FALSE)
 define_treatments_and_controls()
 
 sigs = signatures$outcome_set[c(table1, "ctra_mRNA")]
