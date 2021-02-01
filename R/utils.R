@@ -1,4 +1,4 @@
-mediate = function(mediator, gene_set){
+mediate = function(mediator, gene_set, controls, treatment){
   datt_m = 
     prepro(gene_set, treatment, c(controls, mediator)) %>%
     rename(treatment = treatment,
@@ -7,17 +7,24 @@ mediate = function(mediator, gene_set){
   
   ok = complete.cases(datt_m$mediator)
   datt_m = datt_m[ok, ]
-  fit_m99(datt_m, gene_set) %>% extract_m99()  
+  fit_m99(datt_m, gene_set, mediator) %>% extract_m99()  
 }
 
-mediate_multiple = function(gene_set){ 
-  
+mediate_multiple = function(controls, treatment, gene_set){ 
+  out = NULL
   args_m97 = 
     crossing(mediators, gene_set) %>% 
     rename(mediator = mediators) %>% 
+    mutate(treatment = treatment,
+           controls = list(controls)) %>% 
     mutate(names = str_c(mediator, gene_set, sep = "_"))
-  map2(args_m97$mediator, args_m97$gene_set, safely(mediate)) %>% 
+  out = pmap(list(args_m97$mediator,
+       args_m97$gene_set,
+       args_m97$controls,
+      args_m97$treatment),
+       safely(mediate)) %>% 
     set_names(args_m97$names)
+  return(out)
   
 }
 
