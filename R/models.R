@@ -419,6 +419,7 @@ fit_m99 = function(datt, gene_set, mediator){
   gene_set = "gene_set"
   keep = datt %>% complete.cases()
   datt_keep = datt[keep,]
+  datt_keep = Filter(function(x) length(unique(x))!=1, datt_keep)
 
   
   if(mediator %>% str_detect("_gamma")) {
