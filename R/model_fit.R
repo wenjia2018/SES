@@ -76,13 +76,20 @@ model_fit =
     
     if(any(str_detect(funcs, "m8"))){
       
-      out$m8_fdr  = fit_m8(controls, treatment, gene_set) %>% extract_m8_fdr()
+      out$m8_fdr = fit_m8(controls, treatment, gene_set) %>% extract_m8_fdr()
+      
+      if(length(out$m8_fdr$sig_genes) > 0){
+        out$m8_fdr$mediation = mediate_multiple(controls, treatment, gene_set = out$m8_fdr$sig_genes)
+      } else{
+        out$m8_fdr$mediation = NULL
+      }
+
       # out$m8_fwer = fit_m8(controls, treatment, gene_set) %>% extract_m8_fwer()
       
     }
    
-    if(is.element("m97", funcs)) out$m97 = mediate_multiple(gene_set)
-    if(is.element("m99", funcs)) out$m99 = mediators %>% set_names() %>% map(safely(mediate), gene_set = gene_set) 
+    if(is.element("m97", funcs)) out$m97 = mediate_multiple(controls, treatment, gene_set)
+    if(is.element("m99", funcs)) out$m99 = mediators %>% set_names() %>% map(safely(mediate), gene_set = gene_set, controls, treatment) 
 
     out = out %>% map(list) %>% as_tibble()
     return(out = out)
