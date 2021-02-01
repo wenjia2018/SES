@@ -99,7 +99,8 @@ extract_m8_fdr = function(m, out = NULL){
   out$detail = m %>% slice(which.min(adj.P.Val)) # m
   out$p = min(m$adj.P.Val) # smallest FWER corrected pvalue
   out$other = list(m = m, avg_logFC = mean(m$logFC))
-  
+  out$sig_genes = m %>% filter(adj.P.Val < 0.05) %>% pull(gene)
+
   return(out = out)
 }
 
@@ -108,18 +109,21 @@ extract_m98 = extract_m7
 
 extract_m99 = function(m, out = NULL){
   
-  extract_p = function(x) {
+  extract_med = function(x, y) {
     m %>% 
       summary %>% 
       capture.output() %>% 
       str_subset(x) %>% 
       str_split(" ", simplify = TRUE) %>%
       str_subset("[0-9]") %>% 
-      pluck(4)
+      pluck(y)
     
   }
+  
+  
   out$detail = "too big" #m
-  out$p = extract_p("ACME")
-  out$other = "empty"
+  out$p = extract_med("ACME", 4)
+  out$other$med_prop = extract_med("Prop. Mediated", 1)
+  out$other$med_beta = extract_med("ACME", 1)
   return(out = out)
 }
