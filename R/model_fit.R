@@ -79,9 +79,11 @@ model_fit =
       out$m8_fdr = fit_m8(controls, treatment, gene_set) %>% extract_m8_fdr()
       
       if(length(out$m8_fdr$sig_genes) > 0){
-        out$m8_fdr$mediation = mediate_multiple(controls, treatment, gene_set = out$m8_fdr$sig_genes)
+        out$m8_fdr$mediation_signle = mediate_multiple(controls, treatment, gene_set = out$m8_fdr$sig_genes)
+        out$m8_fdr$mediation_mean = mediators %>% set_names() %>% map(safely(mediate), gene_set = out$m8_fdr$sig_genes, controls, treatment) 
       } else{
-        out$m8_fdr$mediation = NULL
+        out$m8_fdr$mediation_signle = NULL
+        out$m8_fdr$mediation_mean = NULL
       }
 
       # out$m8_fwer = fit_m8(controls, treatment, gene_set) %>% extract_m8_fwer()
