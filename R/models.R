@@ -384,6 +384,11 @@ fit_m7 = function(datt, gene_set, rotate){
       
       datt_pca = bind_cols(datt, !!outcome := pca_rotated$scores[, outcome])
       
+      keep = datt_pca %>% complete.cases()
+      datt_pca = datt_pca[keep, ]
+      datt_pca = Filter(function(x) length(unique(x))!=1, datt_pca)
+      
+      
       (rec =
           str_c(outcome) %>%
           str_c(" ~ .") %>%
