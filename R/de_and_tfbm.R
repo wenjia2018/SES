@@ -9,12 +9,16 @@ de_and_tfbm <- function(treatment, controls, de_only = FALSE) {
   y = y[, keep]
   
   X = model.matrix(~ ., data = X)
+  # drop columns to make sure X is full rank
+  X = ordinal::drop.coef(X)
+  
   # MatrixModels::model.Matrix can drop unused levels, but has error when the variable names contains some special characters 
   # https://stackoverflow.com/questions/44114391/error-in-sparse-model-matrix
   # X = MatrixModels::model.Matrix(~., data = X, sparse = TRUE, drop.unused.levels = TRUE)
   # needed for limma::topTables() to work with factors
   treatment = X %>% colnames() %>% str_detect(treatment) %>% which()
   
+
   # Estimate DE using standard limmma/edger pipeline. 
   ttT <-
     lmFit(y, X) %>%
@@ -24,8 +28,7 @@ de_and_tfbm <- function(treatment, controls, de_only = FALSE) {
   if(de_only) return(ttT)
   # gene set tests self contained
   sets = signatures$outcome_set[table1]
-  # drop columns to make sure X is full rank
-  X = ordinal::drop.coef(X)
+
   gene_set_test = mroast(y, index = sets, design = X, contrast = treatment) %>% rownames_to_column("gene_set_name")
   # optional gene.weights = ttT$logFC
   # ttT = ttT %>% mutate(weight = ifelse(logFC>0,1,-1)) gene.weights = ttT$weight
