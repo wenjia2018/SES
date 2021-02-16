@@ -25,7 +25,7 @@ de_and_tfbm <- function(treatment, controls, de_only = FALSE) {
     eBayes %>%
     tidy_topTable(of_in = treatment, confint = TRUE)
   
-  if(de_only) return(ttT)
+  if(de_only) return(list(ttT = ttT))
   # gene set tests self contained
   sets = signatures$outcome_set[table1]
 
