@@ -86,25 +86,59 @@ gsea_webgestalt = function(sheet_name){
                                        outputDirectory=outputDirectory)
   
 }
-a = c("ses4", "income", "edu", "SEI", "sss") %>%
+full_gsea = c("ses4", "income", "edu", "SEI", "sss") %>%
   set_names() %>% 
   map(gsea_webgestalt)
-# a %>% saveRDS("./user_wx/ses_gsea_webgestaltR_removefig1A_kegg.rds")
-# a %>% saveRDS("./user_wx/ses_gsea_webgestaltR_removefig1A_10kperm.rds")
-# 
-b = a %>% map(~ .x %>% filter(FDR<0.05))
+# full_gsea %>% readRDS("./user_wx/ses_gsea_webgestaltR_removefig1A.rds")
+
+complete_tables = full_gsea %>% map(~ .x %>% filter(FDR<0.05))
+
 # 
 # enrichResult_reactome %>% kableExtra::kable() %>% kableExtra::kable_styling()
-genesetname = list(
-  edu = b$edu$geneSet,
-  income = b$income$geneSet,
-  SEI = b$SEI$geneSet,
-  ses4 = b$ses4$geneSet,
-  sss = b$sss$geneSet)
-venn::venn(genesetname, ilabels = TRUE, 
+gsea_genesetnames = list(
+  edu = complete_tables$edu$geneSet,
+  income = complete_tables$income$geneSet,
+  SEI = complete_tables$SEI$geneSet,
+  ses4 = complete_tables$ses4$geneSet,
+  sss = complete_tables$sss$geneSet)
+
+
+complete_tables <- complete_tables %>% reduce(rbind) %>% select(geneSet, description) %>% unique()
+gsea_genesetnames_complement <- map(gsea_genesetnames, ~setdiff(complete_tables$geneSet, .x)) # the complement of these reactome terms
+
+# the universe of reactome terms considered here is "all reactome sets deemed significantly related to at least one ses predictor"
+# there are then 2^5 intersections in the venn diagram (i.e. intersections over the 5 ses predictors, with each being the complement or not)
+
+universe= 
+  list(gsea_genesetnames_complement,
+       gsea_genesetnames) %>% 
+  transpose()
+
+crossing(edu =0:1, 
+         income =0:1, 
+         SEI =0:1,
+         ses4 =0:1,
+         sss =0:1) %>%
+  mutate(x = 
+           pmap(., 
+                function(edu, income, SEI, ses4, sss) 
+                  list(universe$edu[edu + 1], 
+                       universe$income[income + 1], 
+                       universe$SEI[SEI + 1],
+                       universe$ses4[ses4 + 1], 
+                       universe$sss[sss + 1]))  %>%
+           map(flatten)  %>% 
+           map(reduce, intersect)) %>% 
+  unnest(x) %>% 
+  left_join(complete_tables, by = c("x" = "geneSet"))  %>% 
+  knitr::kable()
+
+
+
+venn::venn(gsea_genesetnames, ilabels = TRUE, 
            zcolor = "style", ellipse = FALSE,
            opacity = 0.15)
-venn::venn(genesetname, ilabels = FALSE, zcolor = "style",snames = " ",
+venn::venn(gsea_genesetnames, ilabels = FALSE, zcolor = "style",snames = " ",
            ellipse = FALSE, opacity = 0.15, ilcs = 1.2,
            box = FALSE,
            sncs = 0.1)

@@ -115,21 +115,10 @@ hispanic = waves %>% filter(re==5) %>% select(lowbirthweight, high_lowbirth, dis
 #' ## whole sample white black and white hispanic 2 sample Wilcoxon test p value
 #+ echo=F, eval=T, warning=FALSE, message=FALSE 
 a = map2(white, black, wilcox.test) %>% map(~ .$p.value) %>% as.data.frame() %>% `rownames<-`("white_black")
+
 b = map2(white,hispanic, wilcox.test) %>% map(~ .$p.value) %>% as.data.frame() %>%  `rownames<-`("white_hispanic")
 
 rbind(a,b)
-
-#' ## whole sample white black and white hispanic 2 sample chisquare test p value
-#+ echo=F, eval=T, warning=FALSE, message=FALSE 
-white_black = data %>% dplyr::filter(raceethnicity != "Hispanic")
-
-map(white_black %>% select(-1), chisq.test, white_black$raceethnicity) %>%
-  map(~ .$p.value) %>%
-  as.data.frame() %>% 
-  `rownames<-`("white_black")
-
-rbind(a,b)
-
 
 
 # blood sample

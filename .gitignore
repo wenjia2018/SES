@@ -2,6 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+.html
+.txt
+.xlsx
 
 user_jc/supervised_play/
 rds/*

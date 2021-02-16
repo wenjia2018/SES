@@ -42,31 +42,26 @@ example0 =
 
 example0 %>% saveRDS("./user_wx/example_MR_table1_completecontrols.rds")
 
-example_MR_table1_completecontrols %>%
+a = example0 %>%
+  mutate(treatment = "w5bmi") %>% 
   hoist(out, "result") %>%
   unnest_longer(result) %>%
-  filter(gene_set_name!="inflam1k_mRNA") %>%
-  mutate(result = result %>% unlist(use.names=FALSE)) %>%
-  hoist(result, p_unadj = "Pvalue") %>%
-  hoist(result, estimate = "Estimate") %>%
-  mutate(controls = str_c(controls, "+", treatment),
-         treatment = "w5bmi",
-         IV = "PGSBMI") %>%
-  dplyr::select(1:5, 9) %>%
-  select(IV, everything()) %>%
-  filter(p_unadj < 0.05)
-example_MR_table1_nocontrols %>%
-  mutate(treatment = "w5bmi") %>%
+  filter(gene_set_name!="inflam1k_mRNA") %>% 
+  mutate(result = result %>% unlist(use.names=FALSE)) %>% 
+  hoist(result, p_unadj = "Pvalue") %>% 
+  hoist(result, estimate = "Estimate") %>% 
+  dplyr::select(1:5, 7) 
+
+ example0 %>%
   hoist(out, "result") %>%
   unnest_longer(result) %>%
-  filter(gene_set_name!="inflam1k_mRNA") %>%
-  mutate(result = result %>% unlist(use.names=FALSE)) %>%
-  hoist(result, p_unadj = "Pvalue") %>%
-  hoist(result, estimate = "Estimate") %>%
-  mutate(controls = "NULL",
-         IV = "PGSBMI") %>%
-  filter(p_unadj <0.05) %>%
-  dplyr::select(1:5, 9) %>%
-  select(IV, everything()) %>%
-  kableExtra::kable() %>%
-  kableExtra::kable_styling()
+  filter(gene_set_name!="inflam1k_mRNA") %>% 
+  mutate(result = result %>% unlist(use.names=FALSE)) %>% 
+  hoist(result, p_unadj = "Pvalue") %>% 
+  hoist(result, estimate = "Estimate") %>% 
+   mutate(controls = str_c(controls, "+", treatment),
+          treatment = "w5bmi") %>% 
+  dplyr::select(1:5, 7) %>% 
+   filter(p_unadj < 0.05) %>% 
+   kableExtra::kable() %>% 
+   kableExtra::kable_styling()
