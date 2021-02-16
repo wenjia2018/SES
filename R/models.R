@@ -335,6 +335,7 @@ fit_m8 = function(controls, treatment, gene_set){
 
 fit_pca_util = function(datt, gene_set, rotate, ncomp){
   # ncomp chosen to be smaller than the smallest gene set: kidney_transplant_tolerance_mRNA with 9 elements
+  if (length(gene_set) < 10) ncomp = length(gene_set)
   pca_rotated <- psych::principal(datt[gene_set], 
                                   rotate = rotate,
                                   nfactors = ncomp, 
