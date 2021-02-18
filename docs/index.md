@@ -12,9 +12,30 @@
     -   [skin color continuous, binary, 3 levels for ctra and ageing](/ses/output/skincolor_eqtl_bespoke.html)
         -   1-3 sentence summary (perhaps after discussion).
 
+
+
+
 -   skin color within race strata
-    -   [omnibus regression for ctra and aging](/ses/output/race_strata_color5.html)
+    -   [color 5 regression for ctra and aging](/ses/output/race_strata_color5.html)
         -   1-3 sentence summary (perhaps after discussion).
-    -   [omnibus regression for ctra and aging with coefficient plot](/ses/output/race_strata_color5_coef_plot.html)
+    -   [color 5 omnibus regression for ctra and aging single gene mediation](/ses/output/strata_omni_med.html)
+        -   1-3 sentence summary (perhaps after discussion).        
+    -   [color 5 omnibus regression for ctra and aging with coefficient plot](/ses/output/race_strata_color5_coef_plot.html)
+        -   1-3 sentence summary (perhaps after discussion).
+    -   [color 3 regression for ctra and aging](/ses/output/race_strata_reg.html)
+        -   1-3 sentence summary (perhaps after discussion).        
+
+
+-   skin color and race cross table
+    -   [regress skin color on snps](/ses/output/skincolor_race_crosscheck.html)
         -   1-3 sentence summary (perhaps after discussion).
 
+
+-   skin color related snps
+    -   [regress skin color on snps](/ses/output/snp_color_asso.html)
+        -   1-3 sentence summary (perhaps after discussion).
+        
+    -   [significant snps as treatment for outcome of ctra and ageing](/ses/output/color_snps_11sig.html)
+        -   1-3 sentence summary (perhaps after discussion).        
+        
+        
