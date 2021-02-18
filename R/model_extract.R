@@ -124,6 +124,8 @@ extract_m99 = function(m, out = NULL){
   out$detail = "too big" #m
   out$p = extract_med("ACME", 4)
   out$other$med_prop = extract_med("Prop. Mediated", 1)
-  out$other$med_beta = extract_med("ACME", 1)
+  out$other$med_ACME = extract_med("ACME", 1)
+  out$other$med_ADE = extract_med("ADE", 1)
+  out$other$med_ADE_p = extract_med("ADE", 4)
   return(out = out)
 }
