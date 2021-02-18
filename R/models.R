@@ -324,7 +324,7 @@ fit_m5 = function(controls, treatment, gene_set){
 
 fit_m8 = function(controls, treatment, gene_set){
   
-  ttT  = de_and_tfbm(treatment, controls, de_only = TRUE)
+  ttT  = de_and_tfbm(treatment, controls, de_only = TRUE) %>% pluck("ttT")
   
   ttT %>% filter(gene %in% gene_set)
   
