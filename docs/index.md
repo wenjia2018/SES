@@ -3,7 +3,7 @@
 
 -   Figures and tables
     -   [figure 1: race and skin color](/ses/output/race_fig1.html)
-
+    -   [figure 1: race and skin color](/ses/output/1e-10.png)
 
 -   categorical race
     -   [aging cluster + inflamation 1K](/ses/output/race_omnibus.html)
