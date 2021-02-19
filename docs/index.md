@@ -1,6 +1,10 @@
 1. Mikes race paper
 ===================
 
+-   Figures and tables
+    -   [figure 1: race and skin color](/ses/output/race_fig1.html)
+
+
 -   categorical race
     -   [aging cluster + inflamation 1K](/ses/output/race_omnibus.html)
         -   1-3 sentence summary (perhaps after discussion).
