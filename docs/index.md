@@ -8,7 +8,7 @@
 -   categorical race
     -   [aging cluster + inflamation 1K](/ses/output/race_omnibus.html)
         -   1-3 sentence summary (perhaps after discussion).
-    -   [ctra + ageing](/ses/output/race_dummy_all.html)
+    -   [ctra + ageing](/ses/output/bespoke_eqtl.html)
         -   1-3 sentence summary (perhaps after discussion).
    
 
