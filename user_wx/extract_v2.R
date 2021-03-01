@@ -47,10 +47,10 @@ m8_present = function(p, control, data){
   return(out)
 }
 
-
-outm8 = function(p, control, data){
-  m8_present(f0(p, data), control) %>% mutate(p_eqtl = p)
-}
+# 
+# outm8 = function(p, control, data){
+#   m8_present(f0(p, data), control) %>% mutate(p_eqtl = p)
+# }
 
 
 outm8_allsig = function(p, control, data){
@@ -62,19 +62,21 @@ outm8_allsig = function(p, control, data){
     filter(control_set == control)
 }
 
-med_extact_m8 = function (focal, control, ex0){
-  out = ex0 %>%
-    hoist(out, med=list("result", "m8_fdr", 1, "mediation")) %>% 
-    mutate(mediator = focal) %>% 
-    filter(control_set== control) %>% 
-    dplyr::select(-out)
-}
+# med_extact_m8 = function (control, ex0){
+#   out = ex0 %>%
+#     hoist(out, med=list("result", "m8_fdr", 1, "mediation_mean")) %>% 
+#     # mutate(mediator = focal) %>% 
+#     filter(control_set== control) %>% 
+#     dplyr::select(-out)
+# }
 
-outm8med = function(p, mediators, control, data){
-  out = mediators %>% 
-    map_df(med_extact_m8, control, f0(p, data)) %>% 
+outm8med = function(p, control, data){
+  out = f0(p, data) %>%
+    hoist(out, med=list("result", "m8_fdr", 1, "mediation_mean")) %>% 
+    filter(control_set== control) %>% 
+    dplyr::select(-out) %>% 
     filter(med!="NULL") %>%
-    unnest_longer(med) %>% 
+    unnest_longer(med) %>%
     hoist(med, p = list("result","p")) %>%
     filter(!is.na(p)) %>% 
     # filter(p < threshold_med) %>% 
@@ -126,7 +128,7 @@ med_extact_m7 = function (focal, control, ex0){
   out = ex0 %>%
     hoist(out, med=list("result", "m7_ob", 1, "mediation", focal, "result")) %>% 
     mutate(mediator = focal) %>% 
-    filter(control_set=="ancestryPC") %>% 
+    filter(control_set== control) %>% 
     select(-out)
 }
 
