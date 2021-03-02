@@ -15,7 +15,7 @@
     -   [skin color continuous, binary, 3 levels for ctra and ageing](/ses/output/skincolor_eqtl_bespoke.html)
         -   1-3 sentence summary (perhaps after discussion).
 
- -   [skin color continuous, binary, 3 levels and 5 levels for ctra, inflamation1k and ageing and ageing clusters](/ses/output/skincolor_summary.html)
+    -   [skin color continuous, binary, 3 levels and 5 levels for ctra, inflamation1k and ageing and ageing clusters](/ses/output/skincolor_summary.html)
         -   1-3 sentence summary (perhaps after discussion).
 
 
