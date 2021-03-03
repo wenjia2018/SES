@@ -4,6 +4,9 @@
 -   Figures and tables
     -   [figure 1: race and skin color](/ses/output/race_fig1.html)
     -   [figures : different measures of skin color](/ses/output/skin_color_bubbles.html)
+    -   ![color3 darkblack DE reactome](/ses/output/Reacfoam_skincolor3_darkblack.jpg)
+
+
 -   categorical race
     -   [aging cluster + inflamation 1K](/ses/output/race_omnibus.html)
         -   1-3 sentence summary (perhaps after discussion).
