@@ -3,6 +3,7 @@
 
 -   Figures and tables
     -   [figure 1: race and skin color](/ses/output/race_fig1.html)
+    -   [figure 2: skin color with in race stratum](/ses/output/race_fig2.html)
     -   [figures : different measures of skin color](/ses/output/skin_color_bubbles.html)
     -   [color3 darkblack DE reactome](/ses/output/Reacfoam_skincolor3_darkblack.jpg)
 
@@ -29,9 +30,8 @@
         -   1-3 sentence summary (perhaps after discussion).        
     -   [color 5 omnibus regression for ctra and aging with coefficient plot](/ses/output/race_strata_color5_coef_plot.html)
         -   1-3 sentence summary (perhaps after discussion).
-    -   [color 3 regression for ctra and aging](/ses/output/race_strata_reg.html)
-        -   1-3 sentence summary (perhaps after discussion).        
-
+    -   [color 3 regression for ctra, inflam1k, aging and cluster](/ses/output/skin_color3_within_race_strata.html)
+        -   1-3 sentence summary (perhaps after discussion).  
 
 -   skin color and race cross table
     -   [regress skin color on snps](/ses/output/skincolor_race_crosscheck.html)
