@@ -2,20 +2,24 @@
 ===================
 
 -   1. Figures and tables
-    -  1.1 [figure 1: race and skin color](/ses/output/race_fig1.html)
+    -  1.1 [figure 1 panelA: race and skin color](/ses/output/race_fig1.html)
     
-    -  1.2[figure 2: skin color with in race stratum](/ses/output/race_fig2.html)
+    -  1.2 [figure 1 panelB: race and skin color](/ses/output/race_fig1_PanelB.html)
     
-    -   [figures : different measures of skin color](/ses/output/skin_color_bubbles.html)
+    -  1.3 [figure 2 panleA: skin color with in race stratum](/ses/output/race_fig2.html)
     
-    -   [color3 darkblack DE reactome](/ses/output/Reacfoam_skincolor3_darkblack.jpg)
+    -  1.4 [figure 2 panelB: skin color with in race stratum](/ses/output/race_fig2_PanelB.html)
+    
+    -  1.5 [figures : different measures of skin color](/ses/output/skin_color_bubbles.html)
+    
+    -  1.6 [color3 darkblack DE reactome](/ses/output/Reacfoam_skincolor3_darkblack.jpg)
 
 
 -  2. categorical race
-    -   [aging cluster + inflamation 1K](/ses/output/race_omnibus.html)
+    -   2.1 [aging cluster + inflamation 1K](/ses/output/race_omnibus.html)
         -   1-3 sentence summary (perhaps after discussion).
         
-    -   [ctra + ageing](/ses/output/bespoke_eqtl.html)
+    -   2.2 [ctra + ageing](/ses/output/bespoke_eqtl.html)
         -   1-3 sentence summary (perhaps after discussion).
    
 
