@@ -2,6 +2,7 @@
 ===================
 
 -   1. Figures and tables
+    
     -  1.1 [figure 1 panelA: race and skin color](/ses/output/race_fig1.html)
     
     -  1.2 [figure 1 panelB: race and skin color](/ses/output/race_fig1_PanelB.html)
@@ -16,6 +17,7 @@
 
 
 -  2. categorical race
+    
     -   2.1 [aging cluster + inflamation 1K](/ses/output/race_omnibus.html)
         -   1-3 sentence summary (perhaps after discussion).
         
