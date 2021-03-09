@@ -14,7 +14,8 @@
     -  1.5 [figures : different measures of skin color](/ses/output/skin_color_bubbles.html)
     
     -  1.6 [color3 darkblack DE reactome](/ses/output/Reacfoam_skincolor3_darkblack.jpg)
-
+    
+    -  1.7 [figures : Aging PCA loading v.s. Aging clusters](/ses/output/pca_loading_plot.html)
 
 -  2. categorical race
     
