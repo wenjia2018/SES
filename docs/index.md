@@ -5,7 +5,7 @@
     
     -  1.1 [figure 1 panelA: race and skin color](/ses/output/race_fig1.html)
     
-    -  1.2 [figure 1 panelB: race and skin color](/ses/output/race_fig1_PanelB.html)
+    -  1.2 [figure 1 panelB: race and skin color](/ses/output/race_fig1_PanelB_jitter.html)
     
     -  1.3 [figure 2 panleA: skin color with in race stratum](/ses/output/race_fig2.html)
     
@@ -26,6 +26,9 @@
         -   1-3 sentence summary (perhaps after discussion).
         
     -   2.2 [ctra + ageing](/ses/output/bespoke_eqtl.html)
+        -   1-3 sentence summary (perhaps after discussion).
+   
+    -   2.3 [ctra + ageing + aging cluster](/ses/output/race_bespoke_summary.html)
         -   1-3 sentence summary (perhaps after discussion).
    
 
