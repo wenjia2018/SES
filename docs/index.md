@@ -17,6 +17,9 @@
     
     -  1.7 [figures : Aging PCA loading v.s. Aging clusters](/ses/output/pca_loading_plot.html)
 
+    -  1.8 [figure: significant gene relationship of figure 1 and figure2](/ses/output/check_gene_sets.html)
+
+    -  1.9 [significant gene and pathway](/ses/output/create_new_signatures.html)
 -  2. categorical race
     
     -   2.1 [aging cluster + inflamation 1K](/ses/output/race_omnibus.html)
@@ -26,37 +29,41 @@
         -   1-3 sentence summary (perhaps after discussion).
    
 
--   skin color
-    -   [skin color continuous, binary, 3 levels for ctra and ageing](/ses/output/skincolor_eqtl_bespoke.html)
+-  3. skin color
+   
+    -  3.1 [skin color continuous, binary, 3 levels for ctra and ageing](/ses/output/skincolor_eqtl_bespoke.html)
         -   1-3 sentence summary (perhaps after discussion).
 
-    -   [skin color continuous, binary, 3 levels and 5 levels for ctra, inflamation1k and ageing and ageing clusters](/ses/output/skincolor_summary.html)
+    -  3.2 [skin color continuous, binary, 3 levels and 5 levels for ctra, inflamation1k and ageing and ageing clusters](/ses/output/skincolor_summary.html)
         -   1-3 sentence summary (perhaps after discussion).
 
 
--   skin color within race strata
-    -   [color 5 regression for ctra and aging](/ses/output/race_strata_color5.html)
+-   4. skin color within race strata
+
+    -   4.1 [color 5 regression for ctra and aging](/ses/output/race_strata_color5.html)
         -   1-3 sentence summary (perhaps after discussion).
         
-    -   [color 5 omnibus regression for ctra and aging single gene mediation](/ses/output/strata_omni_med.html)
+    -   4.2 [color 5 omnibus regression for ctra and aging single gene mediation](/ses/output/strata_omni_med.html)
         -   1-3 sentence summary (perhaps after discussion).     
         
-    -   [color 5 omnibus regression for ctra and aging with coefficient plot](/ses/output/race_strata_color5_coef_plot.html)
+    -   4.3 [color 5 omnibus regression for ctra and aging with coefficient plot](/ses/output/race_strata_color5_coef_plot.html)
         -   1-3 sentence summary (perhaps after discussion).
         
-    -   [color 3 regression for ctra, inflam1k, aging and cluster](/ses/output/skin_color3_within_race_strata.html)
+    -   4.4 [color 3 regression for ctra, inflam1k, aging and cluster](/ses/output/skin_color3_within_race_strata.html)
         -   1-3 sentence summary (perhaps after discussion).  
 
--   skin color and race cross table
-    -   [regress skin color on snps](/ses/output/skincolor_race_crosscheck.html)
+-   5. skin color and race cross table
+
+    -   5.1 [regress skin color on snps](/ses/output/skincolor_race_crosscheck.html)
         -   1-3 sentence summary (perhaps after discussion).
 
 
--   skin color related snps
-    -   [regress skin color on snps](/ses/output/snp_color_asso.html)
+-   6. skin color related snps
+
+    -   6.1 [regress skin color on snps](/ses/output/snp_color_asso.html)
         -   1-3 sentence summary (perhaps after discussion).
         
-    -   [significant snps as treatment for outcome of ctra and ageing](/ses/output/color_snps_11sig.html)
+    -   6.2 [significant snps as treatment for outcome of ctra and ageing](/ses/output/color_snps_11sig.html)
         -   1-3 sentence summary (perhaps after discussion).        
         
         
