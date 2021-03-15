@@ -17,9 +17,13 @@
     
     -  1.7 [figures : Aging PCA loading v.s. Aging clusters](/ses/output/pca_loading_plot.html)
 
-    -  1.8 [figure: significant gene relationship of figure 1 and figure2](/ses/output/check_gene_sets.html)
+    -  1.8 [figures : Aging Up PCA loading v.s. Aging clusters](/ses/output/aging_up_pca_loading.html)
+    
+    -  1.9 [figures : Aging Down PCA loading v.s. Aging clusters](/ses/output/aging_down_pca_loading.html)
 
-    -  1.9 [significant gene and pathway](/ses/output/create_new_signatures.html)
+    -  1.10 [figure: significant gene relationship of figure 1 and figure2](/ses/output/check_gene_sets.html)
+
+    -  1.11 [significant gene and pathway](/ses/output/create_new_signatures.html)
 -  2. categorical race
     
     -   2.1 [aging cluster + inflamation 1K](/ses/output/race_omnibus.html)
