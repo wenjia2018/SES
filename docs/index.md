@@ -43,7 +43,8 @@
 
     -  3.2 [skin color continuous, binary, 3 levels and 5 levels for ctra, inflamation1k and ageing and ageing clusters](/ses/output/skincolor_summary.html)
         -   1-3 sentence summary (perhaps after discussion).
-
+        
+    -  3.3 [skin color 3 levels for ageing, ageing clusters and aging complement](/ses/output/skincolor_summary_complement.html)
 
 -   4. skin color within race strata
 
@@ -61,7 +62,7 @@
 
 -   5. skin color and race cross table
 
-    -   5.1 [regress skin color on snps](/ses/output/skincolor_race_crosscheck.html)
+    -   5.1 [skin color and race cross table](/ses/output/skincolor_race_crosscheck.html)
         -   1-3 sentence summary (perhaps after discussion).
 
 
