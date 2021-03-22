@@ -24,6 +24,8 @@
     -  1.10 [figure: significant gene relationship of figure 1 and figure2](/ses/output/check_gene_sets.html)
 
     -  1.11 [significant gene and pathway](/ses/output/create_new_signatures.html)
+    
+    -  1.12 [tfbm for race and skincolor](/ses/output/tfbm_race_skincolor.html)
 
 -  2. categorical race
     
@@ -75,4 +77,8 @@
     -   6.2 [significant snps as treatment for outcome of ctra and ageing](/ses/output/color_snps_11sig.html)
         -   1-3 sentence summary (perhaps after discussion).        
         
+-   7. Descriptive Data
+
+    -   7.1 [Total and Analytic Sample](/ses/output/summary_of_data.html)
+    -   7.2 [Race by Skin Color](/ses/output/color_race.html)
         
