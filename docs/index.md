@@ -3,9 +3,9 @@
 
 -   1. Figures and tables
     
-    -  1.1 [figure 1 panelA: race and skin color](/ses/output/race_fig1.html)
+    -  1.1 [figure 1 panelA: skin color omnibus](/ses/output/skin_color_fig1A.html)
     
-    -  1.2 [figure 1 panelB: race and skin color](/ses/output/race_fig1_PanelB_jitter.html)
+    -  1.2 [figure 1 panelB: skin color PCA](/ses/output/skin_color_fig1B.html)
     
     -  1.3 [figure 2 panleA: skin color with in race stratum](/ses/output/race_fig2.html)
     
