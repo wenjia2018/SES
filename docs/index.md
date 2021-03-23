@@ -81,4 +81,4 @@
 
     -   7.1 [Total and Analytic Sample](/ses/output/summary_of_data.html)
     -   7.2 [Race by Skin Color](/ses/output/color_race.html)
-        
+    -   7.3 [Skin Color by immigrate status](/ses/output/skin_color_immigrat_status.html)  
