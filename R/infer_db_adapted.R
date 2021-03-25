@@ -11,7 +11,7 @@ infer_db_adapted =
     if (!is.null(ttT_sub)) 
       telis <- dbr:::get_telis(R = R, ttT_sub = ttT_sub, n_sim = n_sim, 
                                perm_telis = perm_telis)
-    m = ttT %>% dplyr::select(AveExpr) %>% purrr::map(regress_db, 
+    m = ttT %>% dplyr::select(logFC) %>% purrr::map(regress_db, 
                                                       X = dplyr::select(ttT, colnames(R)))
     return(out = list(ttT = ttT, telis = telis, m = m))
   }

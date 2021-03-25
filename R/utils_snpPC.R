@@ -34,7 +34,7 @@ eqtl_pca <- function(gene_set_name, p_eqtl) {
     gene_sets <- Biobase::featureNames(dat)
   }else{
     # for a predefined signature 
-    signatures <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_17.11.2020_signature.rds")
+    signatures <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_22.03.2021_signature.rds")
     gene_sets <- signatures$outcome_set %>% pluck(gene_set_name)
   }
   G_list <- readRDS("/home/share/data_input/genename_15062020.rds")
@@ -71,36 +71,3 @@ eqtl_pca <- function(gene_set_name, p_eqtl) {
   custom_PCA %>% saveRDS(str_c("/home/share/dna_ancestry/dna/custom_PCA_", gene_set_name, "_", p_eqtl,".rds"))
 }
 
-
-# examples to get bespoke pca for new signatures and the whole genome:
-if(0){
-  gene_set_name = c(
-    "aging_down_cl1_mRNA",
-    "aging_down_cl1a_mRNA",
-    "aging_down_cl1b_mRNA",
-    "aging_down_cl1c_mRNA",
-    "aging_down_cl2_mRNA",
-    "aging_down_cl3_mRNA",
-    "aging_up_cl1_mRNA",
-    "aging_up_cl2_mRNA",
-    "aging_up_cl3_mRNA",
-    "aging_up_cl4_mRNA"
-    )
-
-  p_eqtl <- c(0.05, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10)
-
-  args =
-    crossing(gene_set_name, p_eqtl)
-  args %>%
-    pmap(eqtl_pca)
-}
-
-if(0){
-  gene_set_name = "whole_genome"
-  p_eqtl <- c(0.05, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10)
-  args =
-    crossing(gene_set_name, p_eqtl)
-  plan(multicore, workers = 10)
-  args %>%
-    furrr::future_pmap(eqtl_pca)
-}

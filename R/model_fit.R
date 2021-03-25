@@ -6,9 +6,10 @@ model_fit =
     ############################################################
     # CUT EXECUTION SHORT IF THE OUTCOME IS THE ENTIRE GENOME  
     ############################################################
-    
+    # regression in the whole gemone controlling for ancestryPC of each signature
     if(gene_set_name == "whole_genome_and_tfbm") return(de_and_tfbm(treatment, controls)) 
-    if(gene_set_name == "whole_genome") return(de_and_tfbm(treatment, controls, de_only = TRUE)) 
+    # regression in the whole gemone controlling for ancestryPC of whole genome
+    if(gene_set_name == "whole_genome") return(de_and_tfbm(treatment, controls)) 
     if(funcs == "m96") return(celltype_cibersort(treatment, controls)) 
     # controls: NULL or controls + ses predictor
     if(funcs == "m95") return(model_MR(gene_set_name, "w5bmi", "PGSBMI.x", controls=NULL)) 
@@ -80,10 +81,10 @@ model_fit =
       out$m8_fdr = fit_m8(controls, treatment, gene_set) %>% extract_m8_fdr()
       
       if(length(out$m8_fdr$sig_genes) > 0){
-        out$m8_fdr$mediation_single = mediate_multiple(controls, treatment, gene_set = out$m8_fdr$sig_genes)
+        # out$m8_fdr$mediation_single = mediate_multiple(controls, treatment, gene_set = out$m8_fdr$sig_genes)
         out$m8_fdr$mediation_mean = mediators %>% set_names() %>% map(safely(mediate), gene_set = out$m8_fdr$sig_genes, controls, treatment) 
       } else{
-        out$m8_fdr$mediation_single = NULL
+        # out$m8_fdr$mediation_single = NULL
         out$m8_fdr$mediation_mean = NULL
       }
 
@@ -104,7 +105,7 @@ model_fit =
     #   }
     # }
     
-    
+    if(is.element("m10", funcs)) out$m10 = fit_m10(treatment, controls, gene_set)
    
     if(is.element("m97", funcs)) out$m97 = mediate_multiple(controls, treatment, gene_set)
     if(is.element("m99", funcs)) out$m99 = mediators %>% set_names() %>% map(safely(mediate), gene_set = gene_set, controls, treatment) 

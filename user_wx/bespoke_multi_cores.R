@@ -28,7 +28,7 @@ fit_pca_util <- partial(fit_pca_util, ncomp = ncomp) # specify n_perm
 print(abbreviations)
 funcs <- str_subset(abbreviations$shorthand, "^m")
 # select models to run
-funcs <- funcs %>% str_subset("m[7-8]")
+funcs <- c("m7", "m8", "m10")
 # funcs <- NULL
 # load snp related to skin color in case you want to perfor snp regression
 dt_color_snp <- readRDS("/home/share/dna_ancestry/dna/dt_color_snp.rds")
@@ -48,14 +48,8 @@ fit_bespoke <- function(gene_set_name, p_eqtl) {
     select(-fid) %>%
     mutate(AID = AID %>% as.character())
   recode_variables_in_dat_bespoke(custom_PCA)
-
-  example0 <-
-    args %>%
-    filter(str_detect(names(controls), "ancestryPC")) %>%
-    mutate(
-      out = pmap(., safely(model_fit), funcs),
-      control_set = names(controls)
-    )
+if(gene_set_name == "whole_genome"){
+  example0 = NULL
 
   example1 <-
     args %>%
@@ -65,10 +59,22 @@ fit_bespoke <- function(gene_set_name, p_eqtl) {
       out = pmap(., safely(model_fit), funcs),
       control_set = names(controls)
     )
+}else{
+  example0 <-
+    args %>%
+    filter(str_detect(names(controls), "ancestryPC")) %>%
+    mutate(
+      out = pmap(., safely(model_fit), funcs),
+      control_set = names(controls))
+  
+  example1 <- NULL
+}
+
 
   return(list(
     example0 = example0,
-    example1 = example1))
+    example1 = example1
+    ))
 }
 
 table1 <-
@@ -82,6 +88,7 @@ table1 <-
     "aging_mRNA",
     "aging_up_mRNA",
     "aging_down_mRNA",
+    "aging_cluster_complement_mRNA",
     "aging_down_cl1_mRNA",
     "aging_down_cl1a_mRNA",
     "aging_down_cl1b_mRNA",
@@ -91,20 +98,28 @@ table1 <-
     "aging_up_cl1_mRNA",
     "aging_up_cl2_mRNA",
     "aging_up_cl3_mRNA",
-    "aging_up_cl4_mRNA"
+    "aging_up_cl4_mRNA",
+    "whole_genome"
   )
 # table1 <-"whole_genome"
-p_eqtl <- c(0.05, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10)
+# table1 <-"aging_cluster_complement_mRNA"
+# table1 <-
+#     c(
+#       "darkblack005_mRNA",
+#       "intersec001_mRNA",
+#       "darkblack005intersec001_mRNA")
+p_eqtl <- c(0.05, 1e-2)
+# , 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10)
 
 args_eqtl <- crossing(table1, p_eqtl)
-plan(multicore, workers = 45)
+plan(multicore, workers = 10)
 # debugonce(fit_bespoke)
 # example_bespoke <- args_eqtl %>% mutate(out = pmap(list(gene_set_name = table1, p_eqtl = p_eqtl), safely(fit_bespoke)))
 
 example_bespoke <- args_eqtl %>%
   mutate(out = furrr::future_pmap(list(gene_set_name = table1, p_eqtl = p_eqtl), safely(fit_bespoke)))
 
-example_bespoke %>% saveRDS("./user_wx/color3_bespoke_18.02.2021.rds")
+example_bespoke %>% saveRDS("./user_wx/skincolor3_24.03.2021.rds")
 # example_bespoke %>% saveRDS("./user_wx/bespoke_snps.rds")
 # example_bespoke %>% saveRDS("./user_wx/bespoke_v4.rds")
 # v2 :only ancestry controls
