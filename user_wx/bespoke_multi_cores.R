@@ -112,14 +112,14 @@ p_eqtl <- c(0.05, 1e-2)
 # , 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10)
 
 args_eqtl <- crossing(table1, p_eqtl)
-plan(multicore, workers = 10)
+plan(multicore, workers = 40)
 # debugonce(fit_bespoke)
 # example_bespoke <- args_eqtl %>% mutate(out = pmap(list(gene_set_name = table1, p_eqtl = p_eqtl), safely(fit_bespoke)))
 
 example_bespoke <- args_eqtl %>%
   mutate(out = furrr::future_pmap(list(gene_set_name = table1, p_eqtl = p_eqtl), safely(fit_bespoke)))
 
-example_bespoke %>% saveRDS("./user_wx/skincolor3_24.03.2021.rds")
+example_bespoke %>% saveRDS("./user_wx/color3_bespoke_NonHblack_strata_24.03.2021.rds")
 # example_bespoke %>% saveRDS("./user_wx/bespoke_snps.rds")
 # example_bespoke %>% saveRDS("./user_wx/bespoke_v4.rds")
 # v2 :only ancestry controls
