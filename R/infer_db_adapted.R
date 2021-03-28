@@ -4,7 +4,8 @@ infer_db_adapted =
             explicit_zeros = TRUE, perm_telis = FALSE, n_sim = 1e+05){
     if (is.null(which_matrix)) 
       which_matrix = utr1
-    R = dbr:::get_matrix(ttT = ttT, which_matrix = which_matrix, which_tfbms = which_tfbms, 
+    # change get_matrix to get_matrix_modified to solve the problem of matrix subsetting with only 1 row, which becomes an array
+    R = get_matrix_modified(ttT = ttT, which_matrix = which_matrix, which_tfbms = which_tfbms, 
                          explicit_zeros = explicit_zeros)
     ttT = dbr:::append_matrix(ttT = ttT, ttT_sub = ttT_sub, R = R)
     telis = NULL
