@@ -21,6 +21,14 @@ outttT = function(p, control, data){
   return(out)
 }
 
+outtfbm = function(p, control, data){
+  out = f1(p, data) %>% 
+    hoist(out, tfbm = list("result", "tfbm")) %>% 
+    filter(control_set == control) %>% 
+    select(-out, -gene_set_name)
+  return(out)
+}
+
 f0 = function(p, data){
   ex0 <- data %>%
     hoist(out, out1 = list("result","example0")) %>%
@@ -94,6 +102,17 @@ m7_present = function(ex0, control){
   
   var = var %>% unnest_longer(var_explained)
   
+  pcaloadings = ex0 %>% 
+    hoist(out, loadings = list("result", "m7_ob", 1, "other", "loadings")) %>%
+    dplyr::select(treatment, gene_set_name, loadings, control_set) %>%
+    filter(loadings!="NULL") %>% 
+    mutate(loadings = loadings %>% map(~.[]) %>% map(~ as.data.frame(.)),
+           loadings = loadings %>% map(~ set_names(., str_c("d", 1:length(.)))),
+           loadings = loadings %>% map(~ split.default(., seq_along(.))))
+
+  pcaloadings = pcaloadings %>%
+    unnest_longer(loadings) %>%
+    mutate(loadings_id = str_c("d", loadings_id))
   
   gene_list = ex0 %>%
     hoist(out, well_loaded = list("result", "m7_ob", 1, "other", "well_loaded")) %>%
@@ -113,8 +132,9 @@ m7_present = function(ex0, control){
     # dplyr::filter(p < threshold) %>%
     left_join(var, by = c("treatment", "gene_set_name", "p_id"= "var_explained_id", "control_set")) %>%
     left_join(gene_list, by = c("treatment", "gene_set_name", "p_id"= "well_loaded_id", "control_set")) %>%
+    left_join(pcaloadings, by = c("treatment", "gene_set_name", "p_id"= "loadings_id", "control_set")) %>%
     filter(control_set == control) %>%
-    dplyr::select(1:7) %>%
+    # dplyr::select(1:7) %>%
     rename(p_pca = p) 
   return(out)
   
@@ -138,7 +158,7 @@ outm7med = function(p, mediators, control, data){
     filter(med!="NULL") %>%
     unnest_longer(med) %>% 
     hoist(med, p = "p") %>%
-    filter(p < threshold_med) %>% 
+    # filter(p < threshold_med) %>% 
     rename(p_med= p)
 }
 if(0){
@@ -195,4 +215,24 @@ if(0){
     kableExtra::kable() %>%
     kableExtra::kable_styling()
   
+}
+
+outm10 = function(p, control, data){
+  out = f0(p, data) %>% 
+    hoist(out, tfbm = list("result", "m10", 1, "tfbm")) %>% 
+    hoist(out, ttT = list("result", "m10", 1, "ttT")) %>%
+    hoist(out, set_test = list("result", "m10", 1, "gene_set_test")) %>%
+    filter(control_set == control) %>% 
+    select(-out, - table1, -controls)
+  return(out)
+}
+
+outm10_whole_genome = function(p, control, data){
+  out = f1(p, data) %>% 
+    hoist(out, tfbm_all = list("result", "tfbm", "tfbm_all")) %>% 
+    hoist(out, tfbm_immue = list("result", "tfbm", "tfbm_immue")) %>% 
+    hoist(out, ttT = list("result", "ttT")) %>%
+    filter(control_set == control) %>% 
+    select(-out, - table1, -controls)
+  return(out)
 }
