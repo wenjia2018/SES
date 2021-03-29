@@ -106,7 +106,7 @@ model_fit =
     # }
     
     if(is.element("m10", funcs)) out$m10 = fit_m10(treatment, controls, gene_set)
-   
+    if(is.element("m11", funcs)) out$m11 = fit_m11(treatment, controls, gene_set)
     if(is.element("m97", funcs)) out$m97 = mediate_multiple(controls, treatment, gene_set)
     if(is.element("m99", funcs)) out$m99 = mediators %>% set_names() %>% map(safely(mediate), gene_set = gene_set, controls, treatment) 
 
