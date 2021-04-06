@@ -25,7 +25,7 @@
 
     -  1.11 [significant gene and pathway](/ses/output/create_new_signatures.html)
     
-    -  1.12 [tfbm for race and skincolor](/ses/output/tfbm_race_skincolor.html)
+
 
 -  2. categorical race
     
@@ -38,7 +38,10 @@
     -   2.3 [ctra + ageing + aging cluster](/ses/output/race_bespoke_summary.html)
         -   1-3 sentence summary (perhaps after discussion).
    
-
+    -   2.4 [tfbm for race and skincolor](/ses/output/tfbm_race_skincolor.html)
+    
+    -   2.5 [additive model for race and skincolor](/ses/output/skincolor_race_additive.html)
+    
 -  3. skin color
    
     -  3.1 [skin color continuous, binary, 3 levels for ctra and ageing](/ses/output/skincolor_eqtl_bespoke.html)
@@ -86,3 +89,16 @@
     -   7.1 [Total and Analytic Sample](/ses/output/summary_of_data.html)
     -   7.2 [Race by Skin Color](/ses/output/color_race.html)
     -   7.3 [Skin Color by immigrate status](/ses/output/skin_color_immigrat_status.html)  
+    
+-   8. skin color and race ethnicity additive and interaction model
+
+    -   8.1 [skin color with race ethnicity as controls without ancestry control](/ses/output/skincolor_2setscontrols.html)
+  
+    -   8.2 [Skin Color and race ethnicity additive model with ancestry control](/ses/output/skincolor_race_additive.html)  
+    
+    -   8.3 [Skin Color and race ethnicity(nonhispanic white and hispanic only) with ancestry control](/ses/output/skincolor_racewhiteandhispanic_interaction.html)  
+     
+    -   8.4 [Skin Color and race ethnicity(nonhispanic black and hispanic only) with ancestry control](/ses/output/skincolor_raceblackandhispanic_interaction.html)   
+    
+    
+    
