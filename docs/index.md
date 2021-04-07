@@ -9,7 +9,7 @@
     
     -  1.3 [figure 2 panleA: skin color with in race stratum](/ses/output/race_fig2.html)
     
-    -  1.4 [figure 2 panelB: skin color with in race stratum](/ses/output/race_fig2_PanelB.html)
+    -  1.4 [figure 2 panelB: skin color with in race stratum](/ses/output/race_fig2_PanelB_jitter.html)
     
     -  1.5 [figures : different measures of skin color](/ses/output/skin_color_bubbles.html)
     
@@ -25,6 +25,7 @@
 
     -  1.11 [significant gene and pathway](/ses/output/create_new_signatures.html)
     
+    -  1.12 [Descriptive statistics](/ses/output/descriptive_table.html)
 
 
 -  2. categorical race
