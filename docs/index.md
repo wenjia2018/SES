@@ -57,7 +57,7 @@
     
     -  3.5 [skin color continuous and Binary FE model](/ses/output/skin_color_FE.html)
     
-    -  3.6 [skin color continuous and Binary FE model](/ses/output/skincolor3_FE.html)
+    -  3.6 [skin color3 level FE model](/ses/output/skincolor3_FE.html)
     
 -   4. skin color within race strata
 
