@@ -27,7 +27,7 @@
     
     -  1.12 [Descriptive statistics](/ses/output/descriptive_table.html)
 
-    -  1.13 [figure 1 panelAB: skin](/ses/output/skincolor_fig1_2Panels_knitr.html)
+    -  1.13 [figure 1 panelAB: skin](/ses/output/skincolor_fig1_2Panels.png)
     
 -  2. categorical race
     
