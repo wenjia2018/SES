@@ -27,7 +27,8 @@
     
     -  1.12 [Descriptive statistics](/ses/output/descriptive_table.html)
 
-
+    -  1.13 [figure 1 panelAB: skin](/ses/output/skincolor_fig1_2Panels_knitr.html)
+    
 -  2. categorical race
     
     -   2.1 [aging cluster + inflamation 1K](/ses/output/race_omnibus.html)
