@@ -56,6 +56,9 @@
     -  3.4 [skin color 3 levels DE and TFBM](/ses/output/tfbm_skin_color.html)
     
     -  3.5 [skin color continuous and Binary FE model](/ses/output/skin_color_FE.html)
+    
+    -  3.6 [skin color continuous and Binary FE model](/ses/output/skincolor3_FE.html)
+    
 -   4. skin color within race strata
 
     -   4.1 [color 5 regression for ctra and aging](/ses/output/race_strata_color5.html)
