@@ -60,6 +60,7 @@
     
     -  3.6 [skin color3 level FE model](/ses/output/skincolor3_FE.html)
     
+    -  3.7 [skin color3 level mancova median mean outcome model](/ses/output/skincolor3_m1m2m3_results.html)
 -   4. skin color within race strata
 
     -   4.1 [color 5 regression for ctra and aging](/ses/output/race_strata_color5.html)
