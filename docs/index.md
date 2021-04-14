@@ -54,13 +54,15 @@
         
     -  3.3 [skin color 3 levels for ageing, ageing clusters and aging complement](/ses/output/skincolor_summary_complement.html)
     
-    -  3.4 [skin color 3 levels DE and TFBM](/ses/output/tfbm_skin_color.html)
+    -  3.4 [skin color 3 levels DE and TFBM](/ses/output/tfbm_skin_color_v2.html)
     
     -  3.5 [skin color continuous and Binary FE model](/ses/output/skin_color_FE.html)
     
     -  3.6 [skin color3 level FE model](/ses/output/skincolor3_FE.html)
     
     -  3.7 [skin color3 level mancova median mean outcome model](/ses/output/skincolor3_m1m2m3_results.html)
+    
+    -  3.8 [skin color3 level logFC plotting](/ses/output/aging_logFC_plotting.html)
 -   4. skin color within race strata
 
     -   4.1 [color 5 regression for ctra and aging](/ses/output/race_strata_color5.html)
@@ -75,7 +77,7 @@
     -   4.4 [color 3 regression for ctra, inflam1k, aging and cluster](/ses/output/skin_color3_within_race_strata.html)
         -   1-3 sentence summary (perhaps after discussion).  
 
-    -   4.5 [skin color 3 levels DE and TFBM](/ses/output/tfbm_skin_color_race_strata.html)
+    -   4.5 [skin color 3 levels DE and TFBM](/ses/output/tfbm_skin_color_race_strata_v2.html)
     
 -   5. skin color and race cross table
 
