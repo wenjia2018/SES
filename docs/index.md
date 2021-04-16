@@ -101,7 +101,7 @@
     -   7.1 [Total and Analytic Sample](/ses/output/summary_of_data.html)
     -   7.2 [Race by Skin Color](/ses/output/color_race.html)
     -   7.3 [Skin Color by immigrate status](/ses/output/skin_color_immigrat_status.html)  
-    
+    -   7.4 [Aging cluster name conversion](/ses/output/cluster_name_conversion.html)  
 -   8. skin color and race ethnicity additive and interaction model
 
     -   8.1 [skin color with race ethnicity as controls without ancestry control](/ses/output/skincolor_2setscontrols.html)
