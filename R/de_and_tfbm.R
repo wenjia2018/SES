@@ -16,13 +16,16 @@ de_and_tfbm <- function(treatment, controls, de_only = FALSE) {
   # https://stackoverflow.com/questions/44114391/error-in-sparse-model-matrix
   # X = MatrixModels::model.Matrix(~., data = X, sparse = TRUE, drop.unused.levels = TRUE)
   # needed for limma::topTables() to work with factors
-  treatment = X %>% colnames() %>% str_detect(treatment) %>% which()
-  
+  treatment = X %>% colnames() %>% str_detect(stringr::fixed(treatment)) %>% which()
+  # treatment = X %>% colnames() %>% str_detect(treatment) %>% which()
 
   # Estimate DE using standard limmma/edger pipeline. 
-  ttT <-
+  ttT_raw <-
     lmFit(y, X) %>%
-    eBayes %>%
+    eBayes
+  
+  ttT <-
+    ttT_raw %>%
     tidy_topTable(of_in = treatment, confint = TRUE)
   
   if(de_only) return(list(ttT = ttT))
@@ -68,6 +71,6 @@ de_and_tfbm <- function(treatment, controls, de_only = FALSE) {
                             as.data.frame()) 
   tfbm = map2(tfbm_telis, tfbm_reg, ~ left_join(.x, .y, by = c("tfbm" = "m_uni.term")) %>% select(tfbm, p_under, p_over, m_uni.p.value, m_cov.p.value ) )
   
-     return(list(ttT = ttT, tfbm = tfbm))
+     return(list(ttT = ttT, ttT_raw = ttT_raw, tfbm = tfbm))
                  # , gene_set_test = gene_set_test))
 }

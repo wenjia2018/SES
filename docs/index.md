@@ -27,8 +27,11 @@
     
     -  1.12 [Descriptive statistics](/ses/output/descriptive_table.html)
 
-    -  1.13 [figure 1 panelAB: skincolor](/ses/output/skincolor_fig1_2Panels.png)
+    -  1.13 [figure 1 panelAB: skincolor eqtl 005](/ses/output/skincolor_fig1_2Panels_eqtl005.png)
     
+    -  1.14 [figure 1 panelAB: skincolor eqtl 001](/ses/output/skincolor_fig1_2Panels_eqtl001.png)
+    
+    -  1.15 [m123: skincolor](/ses/output/m123plot_knitr.html)
 -  2. categorical race
     
     -   2.1 [aging cluster + inflamation 1K](/ses/output/race_omnibus.html)
