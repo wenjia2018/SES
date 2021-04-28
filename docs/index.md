@@ -65,7 +65,9 @@
     
     -  3.7 [skin color3 level mancova median mean outcome model](/ses/output/skincolor3_m1m2m3_results.html)
     
-    -  3.8 [skin color3 level logFC plotting](/ses/output/aging_logFC_plotting.html)
+    -  3.8 [skin color3 level logFC plotting](/ses/output/aging_logFC_plotting_v2.html)
+    
+    -  3.9 [skin color3 level logFC correlated t test](/ses/output/aging_logFC_corrttest.html)
 -   4. skin color within race strata
 
     -   4.1 [color 5 regression for ctra and aging](/ses/output/race_strata_color5.html)
