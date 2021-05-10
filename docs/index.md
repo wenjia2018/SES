@@ -57,7 +57,7 @@
         
     -  3.3 [skin color 3 levels for ageing, ageing clusters and aging complement](/ses/output/skincolor_summary_complement.html)
     
-    -  3.4 [skin color 3 levels DE and TFBM](/ses/output/tfbm_skin_color_v2.html)
+    -  3.4 [skin color 3 levels DE and TFBM](/ses/output/tfbm_skin_color_v3.html)
     
     -  3.5 [skin color continuous and Binary FE model](/ses/output/skin_color_FE.html)
     
