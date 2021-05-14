@@ -32,6 +32,8 @@
     -  1.14 [figure 1 panelAB: skincolor eqtl 001](/ses/output/skincolor_fig1_2Panels_eqtl001_correctedp.png)
     
     -  1.15 [m123: skincolor](/ses/output/m123plot_knitr.html)
+    
+    -  1.16 [comparision of different bespoke ancestry control and MC correction](/ses/output/compare_bespoke_ancestry.html)
 -  2. categorical race
     
     -   2.1 [aging cluster + inflamation 1K](/ses/output/race_omnibus.html)
