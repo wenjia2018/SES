@@ -27,7 +27,7 @@
     
     -  1.12 [Descriptive statistics](/ses/output/descriptive_table.html)
 
-    -  1.13 [figure 1 panelAB: skincolor eqtl 005](/ses/output/skincolor_fig1_2Panels_eqtl005_correctedp.png)
+    -  1.13 [figure 1 panelAB: skincolor eqtl 005](/ses/output/skincolor_figure1_panelAB_agingcompositeancestry_fdr.png)
     
     -  1.14 [figure 1 panelAB: skincolor eqtl 001](/ses/output/skincolor_fig1_2Panels_eqtl001_correctedp.png)
     
