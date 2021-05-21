@@ -42,6 +42,12 @@
     -  1.19 [skin color genowide gene mediation](/ses/output/skincolor_logFC_and_acme_plotting.html)
     
     -  1.20 [skin color wellloaded genes intersection](/ses/output/skincolor_pca_wellloaded.html)
+    
+    -  1.21 [skin color wellloaded genes and intersection at different threshold](/ses/output/skincolor_pca_wellloaded_varying_threshold.html)
+    
+    -  1.22 [skin color unique wellloaded genes at different threshold](/ses/output/skincolor_pca_wellloaded_unique.html)
+    
+    
 -  2. categorical race
     
     -   2.1 [aging cluster + inflamation 1K](/ses/output/race_omnibus.html)
