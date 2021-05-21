@@ -107,7 +107,8 @@
         
     -   6.2 [significant snps as treatment for outcome of ctra and ageing](/ses/output/color_snps_11sig.html)
         -   1-3 sentence summary (perhaps after discussion).        
-        
+     
+    -   6.3 [regress ageing on snp with aging composite ancestry](/ses/output/snp_aging_signature.html)   
 -   7. Descriptive Data
 
     -   7.1 [Total and Analytic Sample](/ses/output/summary_of_data.html)
