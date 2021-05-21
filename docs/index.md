@@ -37,11 +37,11 @@
     
     -  1.17 [skin color cell type](/ses/output/skincolor_celltype.html)
     
-    -  1.18 [figure 2 skin color strata pca](skincolor_fig2_pca.html)
+    -  1.18 [figure 2 skin color strata pca](/ses/output/skincolor_fig2_pca.html)
     
-    -  1.19 [skin color genowide gene mediation](skincolor_logFC_and_acme_plotting.html)
+    -  1.19 [skin color genowide gene mediation](/ses/output/skincolor_logFC_and_acme_plotting.html)
     
-    -  1.20 [skin color wellloaded genes intersection](skincolor_pca_wellloaded.html)
+    -  1.20 [skin color wellloaded genes intersection](/ses/output/skincolor_pca_wellloaded.html)
 -  2. categorical race
     
     -   2.1 [aging cluster + inflamation 1K](/ses/output/race_omnibus.html)
