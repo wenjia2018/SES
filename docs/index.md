@@ -27,7 +27,7 @@
     
     -  1.12 [Descriptive statistics](/ses/output/descriptive_table.html)
 
-    -  1.13 [figure 1 panelAB: skincolor eqtl 005](/ses/output/skincolor_figure1_panelAB_agingcompositeancestry_fdr.png)
+    -  1.13 [figure 1 panelAB: skincolor eqtl 005](/ses/output/skincolor_fig1_2Panels_eqtl005_correctedp_v2.png)
     
     -  1.14 [figure 1 panelAB: skincolor eqtl 001](/ses/output/skincolor_fig1_2Panels_eqtl001_correctedp.png)
     
@@ -37,7 +37,7 @@
     
     -  1.17 [skin color cell type](/ses/output/skincolor_celltype.html)
     
-    -  1.18 [figure 2 skin color strata pca](/ses/output/skincolor_fig2_pca.html)
+    -  1.18 [figure 2 skin color strata pca](/ses/output/skincolor_fig2_eqtl005_correctedp_v2.png)
     
     -  1.19 [skin color genowide gene mediation](/ses/output/skincolor_logFC_and_acme_plotting.html)
     
