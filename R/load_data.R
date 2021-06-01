@@ -5,16 +5,16 @@ load_data = function(reconciled, remove_inflam){
     # ... after reconciling
     # signatures = readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_21042020_signature.rds") # from Wenjia
     # dat = readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_21042020.rds")
-    signatures <- readRDS("/home/share/preprocessed_two_batches/recon_25.08.2020/dt_batches1_2_steve_waves_25.08.2020_signature.rds")
-    dat <- readRDS("/home/share/preprocessed_two_batches/recon_25.08.2020/dt_batches1_2_steve_waves_25.08.2020.rds")
+    signatures <- readRDS("/home/share/preprocessing/preprocessed_two_batches/recon_25.08.2020/dt_batches1_2_steve_waves_25.08.2020_signature.rds")
+    dat <- readRDS("/home/share/preprocessing/preprocessed_two_batches/recon_25.08.2020/dt_batches1_2_steve_waves_25.08.2020.rds")
     
   } else {  
     # the analyses *before* ensuring all the differently normalized datasets have identical genes
     # dat = readRDS("/home/share/preprocessed_two_batches/wx/dt_batches1_2_steve_waves_21042020.rds")
     # signatures = readRDS("/home/share/preprocessed_two_batches/for_cecilia/dt_batches1_2_steve_waves_21042020_signature.rds") # from Wenjia
     # after adding two new signatures and several pheno data
-    signatures <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_22.03.2021_signature.rds")
-    dat <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_22.03.2021.rds")
+    signatures <- readRDS("/home/share/preprocessing/preprocessed_two_batches/dt_batches1_2_steve_waves_22.03.2021_signature.rds")
+    dat <- readRDS("/home/share/preprocessing/preprocessed_two_batches/dt_batches1_2_steve_waves_22.03.2021.rds")
   }
   
   if(remove_inflam) {
