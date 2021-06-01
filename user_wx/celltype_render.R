@@ -17,6 +17,7 @@ library(rlang)
 library(compositions)
 # library(easyCODA)
 example3 = readRDS("/home/share/scratch/xu/example3_celltype.rds")
+example3 = readRDS("/home/xu/scratch/xu/example3_celltype.rds")
 b=example3$out[[9]]$result$b*10
 
 barplot(b, args.legend = list(x = "topright", cex = 0.7),  main = "Cell type distribution (proportion)")

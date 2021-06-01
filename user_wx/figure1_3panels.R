@@ -145,7 +145,7 @@ panelB = ggplot(exB_data, aes(treatment, gene_set_name, size = pval2, alpha = 0.
 # ESTIMATE VARIOUS PCA "ROTATIONS"
 example0_noerror = remove_errors(example0)
 # example0_m7_ob = example0_noerror %>% get_sig_PCs_and_sig_enrichment_on_those_PCs("m7_ob", threshold = threshold)
-example0_m7_ob = readRDS("/home/xu/ses-1/user_wx/ob_rotation_pca.rds")
+example0_m7_ob = readRDS("/home/xu/ses-1/user_wx_RESTORED/ob_rotation_pca.rds")
 
 m7_ob = example0_m7_ob %>%
   filter(map_lgl(well_loaded_genes_on_significant_PCs, ~ length(.x)!=0))%>% 

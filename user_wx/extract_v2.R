@@ -41,7 +41,16 @@ f0 = function(p, data){
   return(ex0)
 }
 
-
+outttT_sig = function(p, control, data) {
+  out = f1(p, data) %>% 
+    hoist(out, ttT = list("result", "ttT")) %>%
+    filter(ttT != "NULL") %>% 
+    filter(control_set == control) %>% 
+    mutate(ttT = ttT %>% map(~ dplyr::filter(., adj.P.Val<0.05))) %>% 
+    filter(map_lgl(.$ttT, ~dim(.)[1]!=0)) %>% 
+    dplyr::select(p_eqtl, treatment, gene_set_name, ttT, control_set)
+  return(out)
+}
 
 m8_present = function(p, control, data){
   
@@ -143,7 +152,71 @@ m7_present = function(ex0, control){
 outm7pca = function(p, control, data){
   m7_present(f0(p, data), control) %>% mutate(p_eqtl = p)
 }
+m7_present_anova = function(ex0, control){
+  
+  var = ex0 %>%
+    hoist(out, var_explained = list("result", "m7_ob", 1, "other", "varexplained")) %>%
+    dplyr::select(treatment, gene_set_name, var_explained, control_set) %>% 
+    filter(var_explained!="NULL")
+  # filter out the non estimable results
+  var$var_explained = var$var_explained %>% map(~ set_names(.x, str_c("d", 1:length(.x))))
+  
+  var = var %>% unnest_longer(var_explained)
+  
+  pcaloadings = ex0 %>% 
+    hoist(out, loadings = list("result", "m7_ob", 1, "other", "loadings")) %>%
+    dplyr::select(treatment, gene_set_name, loadings, control_set) %>%
+    filter(loadings!="NULL") %>% 
+    mutate(loadings = loadings %>% map(~.[]) %>% map(~ as.data.frame(.)),
+           loadings = loadings %>% map(~ set_names(., str_c("d", 1:length(.)))),
+           loadings = loadings %>% map(~ split.default(., seq_along(.))))
+  
+  pcaloadings = pcaloadings %>%
+    unnest_longer(loadings) %>%
+    mutate(loadings_id = str_c("d", loadings_id))
+  
+  gene_list = ex0 %>%
+    hoist(out, well_loaded = list("result", "m7_ob", 1, "other", "well_loaded")) %>%
+    dplyr::select(treatment, gene_set_name, well_loaded, control_set) %>% 
+    filter(well_loaded!="NULL")
+  gene_list$well_loaded = gene_list$well_loaded %>% map(~ set_names(.x, str_c("d", 1:length(.x))))
+  
+  gene_list = gene_list %>% unnest_longer(well_loaded)
+  # 
+  out = ex0 %>%
+    hoist(out, estimate = list("result", "m7_ob", 1, "detail", "anova")) %>% 
+    unnest_longer(estimate) %>% 
+    hoist(estimate, p = "p.value") %>% 
+    hoist(estimate, coef = "estimate") %>% 
+    rename(p_id = estimate_id) %>% 
+    dplyr::select(treatment, gene_set_name, p, coef, p_id, control_set) %>% 
+    # dplyr::filter(p < threshold) %>%
+    left_join(var, by = c("treatment", "gene_set_name", "p_id"= "var_explained_id", "control_set")) %>%
+    left_join(gene_list, by = c("treatment", "gene_set_name", "p_id"= "well_loaded_id", "control_set")) %>%
+    left_join(pcaloadings, by = c("treatment", "gene_set_name", "p_id"= "loadings_id", "control_set")) %>%
+    filter(control_set == control) %>%
+    # dplyr::select(1:7) %>%
+    rename(p_pca = p) 
+  return(out)
+  
+}
 
+outm7pca_anova = function(p, control, data){
+  m7_present_anova(f0(p, data), control) %>% mutate(p_eqtl = p)
+}
+# outm7hyp = function(p, control, data) {
+#   ex0 = f0(p, data) %>% 
+#     filter(control_set == control) %>% 
+#     hoist(out, fit = list("result", "m7_ob", 1, "all")) %>% 
+#     unnest_longer(fit) 
+#   
+#   ftest_v = ex0$treatment %>% unique %>% str_subset("__")
+#   ex0 %>% 
+#     mutate(ftest_v = list(ftest_v),
+#            ftest_v = map(~ ifelse(str_detect(treatment,"__"), replace(.x, str_detect(treatment,"__") %>% which, "treatment"), .x)),
+#            hypo = map(fit, ~ car::linearHypothesis(.x, str_subset(names(coef(.x)), ftest_v), verbose=F)))
+#     
+# }
 med_extact_m7 = function (focal, control, ex0){
   out = ex0 %>%
     hoist(out, med=list("result", "m7_ob", 1, "mediation", focal, "result")) %>% 
@@ -236,3 +309,54 @@ outm10_whole_genome = function(p, control, data){
     select(-out, - table1, -controls)
   return(out)
 }
+
+outm11 = function(p, control, data){
+  out = f0(p, data) %>% 
+    hoist(out, tfbm = list("result", "m11", 1, "tfbm")) %>% 
+    hoist(out, ttT = list("result", "m11", 1, "ttT")) %>%
+    hoist(out, set_test = list("result", "m11", 1, "gene_set_test")) %>%
+    filter(control_set == control) %>% 
+    select(-out, - table1, -controls)
+  return(out)
+}
+
+outm1 = function(p, control, data){
+  out = f0(p, data) %>% 
+    hoist(out, p = list("result", "m1", 1, "p")) %>% 
+    filter(control_set == control) %>% 
+    select(-out, - table1, -controls)
+  return(out)
+}
+
+outm2 = function(p, control, data){
+  out = f0(p, data) %>% 
+    hoist(out, p = list("result", "m2", 1, "p")) %>% 
+    filter(control_set == control) %>% 
+    select(-out, - table1, -controls)
+  return(out)
+}
+
+outm3 = function(p, control, data){
+  out = f0(p, data) %>% 
+    hoist(out, p = list("result", "m3", 1, "p")) %>% 
+    filter(control_set == control) %>% 
+    select(-out, - table1, -controls)
+  return(out)
+}
+
+outm7_lh = function(p, control, data){
+  out = f0(p, data) %>% 
+    hoist(out, lh = list("result", "m7_ob", 1, "all")) %>% 
+    filter(control_set == control) %>% 
+    select(-out, - table1, -controls)
+  return(out)
+} 
+  
+outm10_lh = function(p, control, data){
+  out = f0(p, data) %>% 
+    hoist(out, lh = list("result", "m10", 1, "ttT_raw")) %>%
+    filter(control_set == control) %>% 
+    select(-out, - table1, -controls)
+  return(out)
+} 
+

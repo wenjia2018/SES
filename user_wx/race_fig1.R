@@ -36,44 +36,17 @@ cluster_union = reduce(names(signatures$outcome_set) %>%
 aging_cluster_complement = setdiff(signatures$outcome_set$aging_mRNA, cluster_union)
 signatures$outcome_set$aging_cluster_complement =  aging_cluster_complement
 source("/home/xu/ses-1/user_wx/extract_v2.R")
-example_race = readRDS("~/ses-1/user_wx/race_bespoke_12.02.2021.rds")
-example_skincolor3 = readRDS("~/ses-1/user_wx/color3_bespoke_18.02.2021.rds")
+example_race = readRDS("~/ses-1/user_wx/race_bespoke_15.03.2021.rds")
+example_skincolor3 = readRDS("~/ses-1/user_wx/color3_bespoke_15.03.2021.rds")
 
-p_eqtl <- c(0.05, 1e-2)
+p_eqtl <- c(0.01, 0.05)
 # , 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10)
 
 fig1A = function(p_eqtl){
-  # check sig genes in aging cluster complement set 
-  temp1 = outm8_allsig (p = p_eqtl, control = "ancestryPC_ses", example_race) 
-  temp2 = outm8_allsig (p = p_eqtl, control = "ancestryPC_ses", example_skincolor3)
-  aging_all = temp1 %>% 
-    rbind(temp2) %>%
-    filter(gene_set_name == "aging_mRNA") %>% 
-    mutate(no_sig = gene_sig %>% map_int(~ length(.x))) %>% 
-    filter(no_sig>0)
-  cluster_complement_sig =
-    aging_all %>% 
-    pull(gene_sig) %>% 
-    `[[`(1)
-   cluster_complement_sig = cluster_complement_sig[cluster_complement_sig %in% aging_cluster_complement]
-    aging_complement_min = aging_all$ttT[[1]] %>%
-      filter(gene %in% cluster_complement_sig) %>%
-      slice(which.min(adj.P.Val)) %>% 
-      mutate(p_omnibus = adj.P.Val,
-             gene_sig = gene) %>% 
-      select(p_omnibus, logFC, gene_sig)
-  aging_c = aging_all %>% 
-    select(p_eqtl, treatment, gene_set_name, control_set) %>%
-    mutate(gene_set_name = "aging_cluster_complement_mRNA") %>% 
-    cbind(aging_complement_min) %>% 
-    relocate(control_set, .after = last_col()) 
-
-
   race = m8_present(p = p_eqtl, control = "ancestryPC_ses", example_race) 
   skincolor = m8_present(p = p_eqtl, control = "ancestryPC_ses", example_skincolor3)
   ex0_m8fdr = race %>% 
     rbind(skincolor) %>%
-    rbind(aging_c) %>% 
     filter(gene_set_name %>% str_detect("aging")) %>% 
     filter(gene_set_name!="aging_down_cl1_mRNA") %>% 
     dplyr::select(treatment, gene_set_name, p_omnibus) %>% 
@@ -143,12 +116,15 @@ fig1A = function(p_eqtl){
   #                                              "Aging Down Cl1",  "Aging Down Cl1a", "Aging Down Cl1b", "Aging Down Cl1c",
   #                                              "Aging Down Cl2",  "Aging Down Cl3",
   #                                              "Aging Up Cl1",    "Aging Up Cl2",    "Aging Up Cl3",    "Aging Up Cl4"  )) %>% fct_rev
-  axiscolor = c("darkblue","darkblue","darkblue","grey30", "grey30", "grey30", "grey30", "grey30", "grey30","grey30", "grey30", "grey30")
-  ggplot(ex0_m8fdr, aes(treatment, gene_set_name, size = pval2
+  axiscolor = c("darkblue","darkblue","darkblue","darkblue","grey30", "grey30", "grey30", "grey30", "grey30", "grey30","grey30", "grey30", "grey30")
+  ex0_m8fdr %>% 
+  mutate(group = ifelse(treatment %>% str_detect("Hispanic"), "Race", "Skin Color")) %>% 
+  ggplot(aes(treatment, gene_set_name, size = pval2
                         # fill = `1KI Genes`,
                         # colour = `1KI Genes`
   )) +
     geom_point(stroke = 1.5, shape = 21, alpha = 0.4, colour = "darkblue", fill = "navy") +
+    facet_wrap(~group, scales = "free_x") +
     # scale_fill_manual(values = c("darkblue", "goldenrod3")) +
     # scale_color_manual(values = c("darkblue", "goldenrod3")) +
     # geom_jitter(height = 0.00000025) +
@@ -174,8 +150,9 @@ fig1A = function(p_eqtl){
 }
 # plots = p_eqtl %>% map(fig1A)
 # plots
-fig1A(0.05)
 fig1A(0.01)
+fig1A(0.05)
+
 
 
 

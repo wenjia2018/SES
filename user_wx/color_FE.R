@@ -24,21 +24,25 @@ define_treatments_and_controls_skincolor_fullsibFE()
 recode_variables_in_dat_racedummy()
 print(abbreviations)
 funcs = str_subset(abbreviations$shorthand, "^m") 
-funcs = funcs %>% str_subset("m[7-8]")
+funcs <- c("m7", "m8", "m10" , "m11")
 # explicitly assign ncomp as the smallest number of table signatures gene numbers
 
 ncomp = 10
 fit_pca_util = partial(fit_pca_util, ncomp = ncomp) # specify n_perm
 # debugonce(model_fit)
 # debugonce(model_MR)
+plan(multicore, workers = 44)
 example0 =
   args %>%
-  filter(is.element(gene_set_name, table1),
-         names(controls) == "basic") %>% 
-  mutate(out = pmap(., safely(model_fit), funcs),
+  filter(is.element(gene_set_name, table1)
+         # names(controls) == "basic"
+         ) %>% 
+  mutate(out = furrr::future_pmap(., safely(model_fit), funcs),
          controls = names(controls))
+
+
 # With controls used in SES paper: predicts the signatures from SES paper + Peters aging signature. 
-example0 %>% saveRDS("./user_wx/example_skincolor_FE_19.11.rds") 
+example0 %>% saveRDS("./user_wx/example_skincolor_binaryandcontinuous_disease_FE_04.05.2021.rds") 
 
 
 # 

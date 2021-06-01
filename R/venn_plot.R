@@ -17,3 +17,22 @@ venn_plot = function(de_tfbm_result) {
              box = FALSE,
              sncs = 1)
 }
+
+
+gsea_webgestalt = function(treatment, ttT, file_output, enrichMethod = "GSEA", enrichDatabase="pathway_Reactome"){
+  rankFile = str_c(file_output,"/", treatment,".rnk")
+  
+  ttT %>%
+    dplyr::select(gene, logFC) %>% 
+    write.table(file = rankFile, quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t")
+  
+  enrichResult = WebGestaltR::WebGestaltR(interestGeneFile = rankFile,
+                                          interestGeneType = "genesymbol",
+                                          enrichMethod = enrichMethod,
+                                          organism = "hsapiens",
+                                          enrichDatabase = enrichDatabase,
+                                          fdrThr = 1,
+                                          minNum=5,
+                                          perNum = 1000,
+                                          outputDirectory = file_output)
+}

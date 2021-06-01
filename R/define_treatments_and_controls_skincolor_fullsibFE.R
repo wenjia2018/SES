@@ -8,22 +8,46 @@ define_treatments_and_controls_skincolor_fullsibFE = function(){
   table1 =
     c(
       "CVD_mRNA",
-      "diabetes_mRNA",
       "inflam1k_mRNA",
-      # "breast_cancer_mRNA",
-      # "Lupus_mRNA", "Colorectal_mRNA",
-      "Rheumatoid_Arthritis_mRNA", "Alzheimers_mRNA",
-      "Aortic_Aneurysm_mRNA", "COPD_mRNA",
-      "Asthma_mRNA","Hypertension_mRNA",
+      "diabetes_mRNA",
+      "Rheumatoid_Arthritis_mRNA", 
+      "Alzheimers_mRNA",
+      "Aortic_Aneurysm_mRNA",
+      "COPD_mRNA",
+      "Asthma_mRNA",
+      "Hypertension_mRNA",
       "Depression_mRNA",
-      "CKD_mRNA",
-      "aging_mRNA",
-      "aging_up_mRNA",
-      "aging_down_mRNA"
+      "CKD_mRNA"
     )
-  
+  # table1 =
+  #   c(
+  #     "ctra_mRNA",
+  #     "inflame_mRNA",
+  #     "interferon_mRNA",
+  #     "AntBIntF_mRNA",
+  #     # "antibody_mRNA", #only 1 gene
+  #     "inflam1k_mRNA",
+  #     "aging_mRNA",
+  #     "aging_up_mRNA",
+  #     "aging_down_mRNA",
+  #     "aging_cluster_complement_mRNA",
+  #     "aging_down_cl1_mRNA",
+  #     "aging_down_cl1a_mRNA",
+  #     "aging_down_cl1b_mRNA",
+  #     "aging_down_cl1c_mRNA",
+  #     "aging_down_cl2_mRNA",
+  #     "aging_down_cl3_mRNA",
+  #     "aging_up_cl1_mRNA",
+  #     "aging_up_cl2_mRNA",
+  #     "aging_up_cl3_mRNA",
+  #     "aging_up_cl4_mRNA",
+  #     "whole_genome"
+  #   )
   treatment = c("color_byinterviewer_continuous",
                 "color_byinterviewer_binary")
+
+  # treatment = c("color_byinterviewer3_DarkBlack",
+  #               "color_byinterviewer3_LightMed")
   
   # check controls for each analysis!!!!!!!!!
   basic = 
@@ -38,20 +62,24 @@ define_treatments_and_controls_skincolor_fullsibFE = function(){
       "Macrophages.M2",
       "B.cells.naive",
       "T.cells.CD4.memory.resting"
+      # "color_byinterviewer3_DarkBlack",
+      # "color_byinterviewer3_LightMed"
     )
   race = c("raceethnicity_NonHblack",
            "raceethnicity_Hispanic", basic)
   
-  # ses = c("ses_sss_composite", basic)
+  ses = c("ses_sss_composite", basic)
   # 
   # ses_race = c("raceethnicity_NonHblack",
   # "raceethnicity_Hispanic", "ses_sss_composite", basic)
-  controls = list(basic = basic, race = race
-                  # ses = ses,  ses_race = ses_race
+  controls = list(basic = basic,
+                  # race = race
+                  ses = ses
+                  # ses_race = ses_race
   )
   
-  gene_set_name = signature_names %>% append("whole_genome_and_tfbm") 
-  
+  gene_set_name = signature_names %>% append("whole_genome")
+
   args = crossing(treatment, gene_set_name, controls)
   
   

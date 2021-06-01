@@ -13,10 +13,10 @@
 
 #+ echo=F, eval=T, warning=FALSE, message=FALSE 
 library(tidyverse)
-dat <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_17.11.2020.rds")
+dat <- readRDS("/home/share/preprocessing/preprocessed_two_batches/dt_batches1_2_steve_waves_17.11.2020.rds")
 AID_blood = dat@phenoData@data$AID
 
-waves <- readRDS("/home/share/preprocessed_two_batches/waves_17.11.2020.rds")
+waves <- readRDS("/home/share/preprocessing/preprocessed_two_batches/waves_17.11.2020.rds")
 
 # compete t-tests for these variables by white versus black, and also white versus hispanic. 
 waves = waves %>% mutate(

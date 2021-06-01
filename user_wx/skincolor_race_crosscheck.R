@@ -1,4 +1,15 @@
 
+#' ---
+#' title: skin color race cross check
+#' date: "`r format(Sys.time(), '%d %B, %Y')`"
+#' output:
+#'    html_document:
+#'      toc: true
+#'      highlight: zenburn
+#' ---
+#' <!-- rmarkdown::render("supervised_play/nice_code.R") -->
+#' <!-- [See here.](http://brooksandrew.github.io/simpleblog/articles/render-reports-directly-from-R-scripts/) -->
+#+ warning=FALSE, message=FALSE
 #' ## skin color race cross check
 #' 
 #' * skin color by interviewer is only available at wave 3: H3IR17
@@ -11,10 +22,10 @@
 #' 
 #+ echo=F, eval=T, warning=FALSE, message=FALSE 
 library(tidyverse)
-dat <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_29.10.2020.rds")
+dat <- readRDS("/home/share/preprocessing/preprocessed_two_batches/dt_batches1_2_steve_waves_29.10.2020.rds")
 AID_blood = dat@phenoData@data$AID
 
-waves <- readRDS("/home/share/preprocessed_two_batches/waves_17.11.2020.rds")
+waves <- readRDS("/home/share/preprocessing/preprocessed_two_batches/waves_17.11.2020.rds")
 
 dt = waves %>%
   filter(AID %in% AID_blood) %>% 
@@ -45,11 +56,19 @@ dt = waves %>%
               Dark = "2",
               Black = "1"
             ),
+         color_byinterviewer3 = H3IR17 %>%
+           as.character() %>% 
+           as.factor %>% 
+           fct_collapse(
+             DarkBlack = c("1", "2"),
+             LightMed = c("3", "4"),
+             White = "5") %>%
+           relevel(ref = "White"),
          raceethnicity = re %>%
              fct_recode(
-               White = "1",
+               `Non Hispanic White` = "1",
                # white nonhispanic
-               Black = "2",
+               `Non Hispanic Black` = "2",
                # black nonhispanic
                NULL = "3",
                # asian nonhispanic
@@ -118,4 +137,19 @@ descr::crosstab(dt$raceethnicity, dt$race_interv_w4,  prop.r = T, prop.c = T, pr
 
 descr::crosstab(dt$raceethnicity, dt$color_byinterviewer,  prop.r = T, prop.c = T, prop.t = FALSE, plot = F)
 
+#' ## created raceethnicity and skin color by interviewer(3 levels) from wave 3
+#+ echo=F, eval=T, warning=FALSE, message=FALSE 
 
+ct = descr::crosstab(dt$raceethnicity, dt$color_byinterviewer3,  prop.r = T, prop.c = T, prop.t = FALSE, plot = F, row.labels = T)
+ct
+# ct %>% xtable %>% openxlsx::write.xlsx("./user_wx/testtable.xlsx")
+# testtable <- read_excel("user_wx/testtable.xlsx")
+
+
+sjPlot::tab_xtab(dt$raceethnicity, dt$color_byinterviewer3,
+                 show.cell.prc = FALSE, show.summary = FALSE,
+                 title = "Race ethnicity and skin color contingency table",
+                 var.labels = c("Race Ethnicity", "Skin Color"),
+                 emph.total = TRUE,
+                 show.row.prc = TRUE, 
+                 show.col.prc = TRUE)
