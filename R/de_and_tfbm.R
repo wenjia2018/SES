@@ -30,8 +30,8 @@ de_and_tfbm <- function(treatment, controls, de_only = FALSE) {
   
   if(de_only) return(list(ttT = ttT))
   # gene set tests self contained
-  # for whole genome regression without predefine any signature sets, sets will be empty,
-  # add the following if else to accomendate this situation
+  # for whole genome regression without pre defined any signature sets, sets will be empty,
+  # add the following if else to accommodate this situation
   # now move gene set function to m10
   sets = signatures$outcome_set[table1 %>% str_subset("whole_genome",negate = T)]
   # check if any signature is not available, as mroast will not work if any of the elements in index are NULL
@@ -71,6 +71,13 @@ de_and_tfbm <- function(treatment, controls, de_only = FALSE) {
                             as.data.frame()) 
   tfbm = map2(tfbm_telis, tfbm_reg, ~ left_join(.x, .y, by = c("tfbm" = "m_uni.term")) %>% select(tfbm, p_under, p_over, m_uni.p.value, m_cov.p.value ) )
   
-     return(list(ttT = ttT, ttT_raw = ttT_raw, tfbm = tfbm))
-                 # , gene_set_test = gene_set_test))
+  if(!exists("ftest_v")) {
+    ttT_raw = NULL
+  } else if(exists("ftest_v") & !is.null(ttT_raw$F) & !("FALSE" %in% (ftest_v %in% colnames(ttT_raw$coefficients)))) {
+    ttT_raw = ttT_raw %>% tidy_topTable(of_in = ftest_v)
+  } else {
+    ttT_raw = NULL
+  }
+    
+     return(list(ttT = ttT, ttT_raw = ttT_raw, tfbm = tfbm, gene_set_test = gene_set_test))
 }
