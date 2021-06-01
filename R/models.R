@@ -17,7 +17,8 @@ abbreviations =
     "m7_ob", "PCA oblimin rotated: regress PCs on covariates, one by one (see m6 for complementary analysis)",
     "m8_fdr", "multiple testing (FDR) corrected over ALL genome",
     "m8_fwer", "multiple testing (FWER) just within each signature set",
-    "m10", "DE, TFBM and gene set analysis for a predefined signature",
+    "m10", "DE, TFBM and gene set analysis within each predefined signature",
+    "m11", "TFBM enrichment for predefined signatures",
     "m96", "cibersort cell type compositional analysis",
     "m97", "mediation (outcome = single gene mRNA in disease signature)",
     "m99", "mediation (outcome = mean mRNA)"
@@ -388,6 +389,7 @@ fit_m7 = function(datt, gene_set, rotate){
       
       keep = datt_pca %>% complete.cases()
       datt_pca = datt_pca[keep, ]
+      # remove invariant columns
       datt_pca = Filter(function(x) length(unique(x))!=1, datt_pca)
       
       
@@ -418,7 +420,7 @@ fit_m7 = function(datt, gene_set, rotate){
 ############################################################
 # DE, TFBM and gene set test for a predefined signatures
 ############################################################
-fit_m10 <- function(treatment, controls, gene_set) {
+fit_m10 <- function(treatment, controls, gene_set, ttT_within_genesets, tfbm_genesets, wholegenome) {
   
   # Specify whole-genome regression of rna on design
   y <- dat %>% Biobase::exprs()
@@ -436,102 +438,62 @@ fit_m10 <- function(treatment, controls, gene_set) {
   # https://stackoverflow.com/questions/44114391/error-in-sparse-model-matrix
   # X = MatrixModels::model.Matrix(~., data = X, sparse = TRUE, drop.unused.levels = TRUE)
   # needed for limma::topTables() to work with factors
-  treatment = X %>% colnames() %>% str_detect(treatment) %>% which()
+  treatment = X %>% colnames() %>% str_detect(stringr::fixed(treatment)) %>% which()
   
   
   # Estimate DE using standard limmma/edger pipeline. 
-  ttT <-
+  ttT_raw <-
     lmFit(y, X) %>%
-    eBayes %>%
-    tidy_topTable(of_in = treatment, confint = TRUE) %>% 
-    filter(gene %in% gene_set)
+    eBayes
   
-  # gene set tests self contained
-  gene_set_test = mroast(y, index = list2(!!gene_set_name := gene_set), design = X, contrast = treatment) %>% rownames_to_column("gene_set_name")
-  
-  
-  # optional gene.weights = ttT$logFC
-  # ttT = ttT %>% mutate(weight = ifelse(logFC>0,1,-1)) gene.weights = ttT$weight
-  
-  # fig1 = DE_enrichplot(ttT)
-  
-  # genes whose uncorrected p-values below 0.05 (not an inference):
-  # this is for telis, taking a given column of matrix, subset several rows comparing the mean with the DE rows
-  # count subset of the gene N
-  # repeately sample for nnumber of gene
-  # average tf for the subset and the distribution of the average of tf of the repeately samples
-  # p_over avearage tf in your subset is bigger than the critical levle, it is in righthand side
-  ttT_sub = filter(ttT, P.Value <= 0.05)
-  
-  tfbm_all = 
-    ttT %>%
-    infer_db_adapted(ttT_sub = ttT_sub)
-  
-  tfbm_immue = 
-    ttT %>% 
-    infer_db_adapted(ttT_sub = ttT_sub, which_tfbms = immune_tfbms)
-  
-  tfbm = list(tfbm_all = ttT %>%
-                infer_db_adapted(ttT_sub = ttT_sub),
-              tfbm_immue = ttT %>% 
-                infer_db_adapted(ttT_sub = ttT_sub, which_tfbms = immune_tfbms))
-  tfbm_telis = tfbm %>% map(. %>%
-                              pluck("telis", "par") %>% 
-                              as.data.frame() %>% 
-                              rownames_to_column(var = "tfbm"))
-  tfbm_reg = tfbm %>% map(. %>%
-                            pluck("m", "logFC") %>% 
-                            as.data.frame()) 
-  tfbm = map2(tfbm_telis, tfbm_reg, ~ left_join(.x, .y, by = c("tfbm" = "m_uni.term")) %>% select(tfbm, p_under, p_over, m_uni.p.value, m_cov.p.value ) )
-  
-  return(list(ttT = ttT, tfbm = tfbm, gene_set_test = gene_set_test))
-}
-
-fit_m11 <- function(treatment, controls, gene_set) {
-  
-  # Specify whole-genome regression of rna on design
-  y <- dat %>% Biobase::exprs()
-  X <- dat %>% Biobase::pData() %>% dplyr::select(all_of(controls), all_of(treatment))
-  
-  keep = X %>% complete.cases()
-  X = X[keep, ]
-  y = y[, keep]
-  
-  X = model.matrix(~ ., data = X)
-  # drop columns to make sure X is full rank
-  X = ordinal::drop.coef(X)
-  
-  # MatrixModels::model.Matrix can drop unused levels, but has error when the variable names contains some special characters 
-  # https://stackoverflow.com/questions/44114391/error-in-sparse-model-matrix
-  # X = MatrixModels::model.Matrix(~., data = X, sparse = TRUE, drop.unused.levels = TRUE)
-  # needed for limma::topTables() to work with factors
-  treatment = X %>% colnames() %>% str_detect(treatment) %>% which()
-  
-  
-  # Estimate DE using standard limmma/edger pipeline. 
   ttT <-
-    lmFit(y, X) %>%
-    eBayes %>%
+    ttT_raw %>%
     tidy_topTable(of_in = treatment, confint = TRUE)
   
-  # gene set tests self contained
-  gene_set_test = mroast(y, index = list2(!!gene_set_name := gene_set), design = X, contrast = treatment) %>% rownames_to_column("gene_set_name")
+  # ttT_within_genesets if doing ttT within predefined gene sets
+  # tfbm_genesets if doing TFBM enrichment for predefined signatures
+  if(ttT_within_genesets == TRUE){
+    ttT <-
+      ttT %>%
+      filter(gene %in% gene_set)
+    ttT_sub = ttT %>%
+      filter(P.Value <= 0.05)
+  } else if (tfbm_genesets == TRUE) {
+    ttT_sub = ttT %>% 
+      filter(gene %in% gene_set)
+  } else if(wholegenome == TRUE) {
+    ttT_sub = filter(ttT, P.Value <= 0.05)
+  }
   
-  
+  # only for one single treatment can mroast and tfbm be done.
+  # for categorical variables not feasible
+  if(length(treatment)==1){
+    # gene set tests self contained
+    # for analysis when gene_set_name is multiple signatures
+    if(length(gene_set_name)>1) {
+      sets = signatures$outcome_set[table1 %>% str_subset("whole_genome", negate = T)] 
+      ind = map_chr(sets, ~ is.null(.))
+      if(TRUE %in% ind ){
+        gene_set_test = NULL
+      }else{
+        gene_set_test = mroast(y, index = sets, design = X, contrast = treatment) %>% rownames_to_column("gene_set_name")
+      }
+      # for analysis when gene_set_name is one signature passing to the function
+    }else if(length(gene_set_name)==1) {
+      gene_set_test = mroast(y, index = list2(!!gene_set_name := gene_set), design = X, contrast = treatment) %>% rownames_to_column("gene_set_name")
+    }
+    
   # optional gene.weights = ttT$logFC
   # ttT = ttT %>% mutate(weight = ifelse(logFC>0,1,-1)) gene.weights = ttT$weight
   
   # fig1 = DE_enrichplot(ttT)
-  
   # genes whose uncorrected p-values below 0.05 (not an inference):
   # this is for telis, taking a given column of matrix, subset several rows comparing the mean with the DE rows
   # count subset of the gene N
   # repeately sample for nnumber of gene
   # average tf for the subset and the distribution of the average of tf of the repeately samples
   # p_over avearage tf in your subset is bigger than the critical levle, it is in righthand side
-  ttT_sub = ttT %>% 
-    filter(gene %in% gene_set)
-  
+
   tfbm_all = 
     ttT %>%
     infer_db_adapted(ttT_sub = ttT_sub)
@@ -552,9 +514,22 @@ fit_m11 <- function(treatment, controls, gene_set) {
                             pluck("m", "logFC") %>% 
                             as.data.frame()) 
   tfbm = map2(tfbm_telis, tfbm_reg, ~ left_join(.x, .y, by = c("tfbm" = "m_uni.term")) %>% select(tfbm, p_under, p_over, m_uni.p.value, m_cov.p.value ) )
+
+  } else{
+    gene_set_test = "treatment is categorical, mroast can not handle"
+    tfbm ="treatment is categorical, tfbm can not be calculated"
+  }
   
-  return(list(ttT = ttT, tfbm = tfbm, gene_set_test = gene_set_test))
+  if(!exists("ftest_v")) {
+    ttT_raw = NULL
+  } else if(exists("ftest_v") & !is.null(ttT_raw$F) & !("FALSE" %in% (ftest_v %in% colnames(ttT_raw$coefficients)))) {
+    ttT_raw = ttT_raw %>% tidy_topTable(of_in = ftest_v)
+  } else {
+    ttT_raw = NULL
+  }
+  return(list(ttT = ttT, ttT_raw = ttT_raw, tfbm = tfbm, gene_set_test = gene_set_test))
 }
+
 
 ############################################################
 # MEDIATION
