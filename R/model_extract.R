@@ -75,12 +75,17 @@ extract_m7 =  function(m, out = NULL){
   
   extract_anova = function(x) anova(x) %>% tidy %>% filter(str_detect(term, "treatment"))
   extract_t = function(x) broom::tidy(x) %>% filter(str_detect(term, "treatment"))
+  
   # Univariate parametric
   out$detail$anova = m$fit %>% map(extract_anova)
   out$detail$t = m$fit %>% map(extract_t)
   out$p = out$detail$anova %>% map_dbl(pluck("p.value"))
   out$other$varexplained = m$varexplained 
   out$other$loadings = m$loadings
+  if(exists("ftest_v")){
+  extract_hyp = function(x) car::linearHypothesis(x, str_subset(names(coef(x)), ftest_v), verbose=F)
+  out$all = m$fit %>% map(extract_hyp)
+  }
   return(out = out)
 }
 
