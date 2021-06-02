@@ -1,11 +1,29 @@
 celltype_cibersort <- function(treatment, controls) {
 
+  celltype_full_list = 
+    c(
+      "B.cells.naive", "B.cells.memory", "Plasma.cells",
+      "T.cells.CD8", "T.cells.CD4.naive", "T.cells.CD4.memory.resting",
+      "T.cells.CD4.memory.activated",
+      "T.cells.follicular.helper",
+      "T.cells.regulatory..Tregs.",
+      "T.cells.gamma.delta",
+      "NK.cells.resting", "NK.cells.activated", "Monocytes", "Macrophages.M0", 
+      "Macrophages.M1",
+      "Macrophages.M2", "Dendritic.cells.resting",
+      "Dendritic.cells.activated", "Mast.cells.resting",
+      "Mast.cells.activated", # not estimable in limma
+      "Eosinophils", "Neutrophils"
+    )
+  
+  
   cell_types <- c(
     "B.cells.naive", "B.cells.memory", "Plasma.cells",
     "T.cells.CD8", "T.cells.CD4.naive", "T.cells.CD4.memory.resting",
     "T.cells.CD4.memory.activated",
     "T.cells.follicular.helper",
-    "T.cells.regulatory..Tregs.", "T.cells.gamma.delta",
+    "T.cells.regulatory..Tregs.", 
+    # "T.cells.gamma.delta",
     "NK.cells.resting", "NK.cells.activated", "Monocytes", "Macrophages.M0",
     "Macrophages.M1",
     "Macrophages.M2", "Dendritic.cells.resting",
@@ -15,6 +33,8 @@ celltype_cibersort <- function(treatment, controls) {
   )
 
   term <- c(controls, treatment)
+# some cell type are not estimable in Manova
+  term <- term %>% setdiff(celltype_full_list) 
   data <- pData(dat) %>% dplyr::select(all_of(term)) %>% rename(treatment = treatment)
   rhs <- str_c(data %>% colnames(), collapse = " + ")
   keep <- data %>%
