@@ -35,7 +35,7 @@
     
     -  1.16 [comparision of different bespoke ancestry control and MC correction](/ses/output/compare_bespoke_ancestry.html)
     
-    -  1.17 [skin color cell type](/ses/output/skincolor_celltype.html)
+    -  1.17 [skin color cell type]
     
     -  1.18 [figure 2 skin color strata pca](/ses/output/skincolor_fig2_eqtl005_correctedp_v2.png)
     
