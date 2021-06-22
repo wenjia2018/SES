@@ -38,7 +38,7 @@ funcs <- str_subset(abbreviations$shorthand, "^m")
 funcs <- c("m7", "m8", "m10" , "m11")
 # funcs <- c( "m8")
 # funcs <- c("m1","m2", "m3")
-# funcs <- c( "m96")
+funcs <- c( "m96")
 # funcs <- NULL
 # load snp related to skin color in case you want to perform snp regression
 dt_color_snp <- readRDS("/home/share/dna_ancestry/dna/dt_color_snp.rds")
@@ -149,7 +149,7 @@ plan(multicore, workers = 14)
 example_bespoke <- args_eqtl %>%
   mutate(out = furrr::future_pmap(list(gene_set_name = table1, p_eqtl = p_eqtl), safely(fit_bespoke)))
 
-example_bespoke %>% saveRDS("./user_wx/skincolor_celltype_NonHwhite_eqtl005_aging_composite_ancestry_20.05.2021.rds")
+example_bespoke %>% saveRDS("./user_wx/skincolor_celltype_eqtl005_aging_composite_ancestry_02.06.2021.rds")
 # example_bespoke %>% saveRDS("./user_wx/bespoke_snps.rds")
 # example_bespoke %>% saveRDS("./user_wx/bespoke_v4.rds")
 # v2 :only ancestry controls
