@@ -133,5 +133,13 @@
      
     -   8.4 [Skin Color and race ethnicity(nonhispanic black and hispanic only) with ancestry control](/ses/output/skincolor_raceblackandhispanic_interaction.html)   
     
+2. Mikes ses paper
+ ===================
+
+-   1. reviewer comments
     
+    -  1.1 [Evalues](/ses/output/evalues_pc.html)
     
+    -  1.2 [Direction dependency analysis](/ses/output/dda_bmi_v1.html)
+    
+       
