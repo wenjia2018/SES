@@ -7,12 +7,16 @@ model_fit =
     # CUT EXECUTION SHORT IF THE OUTCOME IS THE ENTIRE GENOME  
     ############################################################
     # regression in the whole gemone controlling for ancestryPC of each signature
-    if(gene_set_name == "whole_genome_and_tfbm") return(de_and_tfbm(treatment, controls)) 
+    if(gene_set_name == "whole_genome_and_tfbm") {
+      if(normalization_bydesign == TRUE) return(de_and_tfbm_normalization(treatment, controls)) 
+      else return(de_and_tfbm(treatment, controls)) 
+    }
+
     # regression in the whole gemone controlling for ancestryPC of whole genome
     if(gene_set_name == "whole_genome") return(fit_m10(treatment, controls, gene_set, ttT_within_genesets = FALSE, tfbm_genesets = FALSE, wholegenome = TRUE))
     if(funcs == "m96") return(celltype_cibersort(treatment, controls)) 
     # controls: NULL or controls + ses predictor
-    if(funcs == "m95") return(model_MR(gene_set_name, "w5bmi", "PGSBMI.x", controls=NULL)) 
+    if(funcs == "m95") return(AER_IV(gene_set_name, treatment, IV, controls)) 
     
     ############################################################
     # OTHERWISE (FOR SMALLER GENE SETS OF INTEREST)
@@ -73,6 +77,8 @@ model_fit =
       # out$m7_nn$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "none", out$m7_nn)
       # out$m7_vx$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "varimax", out$m7_vx)
       out$m7_ob$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "oblimin", out$m7_ob)
+      
+      # out$m7_ob$dda = mediators %>% set_names() %>% map(safely(DDA), gene_set = gene_set, rotate = "oblimin", out$m7_ob)
     } 
     
     if(any(str_detect(funcs, "m8"))){
@@ -89,7 +95,7 @@ model_fit =
       
       if(mediation_each_gene) {
         # out$m8_fdr$mediation_single = mediate_multiple(controls, treatment, gene_set = gene_set)
-        plan(multicore, workers = 50)
+        plan(multicore, workers = 40)
         out$m8_fdr$mediation_single = furrr::future_map(gene_set, ~ mediate_multiple(controls, treatment, .x))
       }
 
@@ -109,7 +115,11 @@ model_fit =
     #     out$m9_fdr$mediation_mean = NULL
     #   }
     # }
-    
+    if(any(str_detect(funcs, "m12"))){
+      
+      out$m12_fdr = fit_m12(controls, treatment, gene_set_name) %>% extract_m8_fdr()
+      
+    }
     if(is.element("m10", funcs)) out$m10 = fit_m10(treatment, controls, gene_set, ttT_within_genesets = TRUE, tfbm_genesets = FALSE, wholegenome = FALSE)
     if(is.element("m11", funcs)) out$m11 = fit_m10(treatment, controls, gene_set, ttT_within_genesets = FALSE, tfbm_genesets = TRUE, wholegenome =FALSE)
     if(is.element("m97", funcs)) out$m97 = mediate_multiple(controls, treatment, gene_set)

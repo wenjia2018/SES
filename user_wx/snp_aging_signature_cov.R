@@ -1,6 +1,6 @@
 
 #' ---
-#' title: aging signature regression on color related snps
+#' title: aging signature regression on color related snps(controlling for other snps)
 #' date: "`r format(Sys.time(), '%d %B, %Y')`"
 #' output:
 #'    html_document:
@@ -37,7 +37,7 @@ control = "ancestryPC_ses"
 p_eqtl = 0.05
 # skincolor_eqtl005_aging_composite_ancestry_11.05.2021.rds m7 m8 without genowide mediation
 snp_NonHwhite <- readRDS("~/ses-1/user_wx/snp_NonHwhite_strata_eqtl005_aging_composite_ancestry_19.05.2021.rds")
-snp <- readRDS("~/ses-1/user_wx/snp_eqtl005_aging_composite_ancestry_19.05.2021.rds")
+snp <- readRDS("~/ses-1/user_wx/snp_all_eqtl005_aging_composite_ancestry_21.06.2021.rds")
 snp_NonHblack <- readRDS("~/ses-1/user_wx/snp_NonHblack_strata_eqtl005_aging_composite_ancestry_17.06.2021.rds")
 #' ## among nonhispanic white
 

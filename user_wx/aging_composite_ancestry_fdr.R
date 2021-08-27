@@ -1,6 +1,6 @@
 
 #' ---
-#' title: aging composite ancestry control with fdr correction
+#' title: aging composite ancestry control with fdr correction(plotting final figures)
 #' date: "`r format(Sys.time(), '%d %B, %Y')`"
 #' output:
 #'    html_document:
@@ -52,13 +52,15 @@ c = pca_plotting(example_skincolor3, p_eqtl, "fdr")
 c
 #' ### figure1 two panels composite ancestry control with fdr corrections
 #+ echo=F, eval=T, warning=FALSE, message=FALSE, fig.width=12, fig.height=10
-pdf("./user_wx/figure.pdf", width = 12, height = 7,onefile=FALSE)
-ggarrange(a, c, ncol = 2, labels = c("A", "B"), common.legend = TRUE, legend="right")
+pdf("./user_wx/figure1new.pdf", width = 12, height = 7,onefile=FALSE)
+ggarrange(a, c, ncol = 2, 
+          # labels = c("A", "B"),
+          common.legend = TRUE, hjust=0.115,widths=c(1,1), legend="right")
 dev.off()
 #' ### 3 aging composite ancestry control pca mediation with fdr corrections (no significant mediation)
 #+ echo=F, eval=T, warning=FALSE, message=FALSE, fig.width=12, fig.height=10
 
-# d = p_eqtl %>% map_df(outm7med, mediators, control,example) 
+# d = p_eqtl %>% map_df(outm7med, mediators, control,example_skincolor3) 
 
 # d %>% filter(p_med<0.05)
 
@@ -96,6 +98,10 @@ sha
 
 sbc = pca_plotting(example_skincolor3_black, p_eqtl, "fdr")
 sbc
+
+pdf("./user_wx/figure2.pdf", width = 12, height = 7,onefile=FALSE)
+ggarrange(sba, sbc + guides(fill = FALSE ) , ncol = 2, labels = c("A", "B"), common.legend = TRUE, legend="right")
+dev.off()
 
 
 #' ### aging composite ancestry control pca with fdr corrections in white race straturm

@@ -33,6 +33,6 @@ gsea_webgestalt = function(treatment, ttT, file_output, enrichMethod = "GSEA", e
                                           enrichDatabase = enrichDatabase,
                                           fdrThr = 1,
                                           minNum=5,
-                                          perNum = 1000,
+                                          perNum = 10000,
                                           outputDirectory = file_output)
 }

@@ -23,6 +23,10 @@ de_and_tfbm <- function(treatment, controls, de_only = FALSE) {
   ttT_raw <-
     lmFit(y, X) %>%
     eBayes
+  #################  
+  # extract F 
+  ttT_raw$F
+  #################
   
   ttT <-
     ttT_raw %>%

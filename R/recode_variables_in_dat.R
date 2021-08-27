@@ -70,10 +70,17 @@ recode_variables_in_dat <- function() {
           "1" = c("intens", "moderate"),
           "0" = "none"
         ))
-    ) #%>% 
+    ) %>% 
+    mutate_at(vars(c("stress_perceived",
+                       "w5bmi")), .funs = list(lm = ~ .x)) %>% 
+    mutate_at(vars(c("bills",
+                     "currentsmoke",
+                     "insurance_lack",
+                     "lowbirthweight",
+                     "high_lowbirth")), .funs = list(binary = ~ .x)) %>% 
   #   filter(!is.na(raceethnicity)) %>% 
   # fastDummies::dummy_cols(select_columns = c("raceethnicity"))
-  # mutate_at(.vars = vars("sss_5"),
-  #           .funs = list(~ .x %>% factor))
+  mutate_at(.vars = vars("sss_5"),
+            .funs = list(~ .x %>% as.numeric()))
   dat <<- dat
 }

@@ -5,49 +5,56 @@ define_treatments_and_controls_skincolor_fullsibFE = function(){
   ############################################################
   
   # TABLE 1
-  table1 =
-    c(
-      "CVD_mRNA",
-      "inflam1k_mRNA",
-      "diabetes_mRNA",
-      "Rheumatoid_Arthritis_mRNA", 
-      "Alzheimers_mRNA",
-      "Aortic_Aneurysm_mRNA",
-      "COPD_mRNA",
-      "Asthma_mRNA",
-      "Hypertension_mRNA",
-      "Depression_mRNA",
-      "CKD_mRNA"
-    )
   # table1 =
   #   c(
-  #     "ctra_mRNA",
-  #     "inflame_mRNA",
-  #     "interferon_mRNA",
-  #     "AntBIntF_mRNA",
-  #     # "antibody_mRNA", #only 1 gene
+  #     "CVD_mRNA",
   #     "inflam1k_mRNA",
-  #     "aging_mRNA",
-  #     "aging_up_mRNA",
-  #     "aging_down_mRNA",
-  #     "aging_cluster_complement_mRNA",
-  #     "aging_down_cl1_mRNA",
-  #     "aging_down_cl1a_mRNA",
-  #     "aging_down_cl1b_mRNA",
-  #     "aging_down_cl1c_mRNA",
-  #     "aging_down_cl2_mRNA",
-  #     "aging_down_cl3_mRNA",
-  #     "aging_up_cl1_mRNA",
-  #     "aging_up_cl2_mRNA",
-  #     "aging_up_cl3_mRNA",
-  #     "aging_up_cl4_mRNA",
-  #     "whole_genome"
+  #     "diabetes_mRNA",
+  #     "Rheumatoid_Arthritis_mRNA", 
+  #     "Alzheimers_mRNA",
+  #     "Aortic_Aneurysm_mRNA",
+  #     "COPD_mRNA",
+  #     "Asthma_mRNA",
+  #     "Hypertension_mRNA",
+  #     "Depression_mRNA",
+  #     "CKD_mRNA"
   #   )
-  treatment = c("color_byinterviewer_continuous",
-                "color_byinterviewer_binary")
+  table1 =
+    c(
+      "ctra_mRNA",
+      "inflame_mRNA",
+      "interferon_mRNA",
+      "AntBIntF_mRNA",
+      # "antibody_mRNA", #only 1 gene
+      "inflam1k_mRNA",
+      "aging_mRNA",
+      "aging_up_mRNA",
+      "aging_down_mRNA",
+      "aging_cluster_complement_mRNA",
+      "aging_down_cl1_mRNA",
+      "aging_down_cl1a_mRNA",
+      "aging_down_cl1b_mRNA",
+      "aging_down_cl1c_mRNA",
+      "aging_down_cl2_mRNA",
+      "aging_down_cl3_mRNA",
+      "aging_up_cl1_mRNA",
+      "aging_up_cl2_mRNA",
+      "aging_up_cl3_mRNA",
+      "aging_up_cl4_mRNA",
+      "whole_genome"
+    )
+  # treatment = c("color_byinterviewer_continuous",
+  #               "color_byinterviewer_binary")
 
   # treatment = c("color_byinterviewer3_DarkBlack",
   #               "color_byinterviewer3_LightMed")
+  
+    treatment = c(
+    # "color_byinterviewer5_White",
+    # "color_byinterviewer5_Black",
+    "color_byinterviewer5_Dark")
+    # "color_byinterviewer5_Medium",
+    # "color_byinterviewer5_Light")
   
   # check controls for each analysis!!!!!!!!!
   basic = 
@@ -61,9 +68,15 @@ define_treatments_and_controls_skincolor_fullsibFE = function(){
       "Macrophages.M0", 
       "Macrophages.M2",
       "B.cells.naive",
-      "T.cells.CD4.memory.resting"
-      # "color_byinterviewer3_DarkBlack",
-      # "color_byinterviewer3_LightMed"
+      "T.cells.CD4.memory.resting",
+      "color_byinterviewer5_Black",
+      "color_byinterviewer5_Dark",
+      "color_byinterviewer5_Medium",
+      "color_byinterviewer5_Light"
+      
+      
+       # "color_byinterviewer3_DarkBlack",
+       # "color_byinterviewer3_LightMed"
     )
   race = c("raceethnicity_NonHblack",
            "raceethnicity_Hispanic", basic)

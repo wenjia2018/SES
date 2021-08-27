@@ -22,12 +22,13 @@ define_treatments_and_controls_skincolor_continuous = function(){
       "aging_down_mRNA"
     )
   
-  treatment = c("color_byinterviewer_continuous")
+  treatment = c("color_byinterviewer_continuous",
+                "color_byinterviewer_binary")
   
-  
+  # check controls for each analysis!!!!!!!!!
   basic = 
     c(
-      "sex_interv",
+      "sex_interv", "famid_fullsib",
       "Plate", "AvgCorrelogram100" ,"age_w5",
       "BirthY", "W5REGION", "pregnant_biow5", 
       "kit_biow5", "tube_biow5",  "FastHrs",

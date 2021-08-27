@@ -17,8 +17,10 @@ abbreviations =
     "m7_ob", "PCA oblimin rotated: regress PCs on covariates, one by one (see m6 for complementary analysis)",
     "m8_fdr", "multiple testing (FDR) corrected over ALL genome",
     "m8_fwer", "multiple testing (FWER) just within each signature set",
+
     "m10", "DE, TFBM and gene set analysis within each predefined signature",
     "m11", "TFBM enrichment for predefined signatures",
+    "m88_fdr", "multiple testing(FDR) corrected over All genome by specified design matrix normalization",
     "m96", "cibersort cell type compositional analysis",
     "m97", "mediation (outcome = single gene mRNA in disease signature)",
     "m99", "mediation (outcome = mean mRNA)"
@@ -330,7 +332,16 @@ fit_m8 = function(controls, treatment, gene_set){
   
   ttT %>% filter(gene %in% gene_set)
   
-  }
+}
+
+fit_m12 = function(controls, treatment, gene_set_name){
+  
+  ttT  = de_and_tfbm_normalization(treatment, controls, de_only = TRUE) %>% pluck("ttT")
+  
+  ttT %>% filter(gene %in% outcome_set_full$outcome_set[[gene_set_name]])
+  
+}
+
 ############################################################
 #  PCA: m6, m7
 ############################################################
@@ -382,7 +393,8 @@ fit_m7 = function(datt, gene_set, rotate){
   datt = dplyr::select(datt, -gene_set) 
   gene_set = colnames(pca_rotated$scores)
   
-  workflow_reg = 
+  lm_reg = 
+    # workflow_reg = 
     function(outcome, datt){
       
       datt_pca = bind_cols(datt, !!outcome := pca_rotated$scores[, outcome])
@@ -392,25 +404,36 @@ fit_m7 = function(datt, gene_set, rotate){
       # remove invariant columns
       datt_pca = Filter(function(x) length(unique(x))!=1, datt_pca)
       
+      #package recipes way of doing regression, conflict with Evalue package 
+      # (rec =
+      #     str_c(outcome) %>%
+      #     str_c(" ~ .") %>%
+      #     as.formula() %>%
+      #     recipe(datt_pca))
+      # (mod = linear_reg() %>%
+      #     set_engine("lm"))
+      # (wf =
+      #     workflow() %>%
+      #     add_recipe(rec) %>%
+      #     add_model(mod) %>%
+      #     fit(datt_pca))
+      # in order to calculate evalue, change to normal lm way of doing regression
       
-      (rec =
-          str_c(outcome) %>%
-          str_c(" ~ .") %>%
-          as.formula() %>%
-          recipe(datt_pca))
-      (mod = linear_reg() %>%
-          set_engine("lm"))
-      (wf =
-          workflow() %>%
-          add_recipe(rec) %>%
-          add_model(mod) %>%
-          fit(datt_pca))
+      covariates = colnames(datt_pca) %>% str_subset(outcome, negate = TRUE) %>% str_c(collapse= " + ")
+      formula_lm = outcome %>%  str_c("~", covariates) %>% as.formula
+      
+      lm(formula_lm, datt_pca)
+      
+      
     }
   
   out$fit = gene_set %>% 
     set_names() %>% 
-    map(workflow_reg, datt = datt) %>% 
-    map(~ pluck(.x, "fit", "fit", "fit"))
+    # recipes way
+    # map(workflow_reg, datt = datt) %>% 
+    # map(~ pluck(.x, "fit", "fit", "fit"))
+   # lm way
+    map(lm_reg, datt = datt)
   
   out$varexplained = pca_rotated$Vaccounted[4,] %>% as.list()
   out$loadings = pca_rotated$loadings

@@ -1,3 +1,5 @@
+# https://rpubs.com/malshe/214303
+# https://stats.idre.ucla.edu/r/dae/multinomial-logistic-regression/
 #+ echo=F, eval=T, warning=FALSE, message=FALSE
 library(here)
 library(tidyverse)
@@ -95,6 +97,14 @@ model_full3 <- nnet::multinom(color_byinterviewer3 ~ rs3822214 + rs12203592 + rs
 temp3 = car::Anova(model_full3)
 temp3
 
+#' ### likelihood ratio test to see the overall effect of all the color related snps
+#+ echo=F, eval=T, warning=FALSE, message=FALSE
+library(lmtest)
+keep = dt %>% complete.cases()
+dt_null = dt[keep,]
+model_null3 = nnet::multinom(color_byinterviewer3 ~ 1, data = dt_null)
+lrtest(model_full3,model_null3)
+
 
 #+ echo=F, eval=T, warning=FALSE, message=FALSE
 temp3 = temp3 %>% tidy %>% mutate(sig = stars.pval(p.value))
@@ -171,7 +181,7 @@ sig5 %>% map( ~ dplyr::select(m5, contains(.))) %>% bind_cols() %>% t %>%
 #+ echo=F, eval=T, warning=FALSE, message=FALSE
 # keep = dt %>% complete.cases()
 # dt_complete = dt[keep, ]
-# model_reduced <- nnet::multinom(color_byinterviewer ~ 1, data = dt_complete)
+# model_reduced <- nnet::multinom(color_byinterviewer3 ~ 1, data = dt_complete)
 # 
 # 
 # anova(model_reduced, model_full)

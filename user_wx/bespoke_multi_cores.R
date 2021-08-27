@@ -35,8 +35,8 @@ mediation_mean = FALSE
 mediation_each_gene = TRUE
 funcs <- str_subset(abbreviations$shorthand, "^m")
 # select models to run
-# funcs <- c("m7", "m8", "m10" , "m11")
-funcs <- c( "m8")
+funcs <- c("m1","m2", "m3", "m7", "m8", "m10" , "m11")
+# funcs <- c( "m8")
 # funcs <- c("m1","m2", "m3")
 # funcs <- c( "m11")
 # funcs <- NULL
@@ -90,45 +90,45 @@ if(gene_set_name == "whole_genome"){
     example1 = example1
     ))
 }
-# table1 =
-#   c(
-#     "CVD_mRNA",
-#     "inflam1k_mRNA",
-#     "diabetes_mRNA",
-#     "Rheumatoid_Arthritis_mRNA", 
-#     "Alzheimers_mRNA",
-#     "Aortic_Aneurysm_mRNA",
-#     "COPD_mRNA",
-#     "Asthma_mRNA",
-#     "Hypertension_mRNA",
-#     "Depression_mRNA",
-#     "CKD_mRNA",
-#     "whole_genome"
-#   )
-table1 <-
+table1 =
   c(
-    # "ctra_mRNA",
-    # "inflame_mRNA",
-    # "interferon_mRNA",
-    # "AntBIntF_mRNA",
-    # "antibody_mRNA", #only 1 gene
+    # "CVD_mRNA",
     # "inflam1k_mRNA",
-    "aging_mRNA"
-    # "aging_up_mRNA",
-    # "aging_down_mRNA",
-    # "aging_cluster_complement_mRNA",
-    # # "aging_down_cl1_mRNA",
-    # "aging_down_cl1a_mRNA",
-    # "aging_down_cl1b_mRNA",
-    # "aging_down_cl1c_mRNA",
-    # "aging_down_cl2_mRNA",
-    # "aging_down_cl3_mRNA",
-    # "aging_up_cl1_mRNA",
-    # "aging_up_cl2_mRNA",
-    # "aging_up_cl3_mRNA",
-    # "aging_up_cl4_mRNA"
-    # "whole_genome"
+    # "diabetes_mRNA",
+    # "Rheumatoid_Arthritis_mRNA",
+    # "Alzheimers_mRNA",
+    # "Aortic_Aneurysm_mRNA",
+    # "COPD_mRNA",
+    # "Asthma_mRNA",
+    # "Hypertension_mRNA",
+    # "Depression_mRNA",
+    "CKD_mRNA",
+    "whole_genome"
   )
+# table1 <-
+#   c(
+#     # "ctra_mRNA",
+#     # "inflame_mRNA",
+#     # "interferon_mRNA",
+#     # "AntBIntF_mRNA",
+#     # "antibody_mRNA", #only 1 gene
+#     # "inflam1k_mRNA",
+#     "aging_mRNA",
+#     # "aging_up_mRNA",
+#     # "aging_down_mRNA",
+#     # "aging_cluster_complement_mRNA",
+#     # # "aging_down_cl1_mRNA",
+#     # "aging_down_cl1a_mRNA",
+#     # "aging_down_cl1b_mRNA",
+#     # "aging_down_cl1c_mRNA",
+#     # "aging_down_cl2_mRNA",
+#     # "aging_down_cl3_mRNA",
+#     # "aging_up_cl1_mRNA",
+#     # "aging_up_cl2_mRNA",
+#     # "aging_up_cl3_mRNA",
+#     # "aging_up_cl4_mRNA"
+#     # "whole_genome"
+#   )
 # table1 <-    c("aging_up_cl3_mRNA","aging_up_cl4_mRNA")
 # table1 <-"aging_cluster_complement_mRNA"
 # table1 <-
@@ -147,7 +147,7 @@ example_bespoke <- args_eqtl %>% mutate(out = pmap(list(gene_set_name = table1, 
 # example_bespoke <- args_eqtl %>%
 #   mutate(out = furrr::future_pmap(list(gene_set_name = table1, p_eqtl = p_eqtl), safely(fit_bespoke)))
 
-example_bespoke %>% saveRDS("./user_wx/skincolor_eqtl005_mediation_singel_gene_aging_11.05.2021.rds")
+example_bespoke %>% saveRDS("./user_wx/skincolor_eqtl005_testR4_02.06.2021.rds")
 # example_bespoke %>% saveRDS("./user_wx/bespoke_snps.rds")
 # example_bespoke %>% saveRDS("./user_wx/bespoke_v4.rds")
 # v2 :only ancestry controls

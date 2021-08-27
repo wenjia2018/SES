@@ -103,7 +103,7 @@ dati2 <-  dati2 %>% mutate(status= case_when(sex_interv=="m" & genedata==1 ~ "Ma
 table1::table1(~ses_sss_composite + color_byinterviewer3 + raceethnicity + sex_interv + age_w5 + BirthY +
                  W5REGION + kit_biow5 + tube_biow5 + FastHrs + travel_biow5 + months_biow5 + time_biow5 | genedata,
                overall = "Wave V",
-               caption = "Supp. Table 1. Descriptive Information about the Wave V Total and mRNA Samples, Add Health",
+               # caption = "Supp. Table 1. Descriptive Information about the Wave V Total and mRNA Samples, Add Health",
                data = dati2)
 
 # tab = arsenal::tableby(~ses_sss_composite + color_byinterviewer3 + raceethnicity + sex_interv + age_w5 + BirthY +
@@ -118,7 +118,7 @@ dt = dati2 %>% filter(geni==TRUE)
 
 sjPlot::tab_xtab(dt$raceethnicity, dt$color_byinterviewer3,
                  show.cell.prc = FALSE, show.summary = FALSE,
-                 title =  "Supp. Table 2. Self-Described Ethnoracial Designation and Interviewer-Rated Skin Color (Trichotomized), Add Health",
+                 # title =  "Supp. Table 2. Self-Described Ethnoracial Designation and Interviewer-Rated Skin Color (Trichotomized), Add Health",
                  var.labels = c("Race Ethnicity", "Skin Color"),
                  emph.total = TRUE,
                  show.row.prc = TRUE, 

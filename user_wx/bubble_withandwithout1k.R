@@ -17,10 +17,11 @@ library(grid)
 library(ggpubr)
 library(dbr) # my package
 walk(dir(path = here("R"),full.names = TRUE), source)
-example0_with1k = readRDS("/home/share/scratch/xu/example0_new2signature_withinflam.rds")
+example0_with1k = readRDS("/data/home2/xu/old/scratch/xu/example0_new2signature_withinflam.rds")
 example0_without1k = readRDS("/home/share/scratch/xu/example0_new2signature_noinflam.rds")
-example0_with1k<- readRDS("/home/share/scratch/example0_with_1KI.rds")
-example0_without1k <- readRDS("/home/share/scratch/example0_without_1KI.rds")
+# some old dir have been removed
+# example0_with1k<- readRDS("/home/share/scratch/example0_with_1KI.rds")
+# example0_without1k <- readRDS("/home/share/scratch/example0_without_1KI.rds")
 threshold_with1k = 0.05/10/5
 gene_set = c("1KI",
              "Alzheimers","Aortic Aneurysm", "Asthma", 

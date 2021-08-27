@@ -3,32 +3,49 @@ define_treatments_and_controls_bespoke = function(gene_set_name, ancestryPC_keep
   ############################################################
   # DEFINE "TREATMENTS", CONTROLS, OUTCOMES (INCLUDING TFBMs) 
   ############################################################
-  
+  IV = c(
+    "rs3822214",  "rs12203592", "rs2153271",  "rs11198112", "rs4930263",  "rs2376558",
+    "rs10896418",
+    "rs10765819", "rs9971729",  "rs642742",   "rs12821256", "rs1407995",  "rs12896399", "rs1805005",
+    "rs2228479", "rs1110400",  "rs1805008",  "rs885479"
+  )
   # treatment = c(
   #   "raceethnicity_NonHblack",
   #   "raceethnicity_Hispanic"
   # )
-  # treatment = c("color_byinterviewer3_DarkBlack",
-  #               "color_byinterviewer3_LightMed")
+  treatment = c(
+    "color_byinterviewer3_DarkBlack",
+    "color_byinterviewer3_LightMed"
+    )
 
   # treatment = c("color_byinterviewer3_DarkBlack", "color_byinterviewer3_LightMed",
   #               "raceethnicity_NonHblack", "raceethnicity_Hispanic")
-  
+
   # treatment = c("color_byinterviewer_continuous",
   #               "color_byinterviewer_binary")
   
   # 
-  # in hispanic and nonhispanic black race group, use hispanic and lightmed as reference, construct the following dummies
-  treatment = c("color_byinterviewer3_DarkBlack", 
-                # "color_byinterviewer3_LightMed",
-                "raceethnicity_NonHblack",
-                # "raceethnicity_Hispanic",
-                "raceethnicity__color_byinterviewer3_NonHblack|DarkBlack"
-                # "raceethnicity__color_byinterviewer3_NonHblack|LightMed"
-                # "raceethnicity__color_byinterviewer3_Hispanic|DarkBlack",
-                # "raceethnicity__color_byinterviewer3_Hispanic|LightMed"
-                )
+  # in hispanic and nonhispanic black race group, use hispanic and (lightmed and white) as reference, construct the following dummies
+  # treatment = c("color_byinterviewer3_DarkBlack",
+  #               # "color_byinterviewer3_LightMed",
+  #               "raceethnicity_NonHblack",
+  #               # "raceethnicity_Hispanic",
+  #               "raceethnicity__color_byinterviewer3_NonHblack|DarkBlack"
+  #               # "raceethnicity__color_byinterviewer3_NonHblack|LightMed"
+  #               # "raceethnicity__color_byinterviewer3_Hispanic|DarkBlack",
+  #               # "raceethnicity__color_byinterviewer3_Hispanic|LightMed"
+  #               )
 
+  # in hispanic and nonhispanic white race group, use hispanic and white as reference, construct the following dummies
+  # treatment = c("color_byinterviewer3_DarkBlack",
+  #               "color_byinterviewer3_LightMed",
+  #               "raceethnicity_NonHwhite",
+  #               # "raceethnicity_Hispanic",
+  #               "raceethnicity__color_byinterviewer3_NonHwhite|DarkBlack",
+  #               "raceethnicity__color_byinterviewer3_NonHwhite|LightMed"
+  #               # "raceethnicity__color_byinterviewer3_Hispanic|DarkBlack",
+  #               # "raceethnicity__color_byinterviewer3_Hispanic|LightMed"
+  # )
   # treatment = c(
   #     # "raceethnicity",
   #     "color_byinterviewer3"
@@ -37,8 +54,8 @@ define_treatments_and_controls_bespoke = function(gene_set_name, ancestryPC_keep
   
   # treatment = c(
   # "color_byinterviewer3_DarkBlack",
-  # # "color_byinterviewer3_LightMed",
-  # "color_byinterviewer3_White"
+  # "color_byinterviewer3_LightMed"
+  # # "color_byinterviewer3_White"
   # )
   # treatment = c("color_byinterviewer3_White", "color_byinterviewer3_LightMed")
   # treatment = c(
@@ -68,7 +85,15 @@ define_treatments_and_controls_bespoke = function(gene_set_name, ancestryPC_keep
       "T.cells.CD8", "T.cells.CD4.naive", "T.cells.CD4.memory.resting",
       "T.cells.CD4.memory.activated",
       # "T.cells.follicular.helper",
-      "T.cells.regulatory..Tregs.", "T.cells.gamma.delta",
+      "T.cells.regulatory..Tregs.",
+      ############################################## 
+      # singleton
+      # https://www.stata.com/statalist/archive/2005-10/msg00594.html
+      # https://www.statalist.org/forums/forum/general-stata-discussion/general/1478632-why-f-test-is-missing-could-you-please-help
+      ############################################## 
+      ######################ATTENTION!############################
+      ###### in strata regression remove gamma.delta#####
+      # "T.cells.gamma.delta",
       "NK.cells.resting", "NK.cells.activated", "Monocytes", "Macrophages.M0", 
       # "Macrophages.M1",
       "Macrophages.M2", "Dendritic.cells.resting",
@@ -76,15 +101,21 @@ define_treatments_and_controls_bespoke = function(gene_set_name, ancestryPC_keep
       # "Mast.cells.activated", # not estimable in limma
       "Eosinophils", "Neutrophils",
       
-      # color race and interaction in dummy variables
-      "color_byinterviewer3_DarkBlack",
+      # nonhispanic black and hispanic group:color race and interaction in dummy variables
+      # "color_byinterviewer3_DarkBlack",
+      # "raceethnicity_NonHblack",
+      # "raceethnicity__color_byinterviewer3_NonHblack|DarkBlack"
+
+      
+      # nonhispanic white and hispanic group:color race and interaction in dummy variables 
+      # "color_byinterviewer3_DarkBlack",
       # "color_byinterviewer3_LightMed",
-      "raceethnicity_NonHblack",
-      # "raceethnicity_Hispanic",
-      "raceethnicity__color_byinterviewer3_NonHblack|DarkBlack"
-      # "raceethnicity__color_byinterviewer3_NonHblack|LightMed"
-      # "raceethnicity__color_byinterviewer3_Hispanic|DarkBlack",
-      # "raceethnicity__color_byinterviewer3_Hispanic|LightMed"
+      # "raceethnicity_NonHwhite",
+      # # "raceethnicity_Hispanic",
+      # "raceethnicity__color_byinterviewer3_NonHwhite|DarkBlack",
+      # "raceethnicity__color_byinterviewer3_NonHwhite|LightMed"
+      # 
+      # 
       
       # color race and interaction in single categorical variables
       # "raceethnicity",
@@ -92,11 +123,11 @@ define_treatments_and_controls_bespoke = function(gene_set_name, ancestryPC_keep
       # "raceethnicity__color_byinterviewer3"
       
       # only color and race no interaction
-      # "color_byinterviewer3_DarkBlack",
-      # "color_byinterviewer3_LightMed",
+      "color_byinterviewer3_DarkBlack",
+      "color_byinterviewer3_LightMed"
       # "raceethnicity_NonHblack",
       # "raceethnicity_Hispanic"
-      
+
       # strata raceethnicity
       # "color_byinterviewer3_DarkBlack",
       # # "color_byinterviewer3_LightMed",
@@ -108,7 +139,9 @@ define_treatments_and_controls_bespoke = function(gene_set_name, ancestryPC_keep
       # "color_byinterviewer5_Medium",
       # "color_byinterviewer5_Light"
       
-      
+      # "rs3822214",  "rs12203592", "rs2153271",  "rs11198112", "rs4930263",  "rs2376558",  "rs10896418",
+      # "rs10765819", "rs9971729",  "rs642742",   "rs12821256", "rs1407995",  "rs12896399", "rs1805005",
+      # "rs2228479", "rs1110400",  "rs1805008",  "rs885479"
       # immigrate skincolor in race strat interaction
       # "color_byinterviewer3_DarkBlack",
       # "immigrat_Nonimmigrate",
@@ -141,24 +174,22 @@ define_treatments_and_controls_bespoke = function(gene_set_name, ancestryPC_keep
       "currentsmoke_binary",
       "w5bmi_lm",
       "insurance_lack_binary",
-      "lowbirthweight_binary",
-      "high_lowbirth_binary",
+      # "lowbirthweight_binary",
+      # "high_lowbirth_binary",
       
       "totdiscrim2_binary",  # binary
       "discrim2_binary",   # binary
-      "totdiscrim1_category",   # categorical of 4
+      "totdiscrim1_category"   # categorical of 4
       # special treatment in mediation
-      "totdiscrim1_gamma", #exponential fit glm for mediation
-      "totdiscrim2_gamma", #exponential fit glm for mediation
-      "countdiscrimwhy_gamma",#exponential fit glm for mediation
-      
-      "totdiscrim1_pois", #poisson fit glm for mediation
-      "totdiscrim2_pois", #poisson fit glm for mediation
-      "countdiscrimwhy_pois"#poisson fit glm for mediation
-      
-# 
-#       "totdiscrim2_category", #ordered logistic fit glm for mediation
-#       "countdiscrimwhy_category"#ordered logistic fit glm for mediation
+      # "totdiscrim1_gamma", #exponential fit glm for mediation
+      # "totdiscrim2_gamma", #exponential fit glm for mediation
+      # "countdiscrimwhy_gamma",#exponential fit glm for mediation
+      # # 
+      # "totdiscrim1_pois", #poisson fit glm for mediation
+      # "totdiscrim2_pois", #poisson fit glm for mediation
+      # "countdiscrimwhy_pois"#poisson fit glm for mediation
+      # 
+
     )
   
   immune_tfbms = 

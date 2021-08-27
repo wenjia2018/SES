@@ -19,6 +19,7 @@ recode_variables_in_dat_bespoke <- function(custom_PCA) {
                NULL = "4",
                # other nonhispanic
                Hispanic = "5"
+               # hispanic
              ) %>%
              relevel(ref = "NonHwhite"),
            raceethnicity2 = re %>%
@@ -111,6 +112,7 @@ recode_variables_in_dat_bespoke <- function(custom_PCA) {
              H3IR17==2 ~ 1,
              H3IR17==1 ~ 1
            ),
+           immigrat = ifelse(immigrat==0, "Immigrate", "Nonimmigrate") %>% as.factor(),
            keep = .$famid_fullsib %in% .$famid_fullsib[duplicated(.$famid_fullsib)],
            # https://stackoverflow.com/questions/16905425/find-duplicate-values-in-r
            famid_fullsib = ifelse(keep == TRUE, famid_fullsib, NA) %>% as.factor,
@@ -134,16 +136,53 @@ recode_variables_in_dat_bespoke <- function(custom_PCA) {
              ) %>% 
              relevel(ref = "White")
     ) %>%
-    finalfit::ff_interaction(raceethnicity, color_byinterviewer3, levels_sep = "|", var_sep = "__") %>% 
-    fastDummies::dummy_cols(select_columns = c("raceethnicity", "color_byinterviewer3", "color_byinterviewer5", "raceethnicity__color_byinterviewer3")) %>% 
+    finalfit::ff_interaction(raceethnicity, color_byinterviewer3, levels_sep = "|", var_sep = "__") %>%
+    fastDummies::dummy_cols(select_columns = c("raceethnicity", "color_byinterviewer3", "color_byinterviewer5", "raceethnicity__color_byinterviewer3")) %>%
     dplyr::select(-starts_with("AncestryPC")) %>% 
     dplyr::left_join(custom_PCA) %>% 
     dplyr::left_join(dt_color_snp) 
   # mutate_at(.vars = vars("sss_5"),
   #           .funs = list(~ .x %>% factor))
-  # subset samples for specific needs
-  keep = (pData(dat)$raceethnicity =="Hispanic" & !is.na(pData(dat)$color_byinterviewer5)) %>% ifelse(is.na(.), FALSE, .)
-  dat <- dat[, keep]
-
+  # subset samples for specific needs:NonHwhite NonHblack  Hispanic 
+  if(stratification <- FALSE){
+    keep = (pData(dat)$raceethnicity =="NonHblack" & 
+              # pData(dat)$color_byinterviewer3 !="White" &
+              !is.na(pData(dat)$color_byinterviewer3)) %>% ifelse(is.na(.), FALSE, .)
+    # keep = (pData(dat)$raceethnicity =="NonHwhite") %>% ifelse(is.na(.), FALSE, .)
+    dat <- dat[, keep]
+  }
+  if(interaction <- FALSE){
+    pData(dat) <- pData(dat) %>%
+      finalfit::ff_interaction(color_byinterviewer3, immigrat, levels_sep = "|", var_sep = "__") %>% 
+      mutate_at(.vars = vars(color_byinterviewer3__immigrat),
+                .funs = list(~ fct_recode(., NULL = "White|Immigrate", NULL = "White|Nonimmigrate"))) %>% 
+      fastDummies::dummy_cols(select_columns = c("color_byinterviewer3__immigrat", "immigrat"))
+  }
+  # Among non hispanic black and hispanic race 
+  if(stratification_interaction <- FALSE){
+    keep = (pData(dat)$raceethnicity !="NonHwhite" & 
+              !is.na(pData(dat)$color_byinterviewer3)) %>% ifelse(is.na(.), FALSE, .)
+    dat <- dat[, keep]
+ 
+    pData(dat) <- pData(dat) %>%
+      finalfit::ff_interaction(raceethnicity, color_byinterviewer3, levels_sep = "|", var_sep = "__") %>% 
+      mutate_at(.vars = vars(raceethnicity__color_byinterviewer3),
+                .funs = list(~ fct_recode(., NULL = "NonHwhite|White", NULL = "NonHwhite|DarkBlack", NULL = "NonHwhite|LightMed"))) %>% 
+      fastDummies::dummy_cols(select_columns = c("raceethnicity", "color_byinterviewer3", "color_byinterviewer5", "raceethnicity__color_byinterviewer3")) 
+  }
+  
+  # Among non hispanic white and hispanic race
+  if(stratification_interaction <- FALSE){
+    keep = (pData(dat)$raceethnicity !="NonHblack" & 
+              !is.na(pData(dat)$color_byinterviewer3)) %>% ifelse(is.na(.), FALSE, .)
+    dat <- dat[, keep]
+    
+    pData(dat) <- pData(dat) %>%
+      finalfit::ff_interaction(raceethnicity, color_byinterviewer3, levels_sep = "|", var_sep = "__") %>% 
+      mutate_at(.vars = vars(raceethnicity__color_byinterviewer3),
+                .funs = list(~ fct_recode(., NULL = "NonHblack|White", NULL = "NonHblack|DarkBlack", NULL = "NonHblack|LightMed"))) %>% 
+      fastDummies::dummy_cols(select_columns = c("raceethnicity", "color_byinterviewer3", "color_byinterviewer5", "raceethnicity__color_byinterviewer3")) 
+  }
+  
   dat <<- dat
 }

@@ -1,6 +1,6 @@
 
 #' ---
-#' title: skin color 3 levels with basic control
+#' title: skin color 5 levels with basic control
 #' date: "`r format(Sys.time(), '%d %B, %Y')`"
 #' output:
 #'    html_document:
@@ -32,7 +32,7 @@
 
 #' ### treatments:
 #' 
-#' * skin color 3 levels: white as reference, LightMed and DarkBlack as treatments
+#' * skin color 5 levels: white as reference, Light, Med, Dark, Black as treatments
 
 #' 
 #' ## omnibus regression p values are corrected genowide
@@ -40,9 +40,9 @@
 #+ echo=F, eval=T, warning=FALSE, message=FALSE
 library(here)
 library(tidyverse)
-example_skincolor <- readRDS("/home/xu/ses-1/user_wx/example_skincolor_FE_08.04.2021.rds")
-
-
+example_skincolor <- readRDS("/home/xu/ses-1/user_wx/example_skincolor5_aging_FE_23.06.2021.rds")
+source("/home/xu/ses-1/user_wx/extract_v2.R")
+source("/home/xu/ses-1/user_wx/plotting_utils.R")
 example_skincolor %>% 
   hoist(out, p = list("result", "m8_fdr", 1, "p")) %>% 
   hoist(out, ttT = list("result", "m8_fdr", 1, "other", "m")) %>% 
@@ -52,7 +52,7 @@ example_skincolor %>%
   dplyr::filter(p<0.05) %>%
   # left_join(race_ge_tfbm, by = c("treatment", "gene_set_name", "controls")) %>% 
   rename(p_omnibus = p) %>% 
-  filter(controls == "basic") %>% 
+  filter(gene_set_name %>%str_detect("aging")) %>% 
   kableExtra::kable() %>%
   kableExtra::kable_styling()
 
@@ -89,9 +89,11 @@ a = outm8 %>%
   mutate(
     treatment= case_when(treatment == "raceethnicity_Hispanic" ~ "Hispanic",
                          treatment =="raceethnicity_NonHblack" ~  "Non Hispanic Black",
-                         treatment =="color_byinterviewer3_LightMed"  ~ "Light Medium",  
-                         treatment =="color_byinterviewer3_DarkBlack"  ~ "Dark Black")) %>%
-  mutate(treatment = factor(treatment, levels = c("Hispanic", "Non Hispanic Black","Light Medium","Dark Black"))) %>%
+                         treatment =="color_byinterviewer5_Light"  ~ "Light Brown", 
+                         treatment =="color_byinterviewer5_Medium"  ~ "Medium Brown",
+                         treatment =="color_byinterviewer5_Dark"  ~ "Dark Brown",
+                         treatment =="color_byinterviewer5_Black"  ~ "Black")) %>%
+  mutate(treatment = factor(treatment, levels = c("Hispanic", "Non Hispanic Black","Light Brown","Medium Brown","Dark Brown","Black"))) %>%
   mutate(gene_set_name = gene_set_name %>% str_replace_all("_mRNA",""),
          gene_set_name = gene_set_name %>% str_replace_all("_"," ") %>% str_to_title(),
          # gene_set_name = gene_set_name %>% replace(gene_set_name == "Inflam1k", "1KI"),

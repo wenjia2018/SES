@@ -68,11 +68,11 @@ define_treatments_and_controls = function(){
   
   mediators = 
     c(
-      "stress_perceived",
-      "bills",
-      "currentsmoke",
-      "w5bmi",
-      "insurance_lack"
+      "stress_perceived_lm",
+      "bills_binary",
+      "currentsmoke_binary",
+      "w5bmi_lm",
+      "insurance_lack_binary"
     )
   
   immune_tfbms = 

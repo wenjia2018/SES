@@ -1,16 +1,30 @@
-define_treatments_and_controls_snps = function(gene_set_name, ancestryPC_keep){ 
+define_treatments_and_controls_skincolor_dummy = function(){ 
   
   ############################################################
   # DEFINE "TREATMENTS", CONTROLS, OUTCOMES (INCLUDING TFBMs) 
   ############################################################
   
-  treatment = c(
-    "rs3822214",  "rs12203592", "rs2153271",  "rs11198112", "rs4930263",  "rs2376558",  "rs10896418",
-    "rs10765819", "rs9971729",  "rs642742",   "rs12821256", "rs1407995",  "rs12896399", "rs1805005",
-    "rs2228479", "rs1110400",  "rs1805008",  "rs885479" 
-  )
+  # TABLE 1
+  table1 =
+    c(
+      "CVD_mRNA",
+      "diabetes_mRNA",
+      "inflam1k_mRNA",
+      # "breast_cancer_mRNA",
+      # "Lupus_mRNA", "Colorectal_mRNA",
+      "Rheumatoid_Arthritis_mRNA", "Alzheimers_mRNA",
+      "Aortic_Aneurysm_mRNA", "COPD_mRNA",
+      "Asthma_mRNA","Hypertension_mRNA",
+      "Depression_mRNA",
+      "CKD_mRNA",
+      "aging_mRNA",
+      "aging_up_mRNA",
+      "aging_down_mRNA"
+    )
   
+  treatment = c("color_byinterviewer_DarkBlack", "color_byinterviewer_LightMed")
   
+ 
   basic = 
     c(
       "sex_interv",
@@ -28,12 +42,22 @@ define_treatments_and_controls_snps = function(gene_set_name, ancestryPC_keep){
       "Macrophages.M2", "Dendritic.cells.resting",
       "Dendritic.cells.activated", "Mast.cells.resting",
       # "Mast.cells.activated", # not estimable in limma
-      "Eosinophils", "Neutrophils"
+      "Eosinophils", "Neutrophils",
+      "color_byinterviewer_DarkBlack",
+      "color_byinterviewer_LightMed"
     )
-  ses = c("ses_sss_composite", basic)
-  ancestryPC = c(ancestryPC_keep, ses)
+  race = c("raceethnicity_NonHblack",
+           "raceethnicity_Hispanic", basic)
   
-  controls = list(basic = basic, ses = ses, ancestryPC = ancestryPC)
+  # ses = c("ses_sss_composite", basic)
+  # 
+  # ses_race = c("raceethnicity_NonHblack",
+  # "raceethnicity_Hispanic", "ses_sss_composite", basic)
+  controls = list(basic = basic, race = race
+                  # ses = ses,  ses_race = ses_race
+                  )
+  
+  gene_set_name = signature_names %>% append("whole_genome_and_tfbm") 
   
   args = crossing(treatment, gene_set_name, controls)
   
@@ -63,10 +87,11 @@ define_treatments_and_controls_snps = function(gene_set_name, ancestryPC_keep){
       
       "totdiscrim1_pois", #poisson fit glm for mediation
       "totdiscrim2_pois", #poisson fit glm for mediation
-      "countdiscrimwhy_pois",#poisson fit glm for mediation
+      "countdiscrimwhy_pois"#poisson fit glm for mediation
       
-      "totdiscrim2_category", #ordered logistic fit glm for mediation
-      "countdiscrimwhy_category"#ordered logistic fit glm for mediation
+      # # "totdiscrim1_category", #ordered logistic fit glm for mediation
+      # "totdiscrim2_category", #ordered logistic fit glm for mediation
+      # "countdiscrimwhy_category"#ordered logistic fit glm for mediation
     )
   
   immune_tfbms = 

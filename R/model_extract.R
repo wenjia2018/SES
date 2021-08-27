@@ -82,6 +82,7 @@ extract_m7 =  function(m, out = NULL){
   out$p = out$detail$anova %>% map_dbl(pluck("p.value"))
   out$other$varexplained = m$varexplained 
   out$other$loadings = m$loadings
+  out$evalue = m$fit %>% map(cal_evalue)
   if(exists("ftest_v")){
   extract_hyp = function(x) car::linearHypothesis(x, str_subset(names(coef(x)), ftest_v), verbose=F)
   out$all = m$fit %>% map(extract_hyp)
@@ -101,7 +102,7 @@ extract_m8_fwer = function(m, out = NULL){
 
 extract_m8_fdr = function(m, out = NULL){
   
-  out$detail = m %>% slice(which.min(adj.P.Val)) # m
+  out$detail = m %>% dplyr::slice(which.min(adj.P.Val)) # m
   out$p = min(m$adj.P.Val) # smallest FWER corrected pvalue
   out$other = list(m = m, avg_logFC = mean(m$logFC))
   out$sig_genes = m %>% filter(adj.P.Val < 0.05) %>% pull(gene)
@@ -111,7 +112,7 @@ extract_m8_fdr = function(m, out = NULL){
 
 
 extract_m98 = extract_m7
-
+# https://stackoverflow.com/questions/41582486/how-to-convert-r-mediation-summary-to-data-frame
 extract_m99 = function(m, out = NULL){
   
   extract_med = function(x, y) {
@@ -124,13 +125,17 @@ extract_m99 = function(m, out = NULL){
       pluck(y)
     
   }
-  
-  
-  out$detail = "too big" #m
+  # for evalue calculation
+  out$sims = list(ACME_sd = m$d0.sims %>% sd, ADE_sd = m$z0.sims %>% sd, Total_sd = m$tau.sims %>% sd, 
+                  y_sd = summary(m$model.y)$sigma)
+  # mediation results mediate_summary is not genearl enough, the results from mediation has . at the end of a number which is
+  # hard to remove
+  # out$detail = m %>% mediate_summary() #m
   out$p = extract_med("ACME", 4)
   out$other$med_prop = extract_med("Prop. Mediated", 1)
   out$other$med_ACME = extract_med("ACME", 1)
   out$other$med_ADE = extract_med("ADE", 1)
   out$other$med_ADE_p = extract_med("ADE", 4)
+  out$evalue = EValue::evalues.OLS(est = out$other$med_ACME %>% as.numeric(), se = out$sim$ACME_sd, sd = out$sim$y_sd)
   return(out = out)
 }

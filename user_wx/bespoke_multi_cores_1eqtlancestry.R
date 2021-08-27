@@ -36,9 +36,9 @@ mediation_each_gene = FALSE
 funcs <- str_subset(abbreviations$shorthand, "^m")
 # select models to run
 funcs <- c("m7", "m8", "m10" , "m11")
-# funcs <- c( "m8")
+funcs <- c( "m7","m8")
 # funcs <- c("m1","m2", "m3")
-funcs <- c( "m96")
+# funcs <- c( "m96")
 # funcs <- NULL
 # load snp related to skin color in case you want to perform snp regression
 dt_color_snp <- readRDS("/home/share/dna_ancestry/dna/dt_color_snp.rds")
@@ -48,10 +48,12 @@ dt_color_snp <- readRDS("/home/share/dna_ancestry/dna/dt_color_snp.rds")
 
 fit_bespoke <- function(gene_set_name, p_eqtl) {
   load_data(reconciled = FALSE, remove_inflam = FALSE)
-  signatures$outcome_set$wholegenome <<-  featureNames(dat)
+  # for whole genowide mediation 
+   signatures$outcome_set$wholegenome <<-  featureNames(dat)
   # find the important PCs to be included for each analysis
   ancestryPC <- get_PC_dim("aging_mRNA", p_eqtl)
   define_treatments_and_controls_bespoke(gene_set_name, ancestryPC)
+  
   # if(linearhpo){
   #   ftest_v <<- str_subset(c(treatment) %>% unique, "__") 
   # }
@@ -132,7 +134,7 @@ table1 <-
    # "wholegenome"# for whole genowide mediation 
   )
 # table1 <-    c("aging_up_cl3_mRNA","aging_up_cl4_mRNA")
-table1 <-"aging_cluster_complement_mRNA"
+# table1 <-"aging_cluster_complement_mRNA"
 # table1 <-
 #     c(
 #       "darkblack005_mRNA",
@@ -149,7 +151,7 @@ plan(multicore, workers = 14)
 example_bespoke <- args_eqtl %>%
   mutate(out = furrr::future_pmap(list(gene_set_name = table1, p_eqtl = p_eqtl), safely(fit_bespoke)))
 
-example_bespoke %>% saveRDS("./user_wx/skincolor_celltype_eqtl005_aging_composite_ancestry_02.06.2021.rds")
+example_bespoke %>% saveRDS("/home/data/home2/xu/snp_all_NonHblack_strata_eqtl005_aging_composite_ancestry_21.06.2021.rds")
 # example_bespoke %>% saveRDS("./user_wx/bespoke_snps.rds")
 # example_bespoke %>% saveRDS("./user_wx/bespoke_v4.rds")
 # v2 :only ancestry controls

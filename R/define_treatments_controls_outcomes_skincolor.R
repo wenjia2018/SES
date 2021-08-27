@@ -1,4 +1,4 @@
-define_treatments_and_controls_race_dummy = function(){ 
+define_treatments_and_controls_skincolor = function(){ 
   
   ############################################################
   # DEFINE "TREATMENTS", CONTROLS, OUTCOMES (INCLUDING TFBMs) 
@@ -22,48 +22,41 @@ define_treatments_and_controls_race_dummy = function(){
       "aging_down_mRNA"
     )
   
-  treatment = c(
-    "raceethnicity_NonHblack",
-    "raceethnicity_Hispanic"
+  treatment = c("color_byinterviewer"
   )
   
   
-      basic = 
-        c(
-          "sex_interv",
-          "Plate", "AvgCorrelogram100" ,"age_w5",
-          "BirthY", "W5REGION", "pregnant_biow5", 
-          "kit_biow5", "tube_biow5",  "FastHrs",
-          "travel_biow5",  "months_biow5", "time_biow5",
-          "B.cells.naive", "B.cells.memory", "Plasma.cells",
-          "T.cells.CD8", "T.cells.CD4.naive", "T.cells.CD4.memory.resting",
-          "T.cells.CD4.memory.activated",
-          # "T.cells.follicular.helper",
-          "T.cells.regulatory..Tregs.", "T.cells.gamma.delta",
-          "NK.cells.resting", "NK.cells.activated", "Monocytes", "Macrophages.M0", 
-          # "Macrophages.M1",
-          "Macrophages.M2", "Dendritic.cells.resting",
-          "Dendritic.cells.activated", "Mast.cells.resting",
-          # "Mast.cells.activated", # not estimable in limma
-          "Eosinophils", "Neutrophils",
-          "raceethnicity_NonHblack",
-          "raceethnicity_Hispanic"
-        )
-      ses = c("ses_sss_composite", basic)
-      ancestryPC =
-        c(
-          "AncestryPC1", "AncestryPC2", "AncestryPC3", "AncestryPC4", "AncestryPC5", "AncestryPC6", "AncestryPC7", 
-          "AncestryPC8", "AncestryPC9", "AncestryPC10", "AncestryPC11", "AncestryPC12", "AncestryPC13", "AncestryPC14", 
-          "AncestryPC15", "AncestryPC16", "AncestryPC17", "AncestryPC18", "AncestryPC19", "AncestryPC20", ses
-        )
-      
-controls = list(basic = basic, ses = ses, ancestryPC = ancestryPC)
+  basic = 
+    c(
+      "sex_interv",
+      "Plate", "AvgCorrelogram100" ,"age_w5",
+      "BirthY", "W5REGION", "pregnant_biow5", 
+      "kit_biow5", "tube_biow5",  "FastHrs",
+      "travel_biow5",  "months_biow5", "time_biow5",
+      "B.cells.naive", "B.cells.memory", "Plasma.cells",
+      "T.cells.CD8", "T.cells.CD4.naive", "T.cells.CD4.memory.resting",
+      "T.cells.CD4.memory.activated",
+      # "T.cells.follicular.helper",
+      "T.cells.regulatory..Tregs.", "T.cells.gamma.delta",
+      "NK.cells.resting", "NK.cells.activated", "Monocytes", "Macrophages.M0", 
+      # "Macrophages.M1",
+      "Macrophages.M2", "Dendritic.cells.resting",
+      "Dendritic.cells.activated", "Mast.cells.resting",
+      # "Mast.cells.activated", # not estimable in limma
+      "Eosinophils", "Neutrophils"
+    )
+  race = c("raceethnicity_NonHblack", "raceethnicity_Hispanic", basic)
+  ses = c("ses_sss_composite", basic)
+  ses_race = c("raceethnicity_NonHblack",
+               "raceethnicity_Hispanic", "ses_sss_composite", basic)
+  controls = list(basic = basic, race = race, ses = ses,  ses_race = ses_race)
+
   
   gene_set_name = signature_names %>% append("whole_genome_and_tfbm") 
   
   args = crossing(treatment, gene_set_name, controls)
   
-
+  
   for(i in 1:dim(args)[1]){
     args$controls[i] = args$controls[i] %>% map(setdiff, args$treatment[i])
   }
@@ -91,9 +84,9 @@ controls = list(basic = basic, ses = ses, ancestryPC = ancestryPC)
       "totdiscrim2_pois", #poisson fit glm for mediation
       "countdiscrimwhy_pois",#poisson fit glm for mediation
       
-      "totdiscrim1_category", #ordered logistic fit glm for mediation
-      "totdiscrim2_category", #ordered logistic fit glm for mediation
-      "countdiscrimwhy_category"#ordered logistic fit glm for mediation
+      "totdiscrim1_category", #poisson fit glm for mediation
+      "totdiscrim2_category", #poisson fit glm for mediation
+      "countdiscrimwhy_category"#poisson fit glm for mediation
     )
   
   immune_tfbms = 

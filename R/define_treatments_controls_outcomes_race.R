@@ -23,7 +23,9 @@ define_treatments_and_controls_race = function(){
     )
   
   treatment = c(
-    "raceethnicity"
+    "raceethnicity",
+    "raceethnicity2",
+    "raceethnicity3"
   )
   
   controls = 
@@ -31,7 +33,7 @@ define_treatments_and_controls_race = function(){
       basic = 
         c(
           "sex_interv",
-
+          "ses_sss_composite",
           "Plate", "AvgCorrelogram100" ,"age_w5",
           "BirthY", "W5REGION", "pregnant_biow5", 
           "kit_biow5", "tube_biow5",  "FastHrs",
@@ -50,7 +52,14 @@ define_treatments_and_controls_race = function(){
           "Dendritic.cells.activated", "Mast.cells.resting",
           # "Mast.cells.activated", # not estimable in limma
           "Eosinophils", "Neutrophils" 
-        ) 
+        ),
+      ancestryPC =
+      c(
+        "AncestryPC1", "AncestryPC2", "AncestryPC3", "AncestryPC4", "AncestryPC5", "AncestryPC6", "AncestryPC7", 
+        "AncestryPC8", "AncestryPC9", "AncestryPC10", "AncestryPC11", "AncestryPC12", "AncestryPC13", "AncestryPC14", 
+        "AncestryPC15", "AncestryPC16", "AncestryPC17", "AncestryPC18", "AncestryPC19", "AncestryPC20"
+        )
+      
     ) %>% 
     c(all = list(unique(unlist(.)))) 
   

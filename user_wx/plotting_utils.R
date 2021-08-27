@@ -92,7 +92,14 @@ omnibus_plot = function(data, p_eqtl) {
                # fill = `1KI Genes`,
                # colour = `1KI Genes`
     )) +
-    geom_point(stroke = 1.5, shape = 21, alpha = 0.4, colour = "darkblue", fill = "navy") +
+    geom_point( shape = 21,
+                # stroke = 1.5,
+               # alpha = 0.4,
+               # colour = "darkblue", fill = "navy",
+               colour = "black",
+               fill = "goldenrod3"
+               ) +
+    # scale_fill_manual(values = c( "goldenrod3", "lightblue","cornflowerblue")) +
     # facet_wrap(~group, scales = "free_x") +
     # scale_fill_manual(values = c("darkblue", "goldenrod3")) +
     # scale_color_manual(values = c("darkblue", "goldenrod3")) +
@@ -105,7 +112,7 @@ omnibus_plot = function(data, p_eqtl) {
       #         and mRNA-Based Disease Signatures, Add Health
       #         (p-values reported, FDR-corrected for whole genome)",
       y = "mRNA Signatures",
-      x = "Skincolor") +
+      x = "Skin Color") +
     theme(axis.text.x = element_text(angle = 30, hjust = 1),
           # plot.margin=unit(c(1, 1, 0.1, 1), "cm"),
           axis.text.y = element_text(color=axiscolor),
@@ -256,7 +263,7 @@ pca_plotting = function(data, p_eqtl, adjmethod) {
       # title = "Figure . PCA regression",
       fill = "Skin Color",
       y = "mRNA Signatures PC",
-      x = "Skincolor") +
+      x = "Skin Color") +
     theme(axis.text.x = element_text(angle = 30, hjust = 1),
           # plot.margin=unit(c(1, 1, 0.1, 1), "cm"),
           # set y axis text color

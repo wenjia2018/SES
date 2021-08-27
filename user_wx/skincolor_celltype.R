@@ -35,9 +35,9 @@ load_data(reconciled = FALSE, remove_inflam = FALSE)
 source("/home/xu/ses-1/user_wx/plotting_utils.R")
 control = "ancestryPC_ses"
 
- example3 = readRDS("/home/xu/ses-1/user_wx/skincolor_celltype_eqtl005_aging_composite_ancestry_20.05.2021.rds")
+ example3 = readRDS("/home/xu/ses-1/user_wx/skincolor_celltype_eqtl005_aging_composite_ancestry_02.06.2021.rds")
  example3 = example3$out[[1]]$result$example0
- plot_celltype = function(example_data, focal) {
+ plot_celltype = function(example_data, focal, ylimit) {
    b = example_data %>% filter(treatment %>% str_detect(focal)) %>% hoist(out,b = list("result","b")) %>% pull(b) %>% `[[`(1)
    N = length(b)
    b = b*10
@@ -54,7 +54,7 @@ control = "ancestryPC_ses"
    ggplot(data = data, aes(x = celltype, y = value, fill=celltype))+
      geom_bar(stat="identity")+
      scale_fill_grey()+
-     ylim(0, 0.5)+
+     ylim(0, ylimit)+
      geom_hline(yintercept = 1/N, linetype="dotted",color = "red") +
      coord_flip() +
      labs(caption = paste("Figure S3. Cell composition as a function of skin color", focal,"\n Add Health (n = 1655)"), face="bold", x = "Cell Types", y = "Magnitude") +
@@ -75,6 +75,6 @@ control = "ancestryPC_ses"
        axis.text.y = element_text(size=12, face="bold", colour = "black") 
      ) 
  }
- plot_celltype(example3, focal = "DarkBlack")
- plot_celltype(example3, focal = "LightMed")
+ plot_celltype(example3, focal = "DarkBlack", ylimit = 0.55)
+ plot_celltype(example3, focal = "LightMed", ylimit = 0.55)
  
