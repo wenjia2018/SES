@@ -8,7 +8,7 @@ model_fit =
     ############################################################
     # regression in the whole gemone controlling for ancestryPC of each signature
     if(gene_set_name == "whole_genome_and_tfbm") {
-      if(normalization_bydesign == TRUE) return(de_and_tfbm_normalization(treatment, controls)) 
+      if(normalization_bydesign == TRUE) return(de_and_tfbm_normalization_TMM(controls, treatment, gene_set_name)) 
       else return(de_and_tfbm(treatment, controls)) 
     }
 
@@ -78,7 +78,7 @@ model_fit =
       # out$m7_vx$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "varimax", out$m7_vx)
       out$m7_ob$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "oblimin", out$m7_ob)
       
-      # out$m7_ob$dda = mediators %>% set_names() %>% map(safely(DDA), gene_set = gene_set, rotate = "oblimin", out$m7_ob)
+      out$m7_ob$dda = mediators %>% set_names() %>% map(safely(DDA), gene_set = gene_set, rotate = "oblimin", out$m7_ob)
     } 
     
     if(any(str_detect(funcs, "m8"))){

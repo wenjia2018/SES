@@ -28,9 +28,11 @@ n_boot = 5000
 ############################################################
 # LOAD DATA, DEFINE VARIABLES, RECODE VARIABLES
 ############################################################
-rle = TRUE
+tmm = TRUE
+rle = FALSE
 log2cpm = FALSE
 normalization_bydesign = FALSE
+remove_diseased_subjects = FALSE
 load_data(reconciled = FALSE, remove_inflam = TRUE)
 define_treatments_and_controls()
 recode_variables_in_dat()
@@ -54,7 +56,7 @@ fit_pca_util = partial(fit_pca_util, ncomp = ncomp) # specify n_perm
 #   mutate(out = pmap(., safely(model_fit), funcs),
 #          controls = names(controls))
 # debugonce(model_MR)
-plan(multicore, workers = 35)
+plan(multicore, workers = 30)
 # example0 =
 #   args %>%
 #   filter(is.element(gene_set_name, table1)
@@ -73,12 +75,12 @@ plan(multicore, workers = 35)
   args %>%
   filter(
     is.element(gene_set_name, table1) &
-    # gene_set_name== "inflam1k_mRNA" &
+    # gene_set_name== "whole_genome_and_tfbm" &
     #   treatment == "ses_sss_composite" &
          names(controls) == "basic") %>%
   mutate(out = furrr::future_pmap(., safely(model_fit), funcs),
          controls = names(controls))
 
 # With controls used in SES paper: predicts the signatures from SES paper + Peters aging signature. 
-example0 %>% saveRDS("./user_wx/example_RLE_pca_noinflame.rds") 
+example0 %>% saveRDS("./user_wx/example_tmm_m7_noinflame0209.rds") 
 

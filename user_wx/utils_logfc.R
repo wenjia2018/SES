@@ -63,3 +63,36 @@ DE_logFC_ploting = function(example, caption_text, cor_coef=0.1){
     labs(caption = paste("correlation = ", cor_coef, ",", caption_text))
   
 }
+
+DE_logFC_ploting_notest = function(example, caption_text){
+  a = example %>% 
+    # mutate(dim = map_int(.$m, ~dim(.)[1]),
+    #        gene_set_name = str_c(gene_set_name, "(", dim, ")")) %>% 
+    ungroup %>% 
+    unnest(m) %>% 
+    dplyr::select(treatment, gene_set_name, logFC) 
+  
+  axiscolor = c("grey30", "grey30", "grey30", "grey30", "grey30", "grey30", "grey30", "grey30","grey30", "grey30", "grey30")
+  a %>% 
+    ggplot(aes(x = logFC, y = gene_set_name)) +
+    geom_violin(fill = "lightblue", color ="lightblue")+
+    facet_wrap( ~  treatment , scales = "free_x", strip.position = "bottom") +
+    geom_vline(xintercept = 0, color = "red", linetype = "dashed") +
+    scale_color_manual(values=c("goldenrod3", "lightblue")) +
+    scale_fill_manual(values=c("goldenrod3", "lightblue")) +
+    theme(
+      # legend.position = "none",
+      panel.margin.x = unit(1, "lines"),
+      panel.grid.minor = element_blank(),
+      axis.ticks = element_blank(),
+      axis.text.y = element_text(color=axiscolor),
+      axis.title.y = element_text(margin = margin(r = 20), color = "grey70"),
+      axis.title.x = element_text(margin = margin(t = 20), color = "darkslategrey"),
+      plot.title = element_text(size = 20, margin = margin(b = 10)),
+      plot.subtitle = element_text(size = 7, color = "darkslategrey", margin = margin(b = 25)),
+      plot.caption = element_text(size = 7, margin = margin(t = 10), color = "grey70", hjust = 0),
+      strip.text = element_text(size = 7),
+      text = element_text(family = "Georgia"))+
+    labs(caption = paste(caption_text))
+  
+}

@@ -17,7 +17,7 @@ abbreviations =
     "m7_ob", "PCA oblimin rotated: regress PCs on covariates, one by one (see m6 for complementary analysis)",
     "m8_fdr", "multiple testing (FDR) corrected over ALL genome",
     "m8_fwer", "multiple testing (FWER) just within each signature set",
-
+    "m12", "DE by design matrix by TMM within each predefined signature",
     "m10", "DE, TFBM and gene set analysis within each predefined signature",
     "m11", "TFBM enrichment for predefined signatures",
     "m88_fdr", "multiple testing(FDR) corrected over All genome by specified design matrix normalization",
@@ -336,7 +336,7 @@ fit_m8 = function(controls, treatment, gene_set){
 
 fit_m12 = function(controls, treatment, gene_set_name){
   
-  ttT  = de_and_tfbm_normalization(treatment, controls, de_only = TRUE) %>% pluck("ttT")
+  ttT  = de_and_tfbm_normalization_TMM(controls, treatment, gene_set_name, de_only = TRUE) %>% pluck("ttT")
   
   ttT %>% filter(gene %in% outcome_set_full$outcome_set[[gene_set_name]])
   

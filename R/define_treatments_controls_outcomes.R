@@ -40,7 +40,7 @@ define_treatments_and_controls = function(){
     list(
       basic = 
         c(
-          "sex_interv", "re", "Plate", "AvgCorrelogram100" ,"age_w5",
+          "sex_interv", "re", "Plate", "age_w5",
           "BirthY", "W5REGION", "pregnant_biow5", 
           "kit_biow5", "tube_biow5",  "FastHrs",
           "travel_biow5",  "months_biow5", "time_biow5"
