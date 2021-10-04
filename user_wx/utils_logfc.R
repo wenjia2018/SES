@@ -93,6 +93,7 @@ DE_logFC_ploting_notest = function(example, caption_text){
       plot.caption = element_text(size = 7, margin = margin(t = 10), color = "grey70", hjust = 0),
       strip.text = element_text(size = 7),
       text = element_text(family = "Georgia"))+
-    labs(caption = paste(caption_text))
+    labs(y = "mRNA Signatures",
+         caption = paste(caption_text))
   
 }

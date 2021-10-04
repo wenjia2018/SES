@@ -102,18 +102,84 @@ path %>% dplyr::select(-Genes, -gene_list) %>%  kableExtra::kable() %>% kableExt
 example0_with1k <- readRDS("~/ses-1/user_wx/example_tmm_m12_withinflame.rds")
 # supplement include people with disease
 # example0_with1k <- readRDS("~/ses-1/user_wx/example_tmm_m12_withinflame_withdiseasepeople.rds")
-data_logfc_with1k = example0_with1k %>%  hoist(out, m = list("result",  "m12_fdr", 1, "other", "m"))
+# parental ses
+example0_with1k <- readRDS("~/ses-1/user_wx/example_tmm_m12_withinflame_parental.rds")
+# ses tertiles
+example0_with1k <- readRDS("~/ses-1/user_wx/example_tmm_m12_withinflame_ses3.rds")
 
-data_logfc_with1k %>% DE_logFC_ploting_notest(caption_text = "withinflamation 1K genes")
+data_logfc_with1k = example0_with1k %>%
+  hoist(out, m = list("result",  "m12_fdr", 1, "other", "m")) %>% 
+  mutate(gene_set_name = gene_set_name %>% str_replace_all("_mRNA",""),
+         gene_set_name = gene_set_name %>% str_replace_all("_"," ") %>% str_to_title(),
+         gene_set_name = gene_set_name %>% replace(gene_set_name == "Cvd", "CVD"),
+         gene_set_name = gene_set_name %>% replace(gene_set_name == "Copd", "COPD"),
+         gene_set_name = gene_set_name %>% replace(gene_set_name == "Ckd", "CKD"),
+         gene_set_name = gene_set_name %>% replace(gene_set_name == "Inflam1k", "1KI"),
+         treatment= case_when(treatment == "edu_p" ~ "Parental Education",
+                               treatment =="income_pp1_log" ~  "Parental Income" ,
+                               treatment =="SEI_max_p_w12" ~ "Parental SEI",
+                               treatment =="ses_composite_pp1" ~ "Parental SES Composite",
+                               treatment =="work_collar_rm_f12" ~ "Mother's Occupation",
+                               treatment =="work_collar_rf_f12" ~ "Father's Occupation" ,
+                               treatment =="work_collar_ff5" ~ "Occupation Work Collar",
+                               treatment =="edu_max" ~ "Education" ,
+                               treatment =="income_hh_ff5" ~ "Income"     ,
+                               treatment =="SEI_ff5" ~ "Occupation"      ,
+                               treatment =="ses_sss_composite" ~ "SES Composite"  ,
+                               treatment =="sss_5" ~ "Subjective Social Status",
+                               treatment =="ses_composite_ff5"  ~ "SES Composite 3",
+                               treatment =="ses_sss_composite_3_1" ~ "SES Composite Low",
+                               treatment =="ses_sss_composite_3_3"  ~ "SES Composite High"
+                               
+  ))
 
+fig1 = 
+  data_logfc_with1k %>% DE_logFC_ploting_notest(caption_text = "withinflamation 1K genes")
 
+if(plot<-FALSE){
+  pdf("ses_logfcs.pdf")
+  print(fig1)
+  dev.off()
+}
 
 example0_without1k  <- readRDS("~/ses-1/user_wx/example_tmm_m12_noinflame.rds")
 # supplement include people with disease
 # example0_without1k  <- readRDS("~/ses-1/user_wx/example_tmm_m12_noinflame_withdiseasepeople.rds")
-data_logfc = example0_without1k %>%  hoist(out, m = list("result",  "m12_fdr", 1, "other", "m"))
 
-data_logfc %>% DE_logFC_ploting(caption_text = "removing inflamation 1K genes")
+# parental ses
+example0_without1k <- readRDS("~/ses-1/user_wx/example_tmm_m12_noinflame_parental.rds")
+
+# ses tertiles
+example0_without1k <- readRDS("~/ses-1/user_wx/example_tmm_m12_noinflame_ses3.rds")
+
+
+data_logfc = example0_without1k %>% 
+  hoist(out, m = list("result",  "m12_fdr", 1, "other", "m")) %>% 
+  mutate(gene_set_name = gene_set_name %>% str_replace_all("_mRNA",""),
+         gene_set_name = gene_set_name %>% str_replace_all("_"," ") %>% str_to_title(),
+         gene_set_name = gene_set_name %>% replace(gene_set_name == "Cvd", "CVD"),
+         gene_set_name = gene_set_name %>% replace(gene_set_name == "Copd", "COPD"),
+         gene_set_name = gene_set_name %>% replace(gene_set_name == "Ckd", "CKD"),
+         gene_set_name = gene_set_name %>% replace(gene_set_name == "Inflam1k", "1KI"),
+         treatment= case_when(treatment == "edu_p" ~ "Parental Education",
+                              treatment =="income_pp1_log" ~  "Parental Income" ,
+                              treatment =="SEI_max_p_w12" ~ "Parental SEI",
+                              treatment =="ses_composite_pp1" ~ "Parental SES Composite",
+                              treatment =="work_collar_rm_f12" ~ "Mother's Occupation",
+                              treatment =="work_collar_rf_f12" ~ "Father's Occupation" ,
+                              treatment =="work_collar_ff5" ~ "Occupation Work Collar",
+                              treatment =="edu_max" ~ "Education" ,
+                              treatment =="income_hh_ff5" ~ "Income"     ,
+                              treatment =="SEI_ff5" ~ "Occupation"      ,
+                              treatment =="ses_sss_composite" ~ "SES Composite"  ,
+                              treatment =="sss_5" ~ "Subjective Social Status",
+                              treatment =="ses_composite_ff5"  ~ "SES Composite 3",
+                              treatment =="ses_sss_composite_3_1" ~ "SES Composite Low",
+                              treatment =="ses_sss_composite_3_3"  ~ "SES Composite High"
+                              
+         ))
+
+data_logfc %>% DE_logFC_ploting_notest(caption_text = "removing inflamation 1K genes")
 
 #' ###  bubble polot of fig1 panelA for each SES indicator
 #+ echo=F, eval=T, warning=FALSE, message=FALSE,comment=NA
@@ -122,7 +188,8 @@ ex0_without1k <- example0_without1k %>%
   hoist(out, p = list("result", "m12_fdr", 1, "p")) %>% 
   dplyr::select(treatment, gene_set_name, p) %>% 
   filter(p<0.05) %>% 
-  dplyr::filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>% 
+  # dplyr::filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>% 
+  # dplyr::filter(treatment %in% c("edu_p", "income_pp1_log", "SEI_max_p_w12", "ses_composite_pp1" )) %>% 
   mutate(pval=case_when(p<0.0001 ~ 0.0001,
                         p<0.001 ~ 0.001,
                         p<0.01 ~ 0.01,
@@ -164,7 +231,8 @@ ex0_with1k <- example0_with1k %>%
   hoist(out, p = list("result", "m12_fdr", 1, "p")) %>% 
   dplyr::select(treatment, gene_set_name, p) %>% 
   filter(p<0.05) %>% 
-  dplyr::filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>% 
+  # dplyr::filter(treatment %in% c("ses_sss_composite", "edu_max", "income_hh_ff5", "SEI_ff5",  "sss_5")) %>% 
+  # dplyr::filter(treatment %in% c("edu_p", "income_pp1_log", "SEI_max_p_w12", "ses_composite_pp1" )) %>%
   mutate(pval=case_when(p<0.0001 ~ 0.0001,
                         p<0.001 ~ 0.001,
                         p<0.01 ~ 0.01,
@@ -242,7 +310,7 @@ fig =
 
 fig
 if(plot<-FALSE){
-  pdf("myplot.pdf")
+  pdf("parentalses.pdf")
   print(fig)
   dev.off()
   
