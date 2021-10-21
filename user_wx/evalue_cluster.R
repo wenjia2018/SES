@@ -39,23 +39,23 @@ recode_variables_in_dat()
 print(abbreviations)
 mediation_mean = FALSE
 mediation_each_gene = FALSE
-if(denovo <- TRUE){
+if(denovo <- FALSE){
   Significant <- readRDS("/home/share/scratch/Clustering/DeNovo/Significant.rds")
   full_clus_res <- readRDS("/home/share/scratch/Clustering/DeNovo/full_clus_res.rds")
   average_expr <- readRDS("/home/share/scratch/Clustering/DeNovo/average_expr.rds")
   gene_set_name = average_expr %>% names()
   args = crossing(treatment, gene_set_name, controls)
 }
-if(without1k <- FALSE){
+if(without1k <- TRUE){
   Significant <- readRDS("/home/share/scratch/Clustering/without_1k/Significant.rds")
   full_clus_res <- readRDS("/home/share/scratch/Clustering/without_1k/full_clus_res.rds")
   average_expr <- readRDS("/home/share/scratch/Clustering/without_1k/average_expr.rds")
   
 }
 if(with1k <- FALSE){
-Significant <- readRDS("/home/share/scratch/Clustering/1k/Significant.rds")
-full_clus_res <- readRDS("/home/share/scratch/Clustering/1k/full_clus_res.rds")
-average_expr <- readRDS("/home/share/scratch/Clustering/1k/average_expr.rds")
+  Significant <- readRDS("/home/share/scratch/Clustering/1k/Significant.rds")
+  full_clus_res <- readRDS("/home/share/scratch/Clustering/1k/full_clus_res.rds")
+  average_expr <- readRDS("/home/share/scratch/Clustering/1k/average_expr.rds")
   
 }
 average_expr = average_expr %>% map(~ .x %>% t %>% as.data.frame)
@@ -65,63 +65,72 @@ get_sig_clus = function(treatment, Significant, full_clus_res){
   no_clus = full_clus_res %>% map(max)
   full_clus = no_clus %>% map(~ seq(1:.x))
   sig_clus = map2(sig_treatment, full_clus, ~ (.y %in%.x))
-
+  
 }
 
 pheno = pData(dat)
-# plate has two unused levels, with 0 in these two groups, "PlateYear2Plate10" "PlateYear2Plate9"
-# if not dropping them explicitly, when using MASS::polr causing a mismatched dimention problem, as 
-# inside this function they drop it somewhere explicit and at some place using the original design matrix, 
-# therefore causing the dimension mismatch.
-pheno$Plate = droplevels(pheno$Plate) 
+
 subData = pheno %>% dplyr::select(all_of(treatment), batch, all_of(controls$basic))
 
 non_missing = complete.cases(subData)
- 
+
 dat@phenoData@data = pheno[non_missing,]
 
-fit_mediate_cluster = function(treatment, gene_set_name, controls, out = NULL){
-  out = mediators %>% 
-    set_names() %>%
-    map(safely(mediate_cluster), treatment, controls, gene_set_name)
+cluster_reg = function(dt, outcome) {
+  covariates = colnames(dt) %>% str_subset(outcome, negate = TRUE) %>% str_c(collapse= " + ")
+  formula_lm = outcome %>%  str_c("~", covariates) %>% as.formula
+  
+  lm(formula_lm, dt)
 }
-mediate_cluster = function(mediator, treatment, controls, gene_set_name){
- clus = average_expr[[gene_set_name]] 
- colnames(clus) = str_c("d", 1:dim(clus)[2])
- clus = rownames_to_column(clus, var = "AID")
- datt_m  = pData(dat) %>% 
-   dplyr::select(AID = AID, all_of(controls), all_of(treatment), all_of(mediator)) %>% 
-   rename(treatment = treatment) 
- 
+extract_cluster_reg = function(m, out = NULL){
+  extract_anova = function(x) anova(x) %>% tidy %>% filter(str_detect(term, "treatment"))
+  extract_t = function(x) broom::tidy(x) %>% filter(str_detect(term, "treatment"))
+  
+  # Univariate parametric
+  out$detail$anova = m %>% extract_anova
+  out$detail$t = m %>% extract_t
+  out$p = out$detail$anova %>% pluck("p.value")
+  out$evalue = m %>% cal_evalue
+}
+
+
+fit_cluster_reg = function(treatment, gene_set_name, controls, out = NULL){
+  clus = average_expr[[gene_set_name]] 
+  colnames(clus) = str_c("d", 1:dim(clus)[2])
+  clus = rownames_to_column(clus, var = "AID")
+  datt_reg  = pData(dat) %>% 
+    dplyr::select(AID = AID, all_of(controls), all_of(treatment)) %>% 
+    rename(treatment = treatment) 
+  
   if(remove_diseased_subjects) {
-    datt_m =
-      datt_m %>% 
+    datt_reg =
+      datt_reg %>% 
       remove_diseased_subjects_from_datt(gene_set_name, controls)
   }
-
+  
   outcome = colnames(clus %>% select(-AID)) %>% set_names() 
   
-  convert_outcome_clus = function(outcome, datt_m){
-    datt_pca = left_join(datt_m, clus %>% select(AID, !!outcome)) %>% select(-AID)
+  convert_outcome_clus = function(outcome, datt_reg){
+    datt_pca = left_join(datt_reg, clus %>% select(AID, !!outcome)) %>% select(-AID)
   }
   
-  datt_pca = outcome %>% map(convert_outcome_clus, datt = datt_m)
-
+  datt_pca = outcome %>% map(convert_outcome_clus, datt = datt_reg)
+  
   sig = get_sig_clus(treatment, Significant, full_clus_res) %>% pluck(gene_set_name)
-
-  pmap(list(datt_pca[sig], outcome[sig], mediator), fit_m99) %>% map(extract_m99)
+  
+  pmap(list(datt_pca[sig], outcome[sig]), cluster_reg) %>% map(extract_cluster_reg)
 }
-# debugonce(fit_mediate_cluster)
+# debugonce(fit_cluster_reg)
 
 # plan(multicore, workers = 10)
 example0 =
   args %>%
   filter(
-    # is.element(gene_set_name, table1) &
-    # gene_set_name == "SES  Composite",
+    is.element(gene_set_name, table1) &
+      # gene_set_name == "SES  Composite",
       names(controls) == "basic") %>%
   # filter(gene_set_name=="Depression_mRNA") %>% 
-  mutate(out = pmap(., safely(fit_mediate_cluster)),
+  mutate(out = pmap(., safely(fit_cluster_reg)),
          controls = names(controls))
 
-example0 %>% saveRDS("./user_wx/mediate_cluster_Denovo_drinkmed.rds")
+example0 %>% saveRDS("./user_wx/Evalue_cluster_without1k_v2.rds")

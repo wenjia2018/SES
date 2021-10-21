@@ -85,12 +85,31 @@ de_and_tfbm_normalization_TMM = function(controls, treatment, gene_set_name, de_
   ttT_raw <-
     lmFit(v_tmm$E, X) %>%
     eBayes(trend = T)
-  #################  
-  # extract F 
-  # ttT_raw$F
   #################
   ttT <-
     ttT_raw %>%
     tidy_topTable(of_in = treatment, confint = TRUE)
-  if(de_only) return(list(ttT = ttT))
+  #################  
+  # extract F and calculate R square
+  # number of predictors in the model
+  k = dim(ttT_raw$coefficients)[2] - 1
+  # residual degrees of freedom
+  df_residual = ttT_raw$df.residual %>% unique
+  if(0) {
+    # r square from the full model(including treatment and controls)
+    rsquare_full = ttT_raw$F %>% map(~ .x/(.x + df_residual / k)) %>% set_names(ttT_raw$sigma %>% names)
+    vars = ttT_raw$coefficients %>% colnames %>% `[`(- treatment)
+    ttT_control = ttT_raw %>% tidy_topTable(of_in = vars, confint = TRUE)
+    rsquare_ohnetreatment = ttT_control$F %>% map(~ .x/(.x + (df_residual+1) / (k-1))) %>% set_names(ttT_control$gene)
+    
+    rsquare_full = rsquare_full[order(names(rsquare_full))]
+    rsquare_ohnetreatment = rsquare_ohnetreatment[order(names(rsquare_ohnetreatment))]
+    
+    rsq_diff = map2(rsquare_full, rsquare_ohnetreatment, `-`)
+    f_statistic = map2(rsquare_full, rsquare_ohnetreatment, ~ (.x - .y) * (df_residual)/(1 - .x)) 
+  }
+  # F value
+  f_statistic = ttT$t^2 
+  F_pval = pf(f_statistic %>% unlist, 1, df_residual, lower.tail = FALSE) %>% p.adjust("fdr")
+  if(de_only) return(list(ttT = ttT, F_pval = F_pval))
 }

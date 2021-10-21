@@ -32,8 +32,13 @@ model_fit =
     
     datt =
       prepro(gene_set, treatment, controls) %>% 
-      dplyr::rename(treatment = treatment) %>% 
-      remove_diseased_subjects_from_datt(gene_set_name, controls)
+      dplyr::rename(treatment = treatment) 
+    
+    if(remove_diseased_subjects) {
+      datt =
+        datt %>% 
+        remove_diseased_subjects_from_datt(gene_set_name, controls)
+    }
     
     if(is.element("m1", funcs)){
       
@@ -64,22 +69,56 @@ model_fit =
     }
     source("R/utils.R", local = TRUE)
     if(any(str_detect(funcs, "m7"))) {
-      
-      # out$m7_nn  = fit_m7(datt, gene_set, "none"   ) %>% extract_m7()
+   
+      if(nn){
+        out$m7_nn  = fit_m7(datt, gene_set, "none") %>% extract_m7()
+        out$m7_nn$other$well_loaded <- get_well_loaded_genes(datt, gene_set, "none")
+        out$m7_nn$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "none", out$m7_nn)
+        # out$m7_nn$dda = mediators %>% set_names() %>% map(safely(DDA), gene_set = gene_set, rotate = "none", out$m7_nn)
+      } else if(oblimin){
+        out$m7_ob  = fit_m7(datt, gene_set, "oblimin") %>% extract_m7()
+        out$m7_ob$other$well_loaded <- get_well_loaded_genes(datt, gene_set, "oblimin")
+        out$m7_ob$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "oblimin", out$m7_ob)
+        # out$m7_ob$dda = mediators %>% set_names() %>% map(safely(DDA), gene_set = gene_set, rotate = "oblimin", out$m7_ob)
+        
+      }
+
       # out$m7_vx  = fit_m7(datt, gene_set, "varimax") %>% extract_m7()
-      out$m7_ob  = fit_m7(datt, gene_set, "oblimin") %>% extract_m7()
+      # 
       # for each of the results just calculated above, append the genes loading high in this dimension
-      # out$m7_nn$other$well_loaded <- get_well_loaded_genes(datt, gene_set, "none")
+      
       # out$m7_vx$other$well_loaded <- get_well_loaded_genes(datt, gene_set, "varimax")
-      out$m7_ob$other$well_loaded <- get_well_loaded_genes(datt, gene_set, "oblimin")
+      # out$m7_ob$other$well_loaded <- get_well_loaded_genes(datt, gene_set, "oblimin")
       
       # for each of the pca, do mediational analysis for each pc
-      # out$m7_nn$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "none", out$m7_nn)
-      # out$m7_vx$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "varimax", out$m7_vx)
-      out$m7_ob$mediation = mediators %>% set_names() %>% map(safely(mediate_pca), gene_set = gene_set, rotate = "oblimin", out$m7_ob)
       
-      out$m7_ob$dda = mediators %>% set_names() %>% map(safely(DDA), gene_set = gene_set, rotate = "oblimin", out$m7_ob)
-    } 
+      
+      
+
+      
+    }
+    
+    if(any(str_detect(funcs, "m16"))) {
+      
+      out$m16  = fit_m16(datt, gene_set) %>% extract_m7()
+      
+      non_sparse = abs(out$m16$other$loadings[,]) > 0
+      out$m16$other$well_loaded = non_sparse %>% as_tibble() %>% map(~rownames(non_sparse)[.x])
+      
+      out$m16$mediation = mediators %>% set_names() %>% map(safely(mediate_spca), gene_set = gene_set, out$m16)
+      
+    }
+    
+    
+    
+    
+    if(any(str_detect(funcs, "m17"))) {
+      
+        out$m17_ob  = fit_m7(datt, gene_set, "oblimin") %>% extract_m7()
+        out$m17_ob$other$well_loaded <- get_well_loaded_genes(datt, gene_set, "oblimin")
+        out$m17_ob$mediation = mediate_multiple_mediators(gene_set = gene_set, rotate = "oblimin", out$m17_ob)
+
+      }
     
     if(any(str_detect(funcs, "m8"))){
       
@@ -117,7 +156,7 @@ model_fit =
     # }
     if(any(str_detect(funcs, "m12"))){
       
-      out$m12_fdr = fit_m12(controls, treatment, gene_set_name) %>% extract_m8_fdr()
+      out$m12_fdr = fit_m12(controls, treatment, gene_set_name) %>% extract_m12_fdr()
       
     }
     if(is.element("m10", funcs)) out$m10 = fit_m10(treatment, controls, gene_set, ttT_within_genesets = TRUE, tfbm_genesets = FALSE, wholegenome = FALSE)

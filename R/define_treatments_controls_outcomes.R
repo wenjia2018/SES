@@ -21,19 +21,21 @@ define_treatments_and_controls = function(){
     )
   
   treatment = c(
+    # "ses_sss_composite_3_1",
+    # "ses_sss_composite_3_3"
     "ses_sss_composite",
     "sss_5",
     "SEI_ff5",
     "edu_max",
     "income_hh_ff5"
     # "ses_composite_ff5",
-    # "work_collar_ff5",
-    # "work_collar_rf_f12",
-    # "work_collar_rm_f12",
     # "ses_composite_pp1",
     # "edu_p",
     # "SEI_max_p_w12",
     # "income_pp1_log"
+    # "work_collar_ff5",
+    # "work_collar_rf_f12",
+    # "work_collar_rm_f12",
   )
   
   controls = 
@@ -68,10 +70,11 @@ define_treatments_and_controls = function(){
   
   mediators = 
     c(
+      # "drink_category"
       "stress_perceived_lm",
+      "w5bmi_lm",
       "bills_binary",
       "currentsmoke_binary",
-      "w5bmi_lm",
       "insurance_lack_binary"
     )
   

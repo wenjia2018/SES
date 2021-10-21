@@ -110,6 +110,13 @@ extract_m8_fdr = function(m, out = NULL){
   return(out = out)
 }
 
+extract_m12_fdr = function(m, out = NULL){
+  
+  out = m$ttT %>% extract_m8_fdr()
+  out$F_pval = m$F_pval
+
+  return(out = out)
+}
 
 extract_m98 = extract_m7
 # https://stackoverflow.com/questions/41582486/how-to-convert-r-mediation-summary-to-data-frame

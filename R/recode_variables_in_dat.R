@@ -8,7 +8,13 @@ recode_variables_in_dat <- function() {
     # mutate_at(.vars = vars(matches("income|composite|SEI")),
     #           .funs = list(~ .x %>% ntile(4) %>% as.factor())
     # ) %>%
-    mutate(raceethnicity = re %>%
+    dplyr::mutate(
+      H5TO12 = ifelse(H5TO11==0, 0, H5TO12),
+      drink_category = case_when(H5TO12 == 0 ~ "never",
+                                 H5TO12 %in% c(1,2) ~ "occasion",
+                                 H5TO12 %in% c(3,4,5,6) ~ "severe"),
+      ses_sss_composite_3 = ses_sss_composite %>% ntile(3),
+      raceethnicity = re %>%
       fct_recode(
         NonHwhite = "1",
         # white nonhispanic
@@ -73,13 +79,15 @@ recode_variables_in_dat <- function() {
     ) %>% 
     mutate_at(vars(c("stress_perceived",
                        "w5bmi")), .funs = list(lm = ~ .x)) %>% 
+    # mutate_at(vars(c("")), .funs = list(category = ~ .x)) %>% 
     mutate_at(vars(c("bills",
+                     "bingedrink",
                      "currentsmoke",
                      "insurance_lack",
                      "lowbirthweight",
                      "high_lowbirth")), .funs = list(binary = ~ .x)) %>% 
   #   filter(!is.na(raceethnicity)) %>% 
-  # fastDummies::dummy_cols(select_columns = c("raceethnicity"))
+  fastDummies::dummy_cols(select_columns = c("ses_sss_composite_3")) %>% 
   mutate_at(.vars = vars("sss_5"),
             .funs = list(~ .x %>% as.numeric()))
   dat <<- dat

@@ -40,7 +40,7 @@ print(abbreviations)
 mediation_mean = FALSE
 mediation_each_gene = FALSE
 
-controls = controls$basic
+# 
 if(denovo <- FALSE){
   Significant <- readRDS("/home/share/scratch/Clustering/DeNovo/Significant.rds")
   full_clus_res <- readRDS("/home/share/scratch/Clustering/DeNovo/full_clus_res.rds")
@@ -69,9 +69,9 @@ get_sig_clus = function(treatment, Significant, full_clus_res){
   sig_clus = map2(sig_treatment, full_clus, ~ (.y %in%.x))
   
 }
-
+controls = controls$basic
 pheno = pData(dat)
-
+pheno$Plate = droplevels(pheno$Plate) 
 subData = pheno %>% dplyr::select(all_of(treatment), batch, all_of(controls))
 
 non_missing = complete.cases(subData)
@@ -82,6 +82,11 @@ fit_mediate_cluster = function(treatment, gene_set_name, controls, out = NULL){
   out = mediate_cluster_multiple(treatment, controls, gene_set_name)
 }
 mediate_cluster_multiple = function(treatment, controls, gene_set_name){
+  print("*******************")
+  print(treatment)
+  print(gene_set_name)
+  print(controls)
+  print("*******************") 
   clus = average_expr[[gene_set_name]] 
   colnames(clus) = str_c("d", 1:dim(clus)[2])
   clus = rownames_to_column(clus, var = "AID")
@@ -110,16 +115,60 @@ mediate_cluster_multiple = function(treatment, controls, gene_set_name){
 }
 
 if(1) {
-  pData(dat) <- pData(dat) %>%
+  resetlevel = function(x) {
+    levels(x) =  c(0:(length(levels(x))-1))
+    x
+  }
+  temp_data = pData(dat)
+  temp_data <- temp_data %>%
+    # mutate_at(
+    #   .vars = vars(matches("^edu_p$|^edu_max$")),
+    #   .funs = list(~ .x %>%
+    #                  fct_recode("0" = "high or less",
+    #                             "1" = "more than high")
+    #   ))  %>% 
+    # mutate_at(
+    #   .vars = vars(c("sex_interv")),
+    #   .funs = list(~ .x %>%
+    #                  fct_recode("0" = "f",
+    #                             "1" = "m")
+    #   ))  %>% 
+    # mutate_at(
+    #   .vars = vars(c("re")),
+    #   .funs = list(~ .x %>%
+    #                  fct_recode("0" = "1",
+    #                             "1" = "2",
+    #                             "2" = "3",
+    #                             "3" = "4",
+    #                             "4" = "5")
+    #   ))   %>% 
     mutate_at(
-      .vars = vars(matches("^edu_p$|^edu_max$")),
-      .funs = list(~ .x %>%
-                     fct_recode("0" = "high or less",
-                                "1" = "more than high")
-      ))  
+      .vars = vars(c("BirthY", "time_biow5")),
+      .funs = list(~ .x %>% as.factor()
+      ))  %>% 
+    mutate_at(
+      .vars = vars(c("sex_interv", "re", "Plate", "BirthY", "W5REGION", "pregnant_biow5", 
+                     "kit_biow5", "tube_biow5", "FastHrs",              
+                     "travel_biow5", "months_biow5", "time_biow5", "edu_max",              
+                     "bills_binary", "currentsmoke_binary", "insurance_lack_binary")),
+      .funs = list(~  .x %>% resetlevel()
+      )) 
+  
+  dat@phenoData@data = temp_data
+  # 
+  # levels(temp_data$Plate) = c(0:(length(levels(temp_data$Plate))-1))
+  # levels(temp_data$BirthY) = c(0:(length(levels(temp_data$BirthY))-1))
+  # levels(temp_data$W5REGION) = c(0:(length(levels(temp_data$W5REGION))-1))
+  # levels(temp_data$pregnant_biow5) = c(0:(length(levels(temp_data$pregnant_biow5))-1))
+  # levels(temp_data$kit_biow5) = c(0:(length(levels(temp_data$kit_biow5))-1))
+  # levels(temp_data$tube_biow5) = c(0:(length(levels(temp_data$tube_biow5))-1))
+  # levels(temp_data$FastHrs) = c(0:(length(levels(temp_data$FastHrs))-1))
+  # 
+  # 
+  
 }
 # debugonce(fit_mediate_cluster)
-
+COR = TRUE
 # plan(multicore, workers = 10)
 example0 =
   args %>%
@@ -127,7 +176,8 @@ example0 =
     is.element(gene_set_name, table1) &
       # gene_set_name == "SES  Composite",
       names(controls) == "basic") %>%
+  # filter(gene_set_name=="Depression_mRNA") %>% 
   mutate(out = pmap(., safely(fit_mediate_cluster)),
          controls = names(controls))
 
-example0 %>% saveRDS("./user_wx/mediate_cluster_multiple_with1k.rds")
+example0 %>% saveRDS("./user_wx/mediate_cluster_multiple_with1k_withCOR.rds")

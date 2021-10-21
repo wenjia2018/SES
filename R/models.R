@@ -335,11 +335,21 @@ fit_m8 = function(controls, treatment, gene_set){
 }
 
 fit_m12 = function(controls, treatment, gene_set_name){
+  out = de_and_tfbm_normalization_TMM(controls, treatment, gene_set_name, de_only = TRUE)
   
-  ttT  = de_and_tfbm_normalization_TMM(controls, treatment, gene_set_name, de_only = TRUE) %>% pluck("ttT")
+  ttT  = 
+    out %>% 
+    pluck("ttT") %>%
+    filter(gene %in% outcome_set_full$outcome_set[[gene_set_name]])
   
-  ttT %>% filter(gene %in% outcome_set_full$outcome_set[[gene_set_name]])
+  F_pval = 
+    out %>% 
+    pluck("F_pval") %>%
+    `[`(outcome_set_full$outcome_set[[gene_set_name]]) %>% 
+    discard(is.na)
   
+  
+  return(list(ttT = ttT, F_pval = F_pval))
 }
 
 ############################################################
@@ -437,6 +447,53 @@ fit_m7 = function(datt, gene_set, rotate){
   
   out$varexplained = pca_rotated$Vaccounted[4,] %>% as.list()
   out$loadings = pca_rotated$loadings
+  out
+}
+
+############################################################
+# sparse PCA
+############################################################
+
+fit_m16 = function(datt, gene_set){
+  out = NULL
+  pca_sparse <- sparsepca::spca(datt[gene_set], k = ncomp, scale = TRUE)
+  rownames = datt[gene_set] %>% colnames()
+  pca_sparse$scores = pca_sparse$scores %>%  as_tibble() %>%  set_names(str_c("d", 1:ncomp))
+
+  datt = dplyr::select(datt, -gene_set) 
+  gene_set = colnames(pca_sparse$scores)
+  
+  lm_reg = 
+    # workflow_reg = 
+    function(outcome, datt){
+      
+      datt_pca = bind_cols(datt, !!outcome := pca_sparse$scores[, outcome])
+      
+      keep = datt_pca %>% complete.cases()
+      datt_pca = datt_pca[keep, ]
+      # remove invariant columns
+      datt_pca = Filter(function(x) length(unique(x))!=1, datt_pca)
+
+      covariates = colnames(datt_pca) %>% str_subset(outcome, negate = TRUE) %>% str_c(collapse= " + ")
+      formula_lm = outcome %>%  str_c("~", covariates) %>% as.formula
+      
+      lm(formula_lm, datt_pca)
+      
+      
+    }
+  
+  out$fit = gene_set %>% 
+    set_names() %>% 
+    # recipes way
+    # map(workflow_reg, datt = datt) %>% 
+    # map(~ pluck(.x, "fit", "fit", "fit"))
+    # lm way
+    map(lm_reg, datt = datt)
+  
+  out$varexplained = summary(pca_sparse)[3, ] %>% as.list()
+  rownames(pca_sparse$loadings) = rownames
+  colnames(pca_sparse$loadings) = str_c("SPC", 1:ncomp)
+  out$loadings = pca_sparse$loadings
   out
 }
 

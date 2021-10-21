@@ -1,3 +1,112 @@
+mediate_spca = function(mediator, gene_set,pca_out){
+  datt_m = 
+    prepro(gene_set, treatment, c(controls, mediator)) %>%
+    rename(treatment = treatment
+           # mediator = mediator
+    ) 
+  if(remove_diseased_subjects) {
+    datt_m =
+      datt_m %>% 
+      remove_diseased_subjects_from_datt(gene_set_name, controls)
+  }
+
+  pca_sparse <- sparsepca::spca(datt_m[gene_set], k = ncomp, scale = TRUE)
+  pca_sparse$scores = pca_sparse$scores %>%  as_tibble() %>%  set_names(str_c("d", 1:ncomp))
+  
+  datt_m = dplyr::select(datt_m, -gene_set) 
+  outcome = colnames(pca_sparse$scores) %>% set_names()
+  
+  convert_outcome = function(outcome, datt_m){
+    datt_pca = bind_cols(datt_m, !!outcome := pca_sparse$scores[, outcome])
+  }
+  
+  datt_pca = outcome %>% map(convert_outcome, datt = datt_m)
+  # only do mediation for significant PCs, p values are corrected by bonferonni
+  # actually should divided by 4 the treatment numbers, but Mike sometimes keep some
+  # signatures when their p value is close and a little bigger to the cut off, so here
+  # choose correcting pca component numbers only so mediational analysis will be done to less cases, save time.
+  threshold = 0.05 / length(pca_out$p)
+  sig = pca_out$p < 0.01
+  print("please be aware: p value correction is bonferonni for now")
+  # map2(datt_pca[sig], outcome[sig], fit_m99) %>% map(extract_m99)
+  pmap(list(datt_pca[sig], outcome[sig], mediator), fit_m99) %>% map(extract_m99)
+}
+
+mediate_multiple_mediators = function(gene_set, rotate, pca_out){
+  datt_m = 
+    prepro(gene_set, treatment, c(controls, all_of(mediators))) %>%
+    rename(treatment = treatment
+           # mediator = mediator
+    ) %>% 
+    select(all_of(mediators), everything())
+  
+  if(remove_diseased_subjects) {
+    datt_m =
+      datt_m %>% 
+      remove_diseased_subjects_from_datt(gene_set_name, controls)
+  }
+  pca_rotated = fit_pca_util(datt_m, gene_set, rotate) 
+  
+  datt_m = dplyr::select(datt_m, -gene_set) 
+  outcome = colnames(pca_rotated$scores) %>% set_names()
+  
+  convert_outcome = function(outcome, datt_m){
+    datt_pca = bind_cols(datt_m, !!outcome := pca_rotated$scores[, outcome])
+  }
+  
+  datt_pca = outcome %>% map(convert_outcome, datt = datt_m)
+  # only do mediation for significant PCs, p values are corrected by bonferonni
+  # actually should divided by 4 the treatment numbers, but Mike sometimes keep some
+  # signatures when their p value is close and a little bigger to the cut off, so here
+  # choose correcting pca component numbers only so mediational analysis will be done to less cases, save time.
+  threshold = 0.05 / length(pca_out$p)
+  sig = pca_out$p < 0.01
+  print("please be aware: p value correction is bonferonni for now")
+  # map2(datt_pca[sig], outcome[sig], fit_m99) %>% map(extract_m99)
+  pmap(list(datt_pca[sig], outcome[sig]), mediate_multimediate) %>% map(~.x %>% summary(opt = "avg"))
+}
+
+mediate_multimediate = function(datt, gene_set) {
+  datt = datt %>% na.omit()
+  M1reg = lm(as.formula(str_c("w5bmi_lm ~ treatment +", controls %>% str_c(collapse = " + "))), datt)
+  M2reg = lm(as.formula(str_c("stress_perceived_lm ~ treatment +", controls %>% str_c(collapse = " + "))), datt)
+  if(COR){
+    datt = datt %>% mutate_at(.vars = vars(c("bills_binary", "currentsmoke_binary","insurance_lack_binary")),
+                              .funs = list(~ .x %>% as.numeric()))
+    M3reg = lm(as.formula(str_c("bills_binary ~ treatment +", controls %>% str_c(collapse = " + "))), datt)
+    M4reg = lm(as.formula(str_c("currentsmoke_binary ~ treatment +", controls %>% str_c(collapse = " + "))), datt)
+    M5reg = lm(as.formula(str_c("insurance_lack_binary ~ treatment +", controls %>% str_c(collapse = " + "))), datt)
+    
+  } else{
+    M3reg = glm(as.formula(str_c("bills_binary ~ treatment +", controls %>% str_c(collapse = " + "))), datt, family = binomial("logit"))
+    M4reg = glm(as.formula(str_c("currentsmoke_binary ~ treatment +", controls %>% str_c(collapse = " + "))), datt, family = binomial("logit"))
+    M5reg = glm(as.formula(str_c("insurance_lack_binary ~ treatment +", controls %>% str_c(collapse = " + "))), datt, family = binomial("logit"))
+    
+  }
+
+  Yreg = lm(as.formula(str_c(gene_set, "~ .")), datt)
+  med_multimediate = multimediate::multimediate(lmodel.m = list(M1reg, M2reg, M3reg, M4reg, M5reg),
+                                            correlated = COR,
+                                            model.y = Yreg,
+                                            treat = "treatment",
+                                            treat.value = 1,
+                                            control.value = 0,
+                                            J = 1000,
+                                            conf.level = 0.95)
+}
+
+
+mediate_mma = function(datt, gene_set) {
+  x = datt %>% select(all_of(mediators), all_of(controls))
+  contmed =  which(colnames(x)%like%"_lm")
+  binmed = which(colnames(x)%like%"_binary")
+  med_index = 1:length(mediators)
+  y = datt %>% select(!!gene_set)
+  m1 <- mma::mma(x = x, y = y, pred = treatment, contmed = contmed, binmed = binmed, jointm = list(n = 1, j1 = med_index),
+            n2 = 1000, alpha = 0.05 )
+  
+}
+
 cal_evalue = function(x) {
   ols_result = x %>% summary %>% broom::tidy() %>% filter(str_detect(term, "treatment"))
   
@@ -13,9 +122,13 @@ DDA = function(mediator, gene_set, rotate, pca_out) {
     prepro(gene_set, treatment, c(controls, mediator)) %>%
     rename(treatment = treatment
            # mediator = mediator
-    ) %>% 
-    remove_diseased_subjects_from_datt(gene_set_name, controls)
+    ) 
   
+  if(remove_diseased_subjects) {
+    datt_m =
+      datt_m %>% 
+      remove_diseased_subjects_from_datt(gene_set_name, controls)
+  }
   pca_rotated = fit_pca_util(datt_m, gene_set, rotate) 
   
   datt_m = dplyr::select(datt_m, -gene_set) 
@@ -45,25 +158,25 @@ DDA = function(mediator, gene_set, rotate, pca_out) {
 
 DDA_component = function(model_formula, predictor, data, n_boot = n_boot) {
   
-  # vardist = dda.vardist(model_formula, pred = predictor, data = data, B = n_boot)
+  vardist = dda.vardist(model_formula, pred = predictor, data = data, B = n_boot)
   
-  resdist = dda.resdist(model_formula, pred = predictor, data = data, B = n_boot)
+  # resdist = dda.resdist(model_formula, pred = predictor, data = data, B = n_boot)
   
-  # indep1 = dda.indep(model_formula, pred = predictor, data = data) 
+  indep1 = dda.indep(model_formula, pred = predictor, data = data)
   # 
-  # indep2 = dda.indep(model_formula, pred = predictor, nlfun = tanh, data = data) 
+  indep2 = dda.indep(model_formula, pred = predictor, nlfun = tanh, data = data)
   
-  indep3 = dda.indep(model_formula, pred = predictor, data = data, hsic.method = "gamma", nlfun = 2) 
+  # indep3 = dda.indep(model_formula, pred = predictor, data = data, hsic.method = "gamma", nlfun = 2) 
   
-  # indep4 = dda.indep(model_formula, pred = predictor, data = data, hsic.method = "boot", B = n_boot, nlfun = 2, parallelize = TRUE, cores = 4) 
+  indep4 = dda.indep(model_formula, pred = predictor, data = data, hsic.method = "boot", B = n_boot, nlfun = 2, parallelize = TRUE, cores = 4)
   
   return(list(
-    # vardist = vardist,
-    resdist = resdist, 
-    # indep1 = indep1, 
-    # indep2 = indep2,
-    indep3 = indep3
-    # indep4 = indep4
+    vardist = vardist,
+    # resdist = resdist, 
+    indep1 = indep1,
+    indep2 = indep2,
+    # indep3 = indep3
+    indep4 = indep4
     ))
   
 }
@@ -74,9 +187,13 @@ mediate = function(mediator, gene_set, controls, treatment){
   datt_m = 
     prepro(gene_set, treatment, c(controls, mediator)) %>%
     rename(treatment = treatment,
-           mediator = mediator) %>% 
-    remove_diseased_subjects_from_datt(gene_set_name, controls)
+           mediator = mediator) 
   
+  if(remove_diseased_subjects) {
+    datt_m =
+      datt_m %>% 
+      remove_diseased_subjects_from_datt(gene_set_name, controls)
+  }
   ok = complete.cases(datt_m$mediator)
   datt_m = datt_m[ok, ]
   fit_m99(datt_m, gene_set, mediator) %>% extract_m99()  
@@ -105,9 +222,12 @@ mediate_pca = function(mediator, gene_set, rotate, pca_out){
     prepro(gene_set, treatment, c(controls, mediator)) %>%
     rename(treatment = treatment
            # mediator = mediator
-           ) %>% 
-    remove_diseased_subjects_from_datt(gene_set_name, controls)
-  
+           ) 
+  if(remove_diseased_subjects) {
+    datt_m =
+      datt_m %>% 
+      remove_diseased_subjects_from_datt(gene_set_name, controls)
+  }
   pca_rotated = fit_pca_util(datt_m, gene_set, rotate) 
   
   datt_m = dplyr::select(datt_m, -gene_set) 
@@ -123,7 +243,7 @@ mediate_pca = function(mediator, gene_set, rotate, pca_out){
   # signatures when their p value is close and a little bigger to the cut off, so here
   # choose correcting pca component numbers only so mediational analysis will be done to less cases, save time.
   threshold = 0.05 / length(pca_out$p)
-  sig = pca_out$p < threshold
+  sig = pca_out$p < 0.01
   print("please be aware: p value correction is bonferonni for now")
  # map2(datt_pca[sig], outcome[sig], fit_m99) %>% map(extract_m99)
  pmap(list(datt_pca[sig], outcome[sig], mediator), fit_m99) %>% map(extract_m99)
