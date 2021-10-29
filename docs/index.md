@@ -117,9 +117,9 @@
     -   6.3 [regress ageing on snp with aging composite ancestry](/ses/output/snp_aging_signature.html)   
 -   7. Descriptive Data
 
-    -   7.1 [Total and Analytic Sample](/ses/output/summary_of_data.html)
-    -   7.2 [Race by Skin Color](/ses/output/color_race.html)
-    -   7.3 [Skin Color by immigrate status](/ses/output/skin_color_immigrat_status.html)  
+    -   7.1 [Total and Analytic Sample](/ses/output/summary_of_data_all3.html)
+    -   7.2 [Race by Skin Color](/ses/output/color_race_all3.html)
+    -   7.3 [Skin Color by immigrate status](/ses/output/skin_color_immigrat_status_all3.html)  
     -   7.4 [Aging cluster name conversion](/ses/output/cluster_name_conversion.html) 
     
     -   7.5 [Race by Skin Color nice version](/ses/output/Doc4.docx)  
