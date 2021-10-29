@@ -16,10 +16,12 @@
 library(tidyverse)
 library(foreign)
 library(descr)
-dat <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_17.11.2020.rds")
+# dat <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_17.11.2020.rds")
+dat <- readRDS("/home/share/preprocessing/preprocessed_two_batches/all.batches.expression.set.tmm_waves_01.09.2021.rds")
 AID_blood = dat@phenoData@data$AID
-waves <- readRDS("/home/share/preprocessed_two_batches/waves_17.11.2020.rds")
-waves_full <- readRDS("/home/share/preprocessed_two_batches/waves_full.rds")
+waves <- readRDS("/home/share/preprocessing/preprocessed_two_batches/waves_01.09.2021.rds")
+# waves <- readRDS("/home/share/preprocessed_two_batches/waves_17.11.2020.rds")
+waves_full <- readRDS("/home/share/preprocessing/preprocessed_two_batches/waves_full.rds")
 
 sibling_w3 = read.xport("/home/share/data_input/sibling3.xpt") %>% as_tibble
 ancestralPCA <- read.delim("/home/share/data_input/ancestralPCA.eigenStratPCs.allparticipants.082719")
@@ -90,3 +92,4 @@ crosstab(df_full_sibling$raceethnicity,  df_full_sibling$color_byinterviewer, pr
 temp_fid = temp_fid%>% filter(AID %in% AID_blood)
 
 temp_fid_ownfid = temp_fid %>% left_join(waves %>% select(AID,famid_fullsib))
+

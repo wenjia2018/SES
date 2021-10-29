@@ -2,7 +2,7 @@
 #' ###  with1k
 #+ echo=F, eval=T, warning=FALSE, message=FALSE
 example <- readRDS("~/ses-1/user_wx/mediate_cluster_multiple_with1k.rds")
-
+example <- readRDS("~/ses-1/user_wx/mediate_cluster_multiple_with1k_withCOR.rds")
  with = 
    example %>% 
   hoist(out, proporp = list ("result")) %>% 

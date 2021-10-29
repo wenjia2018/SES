@@ -133,8 +133,9 @@ recode_variables_in_dat_racedummy <- function() {
         Black = "1"
       ) %>% 
       relevel(ref = "White")
-             ) %>% fastDummies::dummy_cols(select_columns = c("color_byinterviewer3","color_byinterviewer5")) %>% 
-    dplyr::select(-starts_with("AncestryPC")) 
+             ) %>% fastDummies::dummy_cols(select_columns = c("color_byinterviewer3","color_byinterviewer5")) 
+  # %>% 
+    # dplyr::select(-starts_with("AncestryPC")) 
   # %>% 
   #   dplyr::left_join(custom_PCA %>% select(-fid))
   # mutate_at(.vars = vars("sss_5"),

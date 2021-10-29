@@ -17,10 +17,10 @@
 
 #+ echo=F, eval=T, warning=FALSE, message=FALSE 
 library(tidyverse)
-dat <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_22.03.2021.rds")
+# dat <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_22.03.2021.rds")
+dat <- readRDS("/home/share/preprocessing/preprocessed_two_batches/all.batches.expression.set.tmm_waves_01.09.2021.rds")
 AID_blood = dat@phenoData@data$AID
-
-waves <- readRDS("/home/share/preprocessed_two_batches/waves_22.03.2021.rds")
+waves <- readRDS("/home/share/preprocessing/preprocessed_two_batches/waves_01.09.2021.rds")
 
 waves = waves %>% mutate(
   color_byinterviewer5 = H3IR17 %>%

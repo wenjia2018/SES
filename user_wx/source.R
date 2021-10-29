@@ -1,4 +1,8 @@
 setwd("/home/xu/ses-1")
+source("./user_wx/ses_all_batches_sc.R")
+
+
+setwd("/home/xu/ses-1")
 source("./user_wx/bespoke_multi_cores.R")
 
 setwd("/home/xu/ses-1")

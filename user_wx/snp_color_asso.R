@@ -14,6 +14,19 @@ library(Biobase)
 library(nnet)
 library(broom)
 walk(dir(path = here("R"),full.names = TRUE), source)
+# choose normalization methods for downstream analysis
+tmm = TRUE
+rle = FALSE
+log2cpm = FALSE
+# which PCA to perform
+oblimin = FALSE
+nn = TRUE
+# explicitly assign ncomp as the smallest number of table signatures gene numbers
+ncomp = 10
+# for doing genowide DE analysis only
+normalization_bydesign = TRUE
+# specify if subjects with disease shall be removed
+remove_diseased_subjects = TRUE
 load_data(reconciled = FALSE, remove_inflam = FALSE)
 dt_color_snp <- readRDS("/home/share/dna_ancestry/dna/dt_color_snp.rds")
 snp <- pData(dat) %>%

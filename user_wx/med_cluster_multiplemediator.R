@@ -41,7 +41,7 @@ mediation_mean = FALSE
 mediation_each_gene = FALSE
 
 # 
-if(denovo <- FALSE){
+if(denovo <- TRUE){
   Significant <- readRDS("/home/share/scratch/Clustering/DeNovo/Significant.rds")
   full_clus_res <- readRDS("/home/share/scratch/Clustering/DeNovo/full_clus_res.rds")
   average_expr <- readRDS("/home/share/scratch/Clustering/DeNovo/average_expr.rds")
@@ -54,7 +54,7 @@ if(without1k <- FALSE){
   average_expr <- readRDS("/home/share/scratch/Clustering/without_1k/average_expr.rds")
   
 }
-if(with1k <- TRUE){
+if(with1k <- FALSE){
   Significant <- readRDS("/home/share/scratch/Clustering/1k/Significant.rds")
   full_clus_res <- readRDS("/home/share/scratch/Clustering/1k/full_clus_res.rds")
   average_expr <- readRDS("/home/share/scratch/Clustering/1k/average_expr.rds")
@@ -173,11 +173,11 @@ COR = TRUE
 example0 =
   args %>%
   filter(
-    is.element(gene_set_name, table1) &
+    # is.element(gene_set_name, table1) &
       # gene_set_name == "SES  Composite",
       names(controls) == "basic") %>%
   # filter(gene_set_name=="Depression_mRNA") %>% 
   mutate(out = pmap(., safely(fit_mediate_cluster)),
          controls = names(controls))
 
-example0 %>% saveRDS("./user_wx/mediate_cluster_multiple_with1k_withCOR.rds")
+example0 %>% saveRDS("./user_wx/mediate_cluster_multiple_DeNovo_withCOR.rds")

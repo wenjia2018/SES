@@ -39,12 +39,12 @@ nn = TRUE
 # explicitly assign ncomp as the smallest number of table signatures gene numbers
 ncomp = 10
 # for doing genowide DE analysis only
-normalization_bydesign = FALSE
+normalization_bydesign = TRUE
 # specify if subjects with disease shall be removed
 remove_diseased_subjects = TRUE
 load_data(reconciled = FALSE, remove_inflam = FALSE)
 define_treatments_and_controls_sc()
-recode_variables_in_dat()
+recode_variables_in_dat_racedummy()
 print(abbreviations)
 mediation_mean = FALSE
 mediation_each_gene = FALSE
@@ -85,18 +85,18 @@ if(0) {
                                 "1" = "more than high")
     ))  
 }
-plan(multicore, workers = 10)
+plan(multicore, workers = 44)
 # debugonce(model_fit)
   example0 =
   args %>%
   filter(
-    is.element(gene_set_name, table1) &
-    # gene_set_name %in% c( "Hypertension_mRNA", "Rheumatoid_Arthritis_mRNA"),
+    # is.element(gene_set_name, table1) &
+    gene_set_name %in% c("whole_genome_and_tfbm"),
     # treatment %in% c("edu_max"),
-         names(controls) == "basic") %>%
+         (names(controls) == "basic" | names(controls) == "all")) %>%
   mutate(out = furrr::future_pmap(., safely(model_fit), funcs),
          controls = names(controls))
 
 # With controls used in SES paper: predicts the signatures from SES paper + Peters aging signature. 
-example0 %>% saveRDS("./user_wx/m16_withinflam.rds")
+example0 %>% saveRDS("./user_wx/m12_with1k_sc.rds")
 
