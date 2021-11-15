@@ -340,7 +340,10 @@ fit_m12 = function(controls, treatment, gene_set_name){
   ttT  = 
     out %>% 
     pluck("ttT") %>%
-    filter(gene %in% outcome_set_full$outcome_set[[gene_set_name]])
+    filter(gene %in% Reduce(union, outcome_set_full$outcome_set[table1])) %>% 
+    mutate(adj.p.withinunion = p.adjust(P.Value, method = "fdr")) %>% 
+    filter(gene %in% outcome_set_full$outcome_set[[gene_set_name]]) %>% 
+    mutate(adj.p.within = p.adjust(P.Value, method = "fdr"))
   
   F_pval = 
     out %>% 

@@ -7,22 +7,19 @@ define_treatments_and_controls_sc = function(){
   # TABLE 1
   table1 =
     c(
-      "CVD_mRNA",
-      "diabetes_mRNA",
-      "inflam1k_mRNA",
-      # "breast_cancer_mRNA",
-      # "Lupus_mRNA", "Colorectal_mRNA",
-      "Rheumatoid_Arthritis_mRNA", "Alzheimers_mRNA",
-      "Aortic_Aneurysm_mRNA", "COPD_mRNA",
-      "Asthma_mRNA","Hypertension_mRNA",
-      "Depression_mRNA",
-      "CKD_mRNA",
-      "ctra_mRNA",
-      "inflame_mRNA",
-      "interferon_mRNA",
-      "AntBIntF_mRNA",
+      # "CVD_mRNA",
+      # "diabetes_mRNA",
+      # "inflam1k_mRNA",
+      # "Rheumatoid_Arthritis_mRNA", "Alzheimers_mRNA",
+      # "Aortic_Aneurysm_mRNA", "COPD_mRNA",
+      # "Asthma_mRNA","Hypertension_mRNA",
+      # "Depression_mRNA",
+      # "CKD_mRNA"
+      # "ctra_mRNA",
+      # "inflame_mRNA",
+      # "interferon_mRNA",
+      # "AntBIntF_mRNA",
       # "antibody_mRNA", #only 1 gene
-      "inflam1k_mRNA",
       "aging_mRNA",
       "aging_up_mRNA",
       "aging_down_mRNA",
@@ -40,9 +37,13 @@ define_treatments_and_controls_sc = function(){
     )
   
   treatment = c(
-
-    "color_byinterviewer3_DarkBlack",
-    "color_byinterviewer3_LightMed"
+    "color_byinterviewer_continuous"
+    # "color_byinterviewer5_Black",
+    # "color_byinterviewer5_Dark",
+    # "color_byinterviewer5_Medium"
+    # "color_byinterviewer5_Light"
+    # "color_byinterviewer3_DarkBlack",
+    # "color_byinterviewer3_LightMed"
   )
   
   controls = 
@@ -52,14 +53,19 @@ define_treatments_and_controls_sc = function(){
           "sex_interv", "Plate", "age_w5",
           "BirthY", "W5REGION", "pregnant_biow5", 
           "kit_biow5", "tube_biow5",  "FastHrs",
-          "travel_biow5",  "months_biow5", "time_biow5",
-          "color_byinterviewer3_DarkBlack",
-          "color_byinterviewer3_LightMed"
+          "travel_biow5",  "months_biow5", "time_biow5"
+          # ,
+          # "color_byinterviewer5_Black",
+          # "color_byinterviewer5_Dark",
+          # "color_byinterviewer5_Medium"
+          # "color_byinterviewer5_Light"
+          # "color_byinterviewer3_DarkBlack",
+          # "color_byinterviewer3_LightMed"
         ),
       ancestryPC =
         c(
-          "AncestryPC1", "AncestryPC2", "AncestryPC3", "AncestryPC4", "AncestryPC5", "AncestryPC6", "AncestryPC7", 
-          "AncestryPC8", "AncestryPC9", "AncestryPC10", "AncestryPC11", "AncestryPC12", "AncestryPC13", "AncestryPC14", 
+          "AncestryPC1", "AncestryPC2", "AncestryPC3", "AncestryPC4", "AncestryPC5", "AncestryPC6", "AncestryPC7",
+          "AncestryPC8", "AncestryPC9", "AncestryPC10", "AncestryPC11", "AncestryPC12", "AncestryPC13", "AncestryPC14",
           "AncestryPC15", "AncestryPC16", "AncestryPC17", "AncestryPC18", "AncestryPC19", "AncestryPC20"
         )
     ) %>% 
@@ -75,12 +81,17 @@ define_treatments_and_controls_sc = function(){
   
   mediators = 
     c(
-      # "drink_category"
       "stress_perceived_lm",
-      "w5bmi_lm",
       "bills_binary",
       "currentsmoke_binary",
-      "insurance_lack_binary"
+      "w5bmi_lm",
+      "insurance_lack_binary",
+      # "lowbirthweight_binary",
+      # "high_lowbirth_binary",
+      
+      "totdiscrim2_binary",  # binary
+      "discrim2_binary",   # binary
+      "totdiscrim1_category" 
     )
   
   immune_tfbms = 

@@ -140,6 +140,12 @@ recode_variables_in_dat_racedummy <- function() {
   #   dplyr::left_join(custom_PCA %>% select(-fid))
   # mutate_at(.vars = vars("sss_5"),
   #           .funs = list(~ .x %>% factor))
-
+  if(stratification <- TRUE){
+    keep = (pData(dat)$raceethnicity =="NonHblack" & 
+              pData(dat)$color_byinterviewer5 !="White" &
+              !is.na(pData(dat)$color_byinterviewer5)) %>% ifelse(is.na(.), FALSE, .)
+    # keep = (pData(dat)$raceethnicity =="NonHwhite") %>% ifelse(is.na(.), FALSE, .)
+    dat <- dat[, keep]
+  }
   dat <<- dat
 }

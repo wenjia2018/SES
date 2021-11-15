@@ -12,10 +12,14 @@ de_and_tfbm_normalization_TMM = function(controls, treatment, gene_set_name, de_
         Melanoma_mRNA = dat$H5ID6A != 1 & dat$H5ID6AM != 1,
         rep(TRUE, dim(dat)[2])
       )
+    
+    keep_nondisease = ifelse(is.na(keep_nondisease), TRUE, keep_nondisease)
+    
     dat = dat[, keep_nondisease]
-    raw = raw[, keep_nondisease]
+
   }
-  
+  rownames(dat@phenoData@data) = dat@phenoData@data$AID
+  raw = raw[, sampleNames(dat)]
   
   ph = Biobase::pData(raw)
   ex = Biobase::exprs(raw)
