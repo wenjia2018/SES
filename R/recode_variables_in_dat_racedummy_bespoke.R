@@ -1,4 +1,4 @@
-recode_variables_in_dat_racedummy <- function() {
+recode_variables_in_dat_racedummy_bespoke <- function(custom_PCA) {
   # IMPURE FUNCTION: NO RETURN
   # only recode variables by special requirements
   # mediator binary(0,1 coded) or continuous
@@ -87,34 +87,34 @@ recode_variables_in_dat_racedummy <- function() {
       
     ) %>% 
     mutate_at(vars(c("stress_perceived",
-                     "w5bmi")), .funs = list(lm = ~ .x)) %>% 
+                "w5bmi")), .funs = list(lm = ~ .x)) %>% 
     mutate_at(vars(c("bills",
-                     "currentsmoke",
-                     "insurance_lack",
-                     "lowbirthweight",
-                     "high_lowbirth")), .funs = list(binary = ~ .x)) %>% 
+                "currentsmoke",
+                "insurance_lack",
+                "lowbirthweight",
+                "high_lowbirth")), .funs = list(binary = ~ .x)) %>% 
     mutate_at(vars(c("totdiscrim1",
                      "totdiscrim2",
                      "countdiscrimwhy")), .funs = list(pois = ~ .x)) %>% 
     mutate(H3IR17 = ifelse(re %in% c(1,2,5), H3IR17, NA), #only use white, black, hispanic
-           color_byinterviewer_continuous =  case_when(
-             H3IR17==5 ~ 0,
-             H3IR17==4 ~ 1,
-             H3IR17==3 ~ 2,
-             H3IR17==2 ~ 3,
-             H3IR17==1 ~ 4
-           ),
-           color_byinterviewer_binary =  case_when(
-             H3IR17==5 ~ 0,
-             H3IR17==4 ~ 0,
-             H3IR17==3 ~ 0,
-             H3IR17==2 ~ 1,
-             H3IR17==1 ~ 1
-           ),
-           keep = .$famid_fullsib %in% .$famid_fullsib[duplicated(.$famid_fullsib)],
-           # https://stackoverflow.com/questions/16905425/find-duplicate-values-in-r
-           famid_fullsib = ifelse(keep == TRUE, famid_fullsib, NA) %>% as.factor,
-           color_byinterviewer3 = H3IR17 %>%
+      color_byinterviewer_continuous =  case_when(
+      H3IR17==5 ~ 0,
+      H3IR17==4 ~ 1,
+      H3IR17==3 ~ 2,
+      H3IR17==2 ~ 3,
+      H3IR17==1 ~ 4
+    ),
+    color_byinterviewer_binary =  case_when(
+      H3IR17==5 ~ 0,
+      H3IR17==4 ~ 0,
+      H3IR17==3 ~ 0,
+      H3IR17==2 ~ 1,
+      H3IR17==1 ~ 1
+    ),
+    keep = .$famid_fullsib %in% .$famid_fullsib[duplicated(.$famid_fullsib)],
+    # https://stackoverflow.com/questions/16905425/find-duplicate-values-in-r
+    famid_fullsib = ifelse(keep == TRUE, famid_fullsib, NA) %>% as.factor,
+      color_byinterviewer3 = H3IR17 %>%
              as.character() %>% 
              as.factor %>% 
              fct_collapse(
@@ -122,29 +122,34 @@ recode_variables_in_dat_racedummy <- function() {
                LightMed = c("3", "4"),
                White = "5") %>%
              relevel(ref = "White"),
-           color_byinterviewer5 = H3IR17 %>%
-             as.character() %>% 
-             as.factor %>% 
-             fct_recode(
-               White = "5",
-               Light = "4",
-               Medium = "3",
-               Dark = "2",
-               Black = "1"
-             ) %>% 
-             relevel(ref = "White")
-    ) %>% fastDummies::dummy_cols(select_columns = c("color_byinterviewer3","color_byinterviewer5"))
-  # %>%
-  #   dplyr::select(-starts_with("AncestryPC")) %>%
-  #   dplyr::left_join(custom_PCA %>% select(-fid))
+    color_byinterviewer5 = H3IR17 %>%
+      as.character() %>% 
+      as.factor %>% 
+      fct_recode(
+        White = "5",
+        Light = "4",
+        Medium = "3",
+        Dark = "2",
+        Black = "1"
+      ) %>% 
+      relevel(ref = "White")
+             ) %>% fastDummies::dummy_cols(select_columns = c("color_byinterviewer3","color_byinterviewer5")) %>%
+    dplyr::select(-starts_with("AncestryPC")) %>%
+    dplyr::left_join(custom_PCA)
   # mutate_at(.vars = vars("sss_5"),
   #           .funs = list(~ .x %>% factor))
-  if(stratification <- TRUE){
+  if(stratification <- FALSE){
     keep = (pData(dat)$raceethnicity =="NonHblack" & 
               pData(dat)$color_byinterviewer5 !="White" &
               !is.na(pData(dat)$color_byinterviewer5)) %>% ifelse(is.na(.), FALSE, .)
     # keep = (pData(dat)$raceethnicity =="NonHwhite") %>% ifelse(is.na(.), FALSE, .)
     dat <- dat[, keep]
   }
+  # remove mistakenly recorded skin color subjects
+  keep = !((pData(dat)$raceethnicity =="NonHblack" & 
+              pData(dat)$color_byinterviewer5 =="White")| 
+             (pData(dat)$raceethnicity =="NonHwhite" & 
+                pData(dat)$color_byinterviewer5 =="Black")) 
+  
   dat <<- dat
 }

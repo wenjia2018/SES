@@ -54,102 +54,38 @@ source("./R/utils_snpPC.R")
 # }
 
 # examples to get bespoke pca for new signatures and the whole genome:
-if(0){
-  gene_set_name = c(
-    "aging_down_cl1_mRNA",
-    "aging_down_cl1a_mRNA",
-    "aging_down_cl1b_mRNA",
-    "aging_down_cl1c_mRNA",
-    "aging_down_cl2_mRNA",
-    "aging_down_cl3_mRNA",
-    "aging_up_cl1_mRNA",
-    "aging_up_cl2_mRNA",
-    "aging_up_cl3_mRNA",
-    "aging_up_cl4_mRNA"
-  )
-  
-  p_eqtl <- c(0.05, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10)
-  
-  args =
-    crossing(gene_set_name, p_eqtl)
-  args %>%
-    pmap(eqtl_pca)
-}
-
-if(0){
-  gene_set_name = "whole_genome"
-  p_eqtl <- c(0.05, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10)
-  args =
-    crossing(gene_set_name, p_eqtl)
-  plan(multicore, workers = 10)
-  args %>%
-    furrr::future_pmap(eqtl_pca)
-  
-  gene_set_name = "aging_cluster_complement_mRNA"
-  p_eqtl <- c(0.05, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10)
-  args =
-    crossing(gene_set_name, p_eqtl)
-  args %>%
-    pmap(eqtl_pca)
-  plan(multicore, workers = 10)
-  args %>%
-    furrr::future_pmap(eqtl_pca)
-}
-
-# get bespoke pca for new signatures:
-
-# gene_set_name = c(
-#   "aging_down_cl1_mRNA",
-#   "aging_down_cl1a_mRNA",   
-#   "aging_down_cl1b_mRNA",
-#   "aging_down_cl1c_mRNA",
-#   "aging_down_cl2_mRNA",
-#   "aging_down_cl3_mRNA",
-#   "aging_up_cl1_mRNA",
-#   "aging_up_cl2_mRNA",
-#   "aging_up_cl3_mRNA",
-#   "aging_up_cl4_mRNA"
-# )
-# 
-# p_eqtl <- c(0.05, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10)
-# 
-# args =
-#   crossing(gene_set_name, p_eqtl)
-# 
-# plan(multicore, workers = 25)
-# args %>% 
-#   furrr::future_pmap(eqtl_pca)
-
-# some cases where ancestry PC is less than default 20, has already revised the code to fix this bug
-# gene_set_name = "aging_up_cl3_mRNA"
-# p_eqtl <- c(1e-7, 1e-8, 1e-9, 1e-10)
-# args =
-#   crossing(gene_set_name, p_eqtl)
-# 
-# plan(multicore, workers = 4)
-# args %>%
-#   furrr::future_pmap(eqtl_pca)
-
 if(1){
   gene_set_name = c(
-    "CVD_mRNA",
-    "diabetes_mRNA",
-    "Rheumatoid_Arthritis_mRNA", 
-    "Alzheimers_mRNA",
-    "Aortic_Aneurysm_mRNA",
-    "COPD_mRNA",
-    "Asthma_mRNA",
-    "Hypertension_mRNA",
-    "Depression_mRNA",
-    "CKD_mRNA"
+    "whole_genome_and_tfbm"
+    # "aging_down_cl1_mRNA",
+    # "aging_down_cl1a_mRNA",
+    # "aging_down_cl1b_mRNA",
+    # "aging_down_cl1c_mRNA",
+    # "aging_down_cl2_mRNA",
+    # "aging_down_cl3_mRNA",
+    # "aging_up_cl1_mRNA",
+    # "aging_up_cl2_mRNA",
+    # "aging_up_cl3_mRNA",
+    # "aging_up_cl4_mRNA",
+    # "aging_mRNA",
+    # "aging_up_mRNA",                   
+    # "aging_down_mRNA",
+    # "aging_cluster_complement_mRNA" 
+    # "CVD_mRNA",
+    # "diabetes_mRNA",
+    # "inflam1k_mRNA",
+    # "Rheumatoid_Arthritis_mRNA", "Alzheimers_mRNA",
+    # "Aortic_Aneurysm_mRNA", "COPD_mRNA",
+    # "Asthma_mRNA","Hypertension_mRNA",
+    # "Depression_mRNA",
+    # "CKD_mRNA"
   )
-  p_eqtl <- c(0.05, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10)
+  
+  # p_eqtl <- c(0.05, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10)
+  p_eqtl <- c(0.05) 
   args =
     crossing(gene_set_name, p_eqtl)
-  plan(multicore, workers = 40)
+  plan(multicore, workers = 20)
   args %>%
     furrr::future_pmap(eqtl_pca)
-  
 }
-
-

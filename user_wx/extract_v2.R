@@ -1,4 +1,4 @@
-
+# extraction results for analysis results using eqtl specific ancestry control 
 f1 = function(p, data){
   ex1 <- data %>%
     hoist(out, out1 = list("result","example1")) %>%
@@ -103,7 +103,7 @@ outm8med = function(p, control, data){
 m7_present = function(ex0, control){
   
   var = ex0 %>%
-    hoist(out, var_explained = list("result", "m7_ob", 1, "other", "varexplained")) %>%
+    hoist(out, var_explained = list("result", "m7_nn", 1, "other", "varexplained")) %>%
     dplyr::select(treatment, gene_set_name, var_explained, control_set) %>% 
     filter(var_explained!="NULL")
   # filter out the non estimable results
@@ -112,7 +112,7 @@ m7_present = function(ex0, control){
   var = var %>% unnest_longer(var_explained)
   
   pcaloadings = ex0 %>% 
-    hoist(out, loadings = list("result", "m7_ob", 1, "other", "loadings")) %>%
+    hoist(out, loadings = list("result", "m7_nn", 1, "other", "loadings")) %>%
     dplyr::select(treatment, gene_set_name, loadings, control_set) %>%
     filter(loadings!="NULL") %>% 
     mutate(loadings = loadings %>% map(~.[]) %>% map(~ as.data.frame(.)),
@@ -124,7 +124,7 @@ m7_present = function(ex0, control){
     mutate(loadings_id = str_c("d", loadings_id))
   
   gene_list = ex0 %>%
-    hoist(out, well_loaded = list("result", "m7_ob", 1, "other", "well_loaded")) %>%
+    hoist(out, well_loaded = list("result", "m7_nn", 1, "other", "well_loaded")) %>%
     dplyr::select(treatment, gene_set_name, well_loaded, control_set) %>% 
     filter(well_loaded!="NULL")
   gene_list$well_loaded = gene_list$well_loaded %>% map(~ set_names(.x, str_c("d", 1:length(.x))))
@@ -132,7 +132,7 @@ m7_present = function(ex0, control){
   gene_list = gene_list %>% unnest_longer(well_loaded)
   # 
   out = ex0 %>%
-    hoist(out, estimate = list("result", "m7_ob", 1, "detail", "t")) %>% 
+    hoist(out, estimate = list("result", "m7_nn", 1, "detail", "t")) %>% 
     unnest_longer(estimate) %>% 
     hoist(estimate, p = "p.value") %>% 
     hoist(estimate, coef = "estimate") %>% 
@@ -155,7 +155,7 @@ outm7pca = function(p, control, data){
 m7_present_anova = function(ex0, control){
   
   var = ex0 %>%
-    hoist(out, var_explained = list("result", "m7_ob", 1, "other", "varexplained")) %>%
+    hoist(out, var_explained = list("result", "m7_nn", 1, "other", "varexplained")) %>%
     dplyr::select(treatment, gene_set_name, var_explained, control_set) %>% 
     filter(var_explained!="NULL")
   # filter out the non estimable results
@@ -164,7 +164,7 @@ m7_present_anova = function(ex0, control){
   var = var %>% unnest_longer(var_explained)
   
   pcaloadings = ex0 %>% 
-    hoist(out, loadings = list("result", "m7_ob", 1, "other", "loadings")) %>%
+    hoist(out, loadings = list("result", "m7_nn", 1, "other", "loadings")) %>%
     dplyr::select(treatment, gene_set_name, loadings, control_set) %>%
     filter(loadings!="NULL") %>% 
     mutate(loadings = loadings %>% map(~.[]) %>% map(~ as.data.frame(.)),
@@ -176,7 +176,7 @@ m7_present_anova = function(ex0, control){
     mutate(loadings_id = str_c("d", loadings_id))
   
   gene_list = ex0 %>%
-    hoist(out, well_loaded = list("result", "m7_ob", 1, "other", "well_loaded")) %>%
+    hoist(out, well_loaded = list("result", "m7_nn", 1, "other", "well_loaded")) %>%
     dplyr::select(treatment, gene_set_name, well_loaded, control_set) %>% 
     filter(well_loaded!="NULL")
   gene_list$well_loaded = gene_list$well_loaded %>% map(~ set_names(.x, str_c("d", 1:length(.x))))
@@ -184,7 +184,7 @@ m7_present_anova = function(ex0, control){
   gene_list = gene_list %>% unnest_longer(well_loaded)
   # 
   out = ex0 %>%
-    hoist(out, estimate = list("result", "m7_ob", 1, "detail", "anova")) %>% 
+    hoist(out, estimate = list("result", "m7_nn", 1, "detail", "anova")) %>% 
     unnest_longer(estimate) %>% 
     hoist(estimate, p = "p.value") %>% 
     hoist(estimate, coef = "estimate") %>% 
@@ -207,7 +207,7 @@ outm7pca_anova = function(p, control, data){
 # outm7hyp = function(p, control, data) {
 #   ex0 = f0(p, data) %>% 
 #     filter(control_set == control) %>% 
-#     hoist(out, fit = list("result", "m7_ob", 1, "all")) %>% 
+#     hoist(out, fit = list("result", "m7_nn", 1, "all")) %>% 
 #     unnest_longer(fit) 
 #   
 #   ftest_v = ex0$treatment %>% unique %>% str_subset("__")
@@ -219,7 +219,7 @@ outm7pca_anova = function(p, control, data){
 # }
 med_extact_m7 = function (focal, control, ex0){
   out = ex0 %>%
-    hoist(out, med=list("result", "m7_ob", 1, "mediation", focal, "result")) %>% 
+    hoist(out, med=list("result", "m7_nn", 1, "mediation", focal, "result")) %>% 
     mutate(mediator = focal) %>% 
     filter(control_set== control) %>% 
     select(-out)
@@ -346,7 +346,7 @@ outm3 = function(p, control, data){
 
 outm7_lh = function(p, control, data){
   out = f0(p, data) %>% 
-    hoist(out, lh = list("result", "m7_ob", 1, "all")) %>% 
+    hoist(out, lh = list("result", "m7_nn", 1, "all")) %>% 
     filter(control_set == control) %>% 
     select(-out, - table1, -controls)
   return(out)

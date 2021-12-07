@@ -133,6 +133,15 @@ data_logfc_with1k = example0_with1k %>%
                                
   ))
 
+(data_logfc_with1k %>% 
+    # filter(treatment == "SES Composite") %>% 
+    unnest(m) %>% 
+    filter(adj.P.Val<0.05) %>% 
+    group_by(treatment, gene_set_name) %>% slice(which.min(adj.P.Val)) %>% 
+    select(-out,-B,-controls) %>%  kableExtra::kable() %>% kableExtra::kable_styling()
+    )
+
+
 fig1 = 
   data_logfc_with1k %>% DE_logFC_ploting_notest(caption_text = "withinflamation 1K genes")
 

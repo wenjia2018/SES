@@ -355,6 +355,50 @@ fit_m12 = function(controls, treatment, gene_set_name){
   return(list(ttT = ttT, F_pval = F_pval))
 }
 
+fit_m13 = function(controls, treatment, gene_set_name){
+  
+  out = de_and_tfbm_normalization_TMM(controls, treatment, gene_set_name, de_only = TRUE)
+  ttT  = 
+    out %>% 
+    pluck("ttT") %>% 
+    rename_at(.vars = vars(-"gene") , .funs = list(~ str_c( .x, "_obs")))
+  
+  boot_p = function(ttT_table){
+
+    temp = ttT_table %>% bind_rows() %>% dplyr::select(gene, logFC)
+    new_ttT=
+      temp %>% 
+      nest_by(gene) %>%
+      left_join(ttT, by = "gene" ) %>%
+      unnest(data) %>%
+      mutate(logFC_comp = ifelse(logFC >= logFC_obs,1,0)) %>%
+      group_by(gene) %>% 
+      summarise(P.Value = (sum(logFC_comp) + 1)/(N + 1)) %>%
+      ungroup
+  }
+  
+  boot_ci = function(ttT_table){
+    temp = ttT_table %>% bind_rows() %>% dplyr::select(gene, logFC)
+    new_ttT=
+      temp %>%
+      group_by(gene) %>%
+      summarise(across(.cols = "logFC",
+                       list(mean = mean,
+                            sd = sd,
+                            CI_L = function(x) quantile(x, 0.025),
+                            CI_R = function(x) quantile(x, 0.975))))
+  }
+  
+  ttT_p = boot_p(out %>% pluck("ttT_boot"))
+  ttT_ci = boot_ci(out %>% pluck("ttT_boot"))
+  ttT_boot = ttT_p %>% left_join(ttT_ci, by = "gene") %>% left_join(ttT)
+  ttT_boot  = 
+    ttT_boot %>% 
+    filter(gene %in% Reduce(union, outcome_set_full$outcome_set[table1])) %>% 
+    mutate(adj.p.withinunion = p.adjust(P.Value, method = "fdr")) %>% 
+    filter(gene %in% outcome_set_full$outcome_set[[gene_set_name]]) %>% 
+    mutate(adj.p.within = p.adjust(P.Value, method = "fdr"))
+}
 ############################################################
 #  PCA: m6, m7
 ############################################################

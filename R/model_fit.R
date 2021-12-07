@@ -159,6 +159,12 @@ model_fit =
       out$m12_fdr = fit_m12(controls, treatment, gene_set_name) %>% extract_m12_fdr()
       
     }
+    
+    if(any(str_detect(funcs, "m13"))){
+      
+      out$m13 = fit_m13(controls, treatment, gene_set_name)
+      
+    }
     if(is.element("m10", funcs)) out$m10 = fit_m10(treatment, controls, gene_set, ttT_within_genesets = TRUE, tfbm_genesets = FALSE, wholegenome = FALSE)
     if(is.element("m11", funcs)) out$m11 = fit_m10(treatment, controls, gene_set, ttT_within_genesets = FALSE, tfbm_genesets = TRUE, wholegenome =FALSE)
     if(is.element("m97", funcs)) out$m97 = mediate_multiple(controls, treatment, gene_set)

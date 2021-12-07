@@ -81,14 +81,44 @@ de_and_tfbm_normalization_TMM = function(controls, treatment, gene_set_name, de_
   # Batch correct
   v_tmm$E = sva::ComBat(v_tmm$E, batch_data)
   
-  # needed for limma::topTables() to work with factors
-  treatment = X %>% colnames() %>% str_detect(stringr::fixed(treatment)) %>% which()
-  # treatment = X %>% colnames() %>% str_detect(treatment) %>% which()
-  
   # Estimate DE using standard limmma/edger pipeline. 
   ttT_raw <-
     lmFit(v_tmm$E, X) %>%
     eBayes(trend = T)
+ 
+   pseudo_E = v_tmm$E - ttT_raw$coefficients[,treatment,drop=FALSE] %*% t(ttT_raw$design[,treatment,drop=FALSE])
+  
+   ttT_boot= NULL
+  
+
+  if(boot==TRUE) {
+    # library(foreach)
+    # myCluster <- parallel::makeCluster(30)
+    # doParallel::registerDoParallel(myCluster)
+    
+    # foreach(i = 1:N) %dopar% {
+    for(i in 1:N){
+      index = sample(1:dim(X)[1], replace = TRUE)
+      X_boot = ordinal::drop.coef(X[index, ])
+      ind = X_boot %>% colnames() %>% str_detect(treatment) %>% sum
+      while(ind < 1){
+        index = sample(1:dim(X)[1], replace = TRUE)
+        X_boot = ordinal::drop.coef(X[index, ])
+        ind = X_boot %>% colnames() %>% str_detect(treatment) %>% sum
+      }
+      treatment_ind = X_boot %>% colnames() %>% str_detect(stringr::fixed(treatment)) %>% which()
+      ttT_boot[[i]] <-
+        lmFit(pseudo_E[, index], X_boot) %>%
+        eBayes(trend = T) %>%
+        tidy_topTable(of_in = treatment_ind, confint = TRUE)
+    } 
+    # parallel::stopCluster(myCluster)
+  }
+  
+  # needed for limma::topTables() to work with factors
+  treatment = X %>% colnames() %>% str_detect(stringr::fixed(treatment)) %>% which()
+  
+
   #################
   ttT <-
     ttT_raw %>%
@@ -115,5 +145,5 @@ de_and_tfbm_normalization_TMM = function(controls, treatment, gene_set_name, de_
   # F value
   f_statistic = ttT$t^2 
   F_pval = pf(f_statistic %>% unlist, 1, df_residual, lower.tail = FALSE) %>% p.adjust("fdr")
-  if(de_only) return(list(ttT = ttT, F_pval = F_pval))
+  if(de_only) return(list(ttT = ttT, ttT_boot = ttT_boot, F_pval = F_pval))
 }

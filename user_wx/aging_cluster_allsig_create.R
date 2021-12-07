@@ -1,0 +1,12 @@
+Significant_all = list()
+Significant_all$aging_mRNA$color_byinterviewer5_Black =c(1:8)
+Significant_all$aging_mRNA$color_byinterviewer5_Dark =c(1:8)
+Significant_all$aging_mRNA$color_byinterviewer5_Medium =c(1:8)
+Significant_all$aging_mRNA$color_byinterviewer5_Light =c(1:8)
+Significant_all$aging_mRNA$color_byinterviewer5_White =c(1:8)
+Significant_all$aging_mRNA$color_byinterviewer3_White =c(1:8)
+Significant_all$aging_mRNA$color_byinterviewer3_DarkBlack =c(1:8)
+Significant_all$aging_mRNA$color_byinterviewer3_LightMed =c(1:8)
+Significant_all$aging_mRNA$color_byinterviewer_continuous =c(1:8)
+Significant_all %>% saveRDS("./Res/Clustering_aging/1k/Significant_all.rds")
+

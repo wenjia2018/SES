@@ -28,16 +28,16 @@ get_PC_dim_general <- function(gene_set_name) {
 # eqtl_pca is used to pre calculate all the pca as it takes at least 20 minitues for calculating one case and
 # it does not work within the pipeline, possibly because of the long waiting time
 eqtl_pca <- function(gene_set_name, p_eqtl) {
-  if (gene_set_name=="whole_genome"){
+  if (gene_set_name %>% str_detect("whole_genome")){
     # for the whole genome
-    dat <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_17.11.2020.rds")
+    dat <- readRDS("/home/share/preprocessing/preprocessed_two_batches/all.batches.expression.set.tmm_waves_01.09.2021.rds")
     gene_sets <- Biobase::featureNames(dat)
   }else{
     # for a predefined signature 
-    signatures <- readRDS("/home/share/preprocessed_two_batches/dt_batches1_2_steve_waves_22.03.2021_signature.rds")
+    signatures <- readRDS("/home/share/preprocessing/preprocessed_two_batches/all.batches.expression.set.tmm_waves_01.09.2021_signature.rds")
     gene_sets <- signatures$outcome_set %>% pluck(gene_set_name)
   }
-  G_list <- readRDS("/home/share/data_input/genename_15062020.rds")
+  G_list <- readRDS("/home/share/data_input/genename_allbatches.rds")
   # specific gens of our interest
   gene <- G_list %>%
     filter(hgnc_symbol %in% gene_sets) %>%
