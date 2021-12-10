@@ -47,20 +47,35 @@ define_treatments_and_controls = function(){
           "kit_biow5", "tube_biow5",  "FastHrs",
           "travel_biow5",  "months_biow5", "time_biow5"
         ),
-      biological = 
+      basic_less = 
         c( 
-          "B.cells.naive", "B.cells.memory", "Plasma.cells",
-          "T.cells.CD8", "T.cells.CD4.naive", "T.cells.CD4.memory.resting",
-          "T.cells.CD4.memory.activated",
-          # "T.cells.follicular.helper",
-          "T.cells.regulatory..Tregs.", "T.cells.gamma.delta",
-          "NK.cells.resting", "NK.cells.activated", "Monocytes", "Macrophages.M0", 
-          # "Macrophages.M1",
-          "Macrophages.M2", "Dendritic.cells.resting",
-          "Dendritic.cells.activated", "Mast.cells.resting",
-          # "Mast.cells.activated", # not estimable in limma
-          "Eosinophils", "Neutrophils" 
-        ) 
+          "sex_interv"
+          , "re" 
+          ,"age_w5"
+          #,"BirthY"
+          #, "W5REGION"
+          , "pregnant_biow5"
+          #, "kit_biow5", "tube_biow5"
+          ,  "FastHrs"
+          #,"travel_biow5",  "months_biow5", "time_biow5"
+          , "Plate",
+          "H5INFECT", "H5SUBCLN", "H5CRP8"
+        ),
+      basic_less_ancestry = 
+        c( 
+          "sex_interv"
+          , "re" 
+          ,"age_w5"
+          #,"BirthY"
+          #, "W5REGION"
+          , "pregnant_biow5"
+          #, "kit_biow5", "tube_biow5"
+          ,  "FastHrs"
+          #,"travel_biow5",  "months_biow5", "time_biow5"
+          , "Plate"
+          , "AncestryPC1", "AncestryPC2", "AncestryPC3", "AncestryPC4",
+           "H5INFECT", "H5SUBCLN", "H5CRP8"
+        )
     ) %>% 
     c(all = list(unique(unlist(.)))) 
   

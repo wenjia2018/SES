@@ -107,6 +107,8 @@ example0_with1k <- readRDS("~/ses-1/user_wx/example_tmm_m12_withinflame_parental
 # ses tertiles
 example0_with1k <- readRDS("~/ses-1/user_wx/example_tmm_m12_withinflame_ses3.rds")
 
+example0_with1k <- readRDS("~/ses-1/user_wx/m12_withinflam_ses_recheck_oldloaddata.rds")
+
 data_logfc_with1k = example0_with1k %>%
   hoist(out, m = list("result",  "m12_fdr", 1, "other", "m")) %>% 
   mutate(gene_set_name = gene_set_name %>% str_replace_all("_mRNA",""),

@@ -86,7 +86,10 @@ recode_variables_in_dat <- function() {
                      "insurance_lack",
                      "lowbirthweight",
                      "high_lowbirth")), .funs = list(binary = ~ .x)) %>% 
-  #   filter(!is.na(raceethnicity)) %>% 
+    
+    mutate_at(vars(c("H5SUBCLN",
+                     "H5CRP8",
+                     "H5INFECT")), .funs = list(~ ifelse(.x %in% c(0,1,2,3), .x, NA))) %>% 
   fastDummies::dummy_cols(select_columns = c("ses_sss_composite_3")) %>% 
   mutate_at(.vars = vars("sss_5"),
             .funs = list(~ .x %>% as.numeric()))

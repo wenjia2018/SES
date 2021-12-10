@@ -12,20 +12,21 @@ de_and_tfbm_normalization_TMM = function(controls, treatment, gene_set_name, de_
         Melanoma_mRNA = dat$H5ID6A != 1 & dat$H5ID6AM != 1,
         rep(TRUE, dim(dat)[2])
       )
-    
-    keep_nondisease = ifelse(is.na(keep_nondisease), TRUE, keep_nondisease)
-    
+    # 
+    keep_nondisease = ifelse(is.na(keep_nondisease), FALSE, keep_nondisease)
+    # 
     dat = dat[, keep_nondisease]
 
   }
   rownames(dat@phenoData@data) = dat@phenoData@data$AID
   raw = raw[, sampleNames(dat)]
-  
-  ph = Biobase::pData(raw)
+
+  # ph = Biobase::pData(raw)
   ex = Biobase::exprs(raw)
   
   ## Get pheno data for all subjects
-  ph = pData(dat)
+  ph = Biobase::pData(dat)
+  rownames(ph) = ph$AID
   all.equal(colnames(ex), ph$AID)
   ## Convert gene names to HGNC
   if(full_reproducibility <- FALSE) {
@@ -86,12 +87,13 @@ de_and_tfbm_normalization_TMM = function(controls, treatment, gene_set_name, de_
     lmFit(v_tmm$E, X) %>%
     eBayes(trend = T)
  
-   pseudo_E = v_tmm$E - ttT_raw$coefficients[,treatment,drop=FALSE] %*% t(ttT_raw$design[,treatment,drop=FALSE])
+
   
    ttT_boot= NULL
   
 
   if(boot==TRUE) {
+    pseudo_E = v_tmm$E - ttT_raw$coefficients[,treatment,drop=FALSE] %*% t(ttT_raw$design[,treatment,drop=FALSE])
     # library(foreach)
     # myCluster <- parallel::makeCluster(30)
     # doParallel::registerDoParallel(myCluster)

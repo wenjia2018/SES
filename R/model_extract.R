@@ -135,7 +135,7 @@ extract_m99 = function(m, out = NULL){
   # for evalue calculation
   out$sims = list(ACME_sd = m$d0.sims %>% sd, ADE_sd = m$z0.sims %>% sd, Total_sd = m$tau.sims %>% sd, 
                   y_sd = summary(m$model.y)$sigma)
-  # mediation results mediate_summary is not genearl enough, the results from mediation has . at the end of a number which is
+  # mediation results mediate_summary is not general enough, the results from mediation has . at the end of a number which is
   # hard to remove
   # out$detail = m %>% mediate_summary() #m
   out$p = extract_med("ACME", 4)
@@ -143,6 +143,9 @@ extract_m99 = function(m, out = NULL){
   out$other$med_ACME = extract_med("ACME", 1)
   out$other$med_ADE = extract_med("ADE", 1)
   out$other$med_ADE_p = extract_med("ADE", 4)
-  out$evalue = EValue::evalues.OLS(est = out$other$med_ACME %>% as.numeric(), se = out$sim$ACME_sd, sd = out$sim$y_sd)
+  out$other$med_Total = extract_med("Total Effect ", 1)
+  
+  out$evalue_acme = EValue::evalues.OLS(est = out$other$med_ACME %>% as.numeric(), se = out$sim$ACME_sd, sd = out$sim$y_sd)
+  out$evalue_Total = EValue::evalues.OLS(est = out$other$med_Total %>% as.numeric(), se = out$sim$Total_sd, sd = out$sim$y_sd)
   return(out = out)
 }

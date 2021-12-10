@@ -66,6 +66,8 @@ mediate_multiple_mediators = function(gene_set, rotate, pca_out){
   pmap(list(datt_pca[sig], outcome[sig]), mediate_multimediate) %>% map(~.x %>% summary(opt = "avg"))
 }
 
+
+# mediate_multimediate for multiple mediators, need to change the mediators and functions accordingly
 mediate_multimediate = function(datt, gene_set) {
   datt = datt %>% na.omit()
   M1reg = lm(as.formula(str_c("w5bmi_lm ~ treatment +", controls %>% str_c(collapse = " + "))), datt)
@@ -198,6 +200,8 @@ mediate = function(mediator, gene_set, controls, treatment){
   datt_m = datt_m[ok, ]
   fit_m99(datt_m, gene_set, mediator) %>% extract_m99()  
 }
+
+# mediation for each gene
 
 mediate_multiple = function(controls, treatment, gene_set){ 
   out = NULL
