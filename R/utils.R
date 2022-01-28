@@ -70,25 +70,16 @@ mediate_multiple_mediators = function(gene_set, rotate, pca_out){
 # mediate_multimediate for multiple mediators, need to change the mediators and functions accordingly
 mediate_multimediate = function(datt, gene_set) {
   datt = datt %>% na.omit()
+  
   M1reg = lm(as.formula(str_c("w5bmi_lm ~ treatment +", controls %>% str_c(collapse = " + "))), datt)
   M2reg = lm(as.formula(str_c("stress_perceived_lm ~ treatment +", controls %>% str_c(collapse = " + "))), datt)
-  if(COR){
-    datt = datt %>% mutate_at(.vars = vars(c("bills_binary", "currentsmoke_binary","insurance_lack_binary")),
-                              .funs = list(~ .x %>% as.numeric()))
-    M3reg = lm(as.formula(str_c("bills_binary ~ treatment +", controls %>% str_c(collapse = " + "))), datt)
-    M4reg = lm(as.formula(str_c("currentsmoke_binary ~ treatment +", controls %>% str_c(collapse = " + "))), datt)
-    M5reg = lm(as.formula(str_c("insurance_lack_binary ~ treatment +", controls %>% str_c(collapse = " + "))), datt)
+  M3reg = glm(as.formula(str_c("bills_binary ~ treatment +", controls %>% str_c(collapse = " + "))), datt, family = binomial("logit"))
+  M4reg = glm(as.formula(str_c("currentsmoke_binary ~ treatment +", controls %>% str_c(collapse = " + "))), datt, family = binomial("logit"))
+  M5reg = glm(as.formula(str_c("insurance_lack_binary ~ treatment +", controls %>% str_c(collapse = " + "))), datt, family = binomial("logit"))
     
-  } else{
-    M3reg = glm(as.formula(str_c("bills_binary ~ treatment +", controls %>% str_c(collapse = " + "))), datt, family = binomial("logit"))
-    M4reg = glm(as.formula(str_c("currentsmoke_binary ~ treatment +", controls %>% str_c(collapse = " + "))), datt, family = binomial("logit"))
-    M5reg = glm(as.formula(str_c("insurance_lack_binary ~ treatment +", controls %>% str_c(collapse = " + "))), datt, family = binomial("logit"))
-    
-  }
 
   Yreg = lm(as.formula(str_c(gene_set, "~ .")), datt)
   med_multimediate = multimediate::multimediate(lmodel.m = list(M1reg, M2reg, M3reg, M4reg, M5reg),
-                                            correlated = COR,
                                             model.y = Yreg,
                                             treat = "treatment",
                                             treat.value = 1,

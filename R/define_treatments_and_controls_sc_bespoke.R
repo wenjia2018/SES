@@ -35,7 +35,7 @@ define_treatments_and_controls_sc_bespoke = function(gene_set_name, ancestryPC_k
         ancestryPC = ancestryPC)
   
   args = crossing(treatment, gene_set_name, controls)
-  
+  # remove duplicated variables appears in both treatment and controls, especially for dummy variables. 
   for(i in 1:dim(args)[1]){
     args$controls[i] = args$controls[i] %>% map(setdiff, args$treatment[i])
   }

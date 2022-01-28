@@ -1,5 +1,6 @@
-set.seed(123)
-
+# main function to start running analysis
+# for skin color with bespoke ancestry controls
+# load packages
 library(here)
 # library(data.table)
 # setDTthreads(threads = 20)
@@ -10,42 +11,34 @@ library(skimr)
 library(furrr)
 library(limma)
 # library(recipes)
-# recipes and Evalue has conflict, after loading recipes, evalue package doesnot work with the error Error: $ operator is invalid for atomic vectors
+# recipes and Evalue has conflict, after loading recipes,
+# evalue package doesnot work with the error Error: $ operator is invalid for atomic vectors
 library(parsnip)
 library(workflows)
 library(Biobase)
 library(dbr) # my package
 
+# source all the useful files
 walk(dir(path = here("R"),full.names = TRUE), source)
-fit_m4 = partial(fit_m4, n_perm = 1000) # specify n_perm
-# source("./dda_v0.1/dda_resdist.r")
-# source("./dda_v0.1/dda_vardist.r")
-# source("./dda_v0.1/dda_indep.r")
-# source("./dda_v0.1/boot_hsic_test.R")
-# source("./dda_v0.1/nlcor_test.r")
-n_boot = 5000
-
 
 ############################################################
 # LOAD DATA, DEFINE VARIABLES, RECODE VARIABLES
 ############################################################
-# choose normalization methods for downstream analysis
-tmm = TRUE
-rle = FALSE
-log2cpm = FALSE
+# set some parameters values
 # which PCA to perform
 oblimin = FALSE
 nn = TRUE
-# explicitly assign ncomp as the smallest number of table signatures gene numbers
+# explicitly assign ncomp for PCA analysis
 ncomp = 10
+fit_pca_util = partial(fit_pca_util, ncomp = ncomp) # specify n_perm
+# type of mediation
+mediation_mean = FALSE
+mediation_each_gene = FALSE
 # for doing genowide DE analysis only
-normalization_bydesign = TRUE
+normalization_bydesign = FALSE
 # specify if subjects with disease shall be removed
 remove_diseased_subjects = TRUE
 
-mediation_mean = FALSE
-mediation_each_gene = FALSE
-funcs = str_subset(abbreviations$shorthand, "^m") 
 funcs <- c("m1", "m2","m3", "m7", "m8", "m10")
 funcs = "m13"
 if(funcs == "m13"){
@@ -55,8 +48,6 @@ if(funcs == "m13"){
 }else{
   boot = FALSE
 }
-
-fit_pca_util = partial(fit_pca_util, ncomp = ncomp) # specify n_perm
 
 fit_bespoke <- function(gene_set_name, p_eqtl) {
   load_data(reconciled = FALSE, remove_inflam = FALSE)
@@ -137,4 +128,4 @@ args_eqtl <- crossing(table1, p_eqtl)
 plan(multicore, workers = 14)
 # debugonce(fit_bespoke)
 example_bespoke <- args_eqtl %>% mutate(out = furrr::future_pmap(list(gene_set_name = table1, p_eqtl = p_eqtl), safely(fit_bespoke)))
-example_bespoke %>% saveRDS("./user_wx/m13_aging_with1k_sc5levels_allsample_bespoke_boot.rds")
+example_bespoke %>% saveRDS("./user_wx/m13_aging_with1k_sc5levels_allsample_bespoke_bootxx.rds")

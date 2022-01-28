@@ -114,7 +114,7 @@ mediate_cluster_multiple = function(treatment, controls, gene_set_name){
   pmap(list(datt_pca[sig], outcome[sig]), mediate_multimediate) %>% map(~.x %>% summary(opt = "avg"))
 }
 
-if(1) {
+if(0) {
   resetlevel = function(x) {
     levels(x) =  c(0:(length(levels(x))-1))
     x
@@ -167,16 +167,17 @@ if(1) {
   # 
   
 }
-# debugonce(fit_mediate_cluster)
-COR = TRUE
+debugonce(fit_mediate_cluster)
+COR = FALSE
 # plan(multicore, workers = 10)
 example0 =
   args %>%
   filter(
+    treatment=="edu_max",
     # is.element(gene_set_name, table1) &
       # gene_set_name == "SES  Composite",
       names(controls) == "basic") %>%
-  # filter(gene_set_name=="Depression_mRNA") %>% 
+  filter(gene_set_name %in% table1) %>%
   mutate(out = pmap(., safely(fit_mediate_cluster)),
          controls = names(controls))
 

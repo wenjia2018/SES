@@ -37,13 +37,13 @@ define_treatments_and_controls_sc = function(){
     )
   
   treatment = c(
-    "color_byinterviewer_continuous"
+    # "color_byinterviewer_continuous"
     # "color_byinterviewer5_Black",
     # "color_byinterviewer5_Dark",
     # "color_byinterviewer5_Medium"
     # "color_byinterviewer5_Light"
-    # "color_byinterviewer3_DarkBlack",
-    # "color_byinterviewer3_LightMed"
+    "color_byinterviewer3_DarkBlack",
+    "color_byinterviewer3_LightMed"
   )
   
   controls = 
@@ -53,14 +53,14 @@ define_treatments_and_controls_sc = function(){
           "sex_interv", "Plate", "age_w5",
           "BirthY", "W5REGION", "pregnant_biow5", 
           "kit_biow5", "tube_biow5",  "FastHrs",
-          "travel_biow5",  "months_biow5", "time_biow5"
+          "travel_biow5",  "months_biow5", "time_biow5",
           # ,
           # "color_byinterviewer5_Black",
           # "color_byinterviewer5_Dark",
           # "color_byinterviewer5_Medium"
           # "color_byinterviewer5_Light"
-          # "color_byinterviewer3_DarkBlack",
-          # "color_byinterviewer3_LightMed"
+          "color_byinterviewer3_DarkBlack",
+          "color_byinterviewer3_LightMed"
         ),
       ancestryPC =
         c(
@@ -74,7 +74,7 @@ define_treatments_and_controls_sc = function(){
   gene_set_name = signature_names %>% append("whole_genome_and_tfbm") 
   
   args = crossing(treatment, gene_set_name, controls)
-  
+  # remove duplicated variables appears in both treatment and controls, especially for dummy variables. 
   for(i in 1:dim(args)[1]){
     args$controls[i] = args$controls[i] %>% map(setdiff, args$treatment[i])
   }

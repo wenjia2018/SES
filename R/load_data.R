@@ -6,7 +6,8 @@ load_data = function(reconciled, remove_inflam){
   outcome_set_full = readRDS("/home/share/preprocessing/preprocessed_two_batches/allpossiblegene.rds")
  
     signatures <- readRDS("/home/share/preprocessing/preprocessed_two_batches/all.batches.expression.set.tmm_waves_01.09.2021_signature.rds")
-    dat <- readRDS("/home/share/preprocessing/preprocessed_two_batches/all.batches.expression.set.tmm_waves_01.09.2021.rds")
+   # ask Ravi which file is the newly updated one with "flagged" subjects removed
+     dat <- readRDS("/home/share/preprocessing/preprocessed_two_batches/all.batches.expression.set.tmm_waves_01.09.2021.rds")
   
   
   if(remove_inflam) {

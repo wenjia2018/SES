@@ -5,6 +5,7 @@ get_PC_dim <- function(gene_set_name, p_eqtl) {
   eigenvalue <- data.table::fread(str_c("/home/share/dna_ancestry/dna/kept", gene_set_name, "_", p_eqtl, ".omni.pca.eigenval"))
   eigenvec <- data.table::fread(str_c("/home/share/dna_ancestry/dna/kept", gene_set_name, "_", p_eqtl, ".omni.pca.eigenvec"))
   kept <- data.table::fread(str_c("/home/share/dna_ancestry/dna/kept", gene_set_name, "_", p_eqtl, ".omni.bim"))
+  # choose first several PCs
   ag <- PCDimension::AuerGervini(eigenvalue$V1, dd = c(dim(eigenvec)[1], dim(kept)[1]))
   d <- PCDimension::agDimension(ag)
   ancestryPC <- str_c("AncestryPC", c(1:d))

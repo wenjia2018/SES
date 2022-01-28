@@ -29,25 +29,29 @@ oblimin = FALSE
 nn = TRUE
 # explicitly assign ncomp as the smallest number of table signatures gene numbers
 ncomp = 10
+# type of mediation
+mediation_mean = FALSE
+mediation_each_gene = FALSE
 # for doing genowide DE analysis only
 normalization_bydesign = TRUE
 # specify if subjects with disease shall be removed
 remove_diseased_subjects = TRUE
 load_data(reconciled = FALSE, remove_inflam = FALSE)
 define_treatments_and_controls_sc()
-# recode_variables_in_dat_racedummy()
+# specify which gene_set you want to do cluster mediation
 gene_set_name = "aging_mRNA"
 p_eqtl = 0.05
+# get the ancestry PC for this gene set
 ancestryPC <- get_PC_dim(gene_set_name, p_eqtl)
+
+# put the ancestry PC to control list
 define_treatments_and_controls_sc_bespoke(gene_set_name, ancestryPC)
 custom_PCA <- readRDS(str_c("/home/share/dna_ancestry/dna/custom_PCA_", gene_set_name, "_", p_eqtl, ".rds"))
 custom_PCA <- custom_PCA %>%
   select(-fid) %>%
   mutate(AID = AID %>% as.character())
 recode_variables_in_dat_racedummy_bespoke(custom_PCA)
-print(abbreviations)
-mediation_mean = FALSE
-mediation_each_gene = FALSE
+# load clusters for the signature code from Ravi to create clusters for signature
 if(denovo <- FALSE){
   Significant <- readRDS("/home/share/scratch/Clustering/DeNovo/Significant.rds")
   full_clus_res <- readRDS("/home/share/scratch/Clustering/DeNovo/full_clus_res.rds")
@@ -68,8 +72,11 @@ if(with1k <- TRUE){
   average_expr <- readRDS("~/ses-1/Res/Clustering_aging/1k_ancestry/average_expr.rds")
   
 }
+
+# reformate the average expression
 average_expr = average_expr %>% map(~ .x %>% t %>% as.data.frame)
 
+# define a function to get the significant cluster
 get_sig_clus = function(treatment, Significant, full_clus_res){
   sig_treatment = Significant %>% map(~ pluck(.x, treatment))
   no_clus = full_clus_res %>% map(max)
@@ -129,7 +136,7 @@ example0 =
   args %>%
   filter(
     # is.element(gene_set_name, table1) &
-    gene_set_name == "aging_mRNA",
+    gene_set_name == gene_set_name,
     names(controls) == "ancestryPC") %>%
   # filter(gene_set_name=="Depression_mRNA") %>% 
   mutate(out = pmap(., safely(fit_mediate_cluster)),

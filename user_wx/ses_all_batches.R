@@ -23,24 +23,31 @@ walk(dir(path = here("R"),full.names = TRUE), source)
 ############################################################
 # LOAD DATA, DEFINE VARIABLES, RECODE VARIABLES
 ############################################################
-# set some parmeter values
+# set some parameters values
 # which PCA to perform
 oblimin = FALSE
 nn = TRUE
-# explicitly assign ncomp for PCA analysiss
+# explicitly assign ncomp for PCA analysis
 ncomp = 10
+fit_pca_util = partial(fit_pca_util, ncomp = ncomp) # specify n_perm
+# type of mediation
+mediation_mean = FALSE
+mediation_each_gene = FALSE
 # for doing genowide DE analysis only
-normalization_bydesign = FALSE
+normalization_bydesign = TRUE
 # specify if subjects with disease shall be removed
 remove_diseased_subjects = TRUE
+
+# load data, specify remove_inflam (whether to remove inflammatory genes)
 load_data(reconciled = FALSE, remove_inflam = TRUE)
-# for skin color
-# define_treatments_and_controls_sc()
+
+# define your own treatment, controls, and re code variables to suit your needs
+
+# for ses
 define_treatments_and_controls()
 recode_variables_in_dat()
 
-mediation_mean = FALSE
-mediation_each_gene = FALSE
+
 # choose which function you want to run
 funcs <- c("m1", "m2","m3", "m7", "m8", "m10")
 funcs = "m12"
@@ -51,9 +58,9 @@ if(funcs == "m13"){
 }else{
   boot = FALSE
 }
-fit_pca_util = partial(fit_pca_util, ncomp = ncomp) # specify n_perm
 
-plan(multicore, workers = 40)
+# for parallel computing
+# plan(multicore, workers = 40)
 # debugonce(model_fit)
   example0 =
   args %>%
@@ -65,6 +72,6 @@ plan(multicore, workers = 40)
   mutate(out = furrr::future_pmap(., safely(model_fit), funcs),
          controls = names(controls))
 
-# With controls used in SES paper: predicts the signatures from SES paper + Peters aging signature. 
+# save the results
 example0 %>% saveRDS("./user_wx/m12_withoutinflam_ses_3setscontrols.rds")
 

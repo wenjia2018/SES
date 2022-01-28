@@ -16,7 +16,7 @@ library(stringi)
 library(kableExtra)
 walk(dir(path = here("R"),full.names = TRUE), source)
 example0_with1k <- readRDS("~/ses-1/user_wx/mediate_cluster_with1k_v2.rds")
-example0_with1k <- readRDS("~/ses-1/user_wx/mediate_cluster_without1k.rds")
+example0_without1k <- readRDS("~/ses-1/user_wx/mediate_cluster_without1k.rds")
 
 threshold = 0.05
 mediators = 
@@ -70,7 +70,7 @@ with =
   select(treatment, gene_set_name, mediator, `E-values`) %>% 
   unique()
 
-temp2 = with %>%
+temp_with = with %>%
   mutate(
     mediator = case_when(mediator =="w5bmi_lm" ~ "BMI",
                          mediator =="bills_binary" ~ "Financial Stress",
@@ -92,7 +92,7 @@ temp2 = with %>%
                           treatment =="ses_composite_ff5"  ~ "SES Composite 3"))
 
 
-temp2 %>%
+temp_with %>%
   select(treatment, gene_set_name, mediator,`E-values`) %>% 
   pivot_wider(names_from = treatment, values_from = `E-values`) %>% 
   mutate(across(3:7, ~ .x %>% as.numeric() %>% format(digits = 4))) %>%
@@ -110,7 +110,45 @@ temp2 %>%
 # kableExtra::kbl() %>%
 # kableExtra::kable_classic() %>%
 # add_header_above(c(" " = 1, "Education" = 4, "Income" = 4,"Occupation" = 4, "SES Composite" = 4, "Subjective Social Status" = 4)) 
-temp2 %>%
+
+exB_data_without = 
+  example0_without1k %>%
+  med_out_all() %>% 
+  mutate(eval = evalue %>% map_dbl(~ .x[2,1]),
+  ) %>% 
+  select(treatment, gene_set_name, result_id, mediator, eval)
+
+without = 
+  exB_data_without %>% 
+  group_by(treatment, gene_set_name, mediator) %>% 
+  mutate(`E-values` = mean(eval)) %>% 
+  ungroup %>% 
+  select(treatment, gene_set_name, mediator, `E-values`) %>% 
+  unique()
+
+temp_without = without %>%
+  mutate(
+    mediator = case_when(mediator =="w5bmi_lm" ~ "BMI",
+                         mediator =="bills_binary" ~ "Financial Stress",
+                         mediator =="currentsmoke_binary" ~ "Current Smoking Status",
+                         mediator =="stress_perceived_lm" ~ "Perceived Stress",
+                         mediator =="insurance_lack_binary" ~ "Lack of Insurance"),
+    treatment = case_when(treatment == "edu_p" ~ "Parental Education",
+                          treatment =="income_pp1_log" ~  "Parental Income" ,
+                          treatment =="SEI_max_p_w12" ~ "Parental SEI",
+                          treatment =="ses_composite_pp1" ~ "Parental SES Composite",
+                          treatment =="work_collar_rm_f12" ~ "Mother's Occupation",
+                          treatment =="work_collar_rf_f12" ~ "Father's Occupation" ,
+                          treatment =="work_collar_ff5" ~ "Occupation Work Collar",
+                          treatment =="edu_max" ~ "Education" ,
+                          treatment =="income_hh_ff5" ~ "Income"     ,
+                          treatment =="SEI_ff5" ~ "Occupation"      ,
+                          treatment =="ses_sss_composite" ~ "SES Composite"  ,
+                          treatment =="sss_5" ~ "Subjective Social Status",
+                          treatment =="ses_composite_ff5"  ~ "SES Composite 3"))
+
+
+temp_without %>%
   select(treatment, gene_set_name, mediator,`E-values`) %>% 
   pivot_wider(names_from = treatment, values_from = `E-values`) %>% 
   mutate(across(3:7, ~ .x %>% as.numeric() %>% format(digits = 4))) %>%

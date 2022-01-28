@@ -1,7 +1,9 @@
+library(tidyverse)
 mediate_cluster <- readRDS("~/ses-1/user_wx/mediate_cluster_with1k_drinkmed.rds")
 mediate_cluster <- readRDS("~/ses-1/user_wx/mediate_cluster_without1k_drinkmed.rds")
-mediate_cluster <- readRDS("~/ses-1/user_wx/mediate_cluster_Denovo_drinkmed.rds")
+mediate_cluster <- readRDS("/home/xu/ses-1/user_wx/mediate_cluster_Denovo_drinkmed.rds")
 mediate_cluster <- readRDS("/home/potente/transitionadulthood/mediate_cluster_marital.rds")
+# specify mediator list in your analysis
 mediators = 
   c(
 "drink_category"

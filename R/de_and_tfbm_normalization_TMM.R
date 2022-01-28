@@ -146,6 +146,6 @@ de_and_tfbm_normalization_TMM = function(controls, treatment, gene_set_name, de_
   }
   # F value
   f_statistic = ttT$t^2 
-  F_pval = pf(f_statistic %>% unlist, 1, df_residual, lower.tail = FALSE) %>% p.adjust("fdr")
+  F_pval = pf(f_statistic %>% unlist, 1, df_residual, lower.tail = FALSE) %>% p.adjust("fdr") %>% setNames(ttT$gene)
   if(de_only) return(list(ttT = ttT, ttT_boot = ttT_boot, F_pval = F_pval))
 }

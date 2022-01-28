@@ -11,13 +11,15 @@ model_fit =
       if(normalization_bydesign == TRUE) return(de_and_tfbm_normalization_TMM(controls, treatment, gene_set_name)) 
       else return(de_and_tfbm(treatment, controls)) 
     }
+ if(in_use <- FALSE) {
+   # regression in the whole gemone controlling for ancestryPC of whole genome
+   if(gene_set_name == "whole_genome") return(fit_m10(treatment, controls, gene_set, ttT_within_genesets = FALSE, tfbm_genesets = FALSE, wholegenome = TRUE))
+   if(funcs == "m96") return(celltype_cibersort(treatment, controls)) 
+   # controls: NULL or controls + ses predictor
+   if(funcs == "m95") return(AER_IV(gene_set_name, treatment, IV, controls)) 
+   
+ }
 
-    # regression in the whole gemone controlling for ancestryPC of whole genome
-    if(gene_set_name == "whole_genome") return(fit_m10(treatment, controls, gene_set, ttT_within_genesets = FALSE, tfbm_genesets = FALSE, wholegenome = TRUE))
-    if(funcs == "m96") return(celltype_cibersort(treatment, controls)) 
-    # controls: NULL or controls + ses predictor
-    if(funcs == "m95") return(AER_IV(gene_set_name, treatment, IV, controls)) 
-    
     ############################################################
     # OTHERWISE (FOR SMALLER GENE SETS OF INTEREST)
     ############################################################
